@@ -31,7 +31,7 @@ function game() {
     console
   });
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const source = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+  const source = html.match(/<script>([\s\S]*?)<\/script>/i)[1];
   const hooks = `
     globalThis.fps = {
       briefing, startTactics, loadLevel, finishLevel,

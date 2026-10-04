@@ -27,7 +27,8 @@ hex to attack. Keyboard users can Tab through hexes and buttons and activate the
 with Enter or Space. Hex labels/tooltips show terrain defence and movement costs.
 
 - Move the squad, attack once per unit per turn, then choose **END TURN** for the Fabricator AI.
-- Entering an enemy zone of control ends movement. Occupied hexes block movement.
+- Entering an enemy zone of control ends movement, except for the skirmishing
+  Field Reader. Occupied hexes block movement.
 - Jack can select **SIDEARM**, **BREACHER** (prone), or **REDACTOR** (blinded).
   **STAND UP** removes prone at a movement cost. The selected-unit HUD shows conditions.
 - Reach the gold objective **with Jack**, or defeat all Fabricators, to unlock **BREACH // LAUNCH FPS**.
