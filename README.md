@@ -54,7 +54,7 @@ Two missions, four enemy types, three weapons:
 
 ## Publish as a playable site
 
-This repo is GitHub Pages-ready: push, enable Pages on the `master` branch in repo settings, and the game is playable at `https://<user>.github.io/hail-to-the-analyst/`.
+This repo is GitHub Pages-ready: enable Pages on the `main` branch in repo settings, and play the game at [cvessell-create.github.io/hail-to-the-analyst](https://cvessell-create.github.io/hail-to-the-analyst/).
 
 ## License
 
