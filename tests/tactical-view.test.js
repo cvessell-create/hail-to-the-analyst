@@ -218,6 +218,106 @@ test('a chosen target receives one keyboard attack, and native controls retain t
   assert.equal(b.turn, 2);
 });
 
+test('optional fictional AUTO terminal shows model and public match reason before a separate answer reveal', () => {
+  const g = game();
+  g.fps.startTactics(0);
+  const card = g.nodes.get('card');
+  const text = () => card.querySelectorAll('p').map(p => p.textContent).join('\n');
+  const orders = () => card.querySelectorAll('details')[0];
+  assert.equal(orders().open, false);
+  assert.equal(card.querySelectorAll('select').some(s => s.getAttribute('aria-label') === 'Archive signal'), false);
+  orders().open = true; orders().ontoggle();
+  g.button('INSPECT STRANGE TRANSMISSION').onclick();
+  assert.equal(g.button('INSPECT STRANGE TRANSMISSION').getAttribute('aria-expanded'), 'true');
+  assert.match(text(), /fictional offline local simulation/);
+  assert.match(text(), /no actual vendor routing or private reasoning/);
+  assert.match(text(), /Selection is not evidence/);
+  assert.equal(g.button('REVEAL ARCHIVE ANSWER').disabled, true);
+  // Even a programmatic activation cannot bypass the model-selection stage.
+  g.button('REVEAL ARCHIVE ANSWER').onclick();
+  assert.doesNotMatch(text(), /AUTO chose|I read the SI/);
+  g.button('RUN FICTIONAL AUTO').focus();
+  g.button('RUN FICTIONAL AUTO').onclick();
+  assert.match(text(), /AUTO chose Relay Finch.*low-complexity.*fast dispatch/);
+  assert.doesNotMatch(text(), /I read the SI|Courier diverted/);
+  assert.equal(g.context.document.activeElement.textContent, 'RUN FICTIONAL AUTO');
+  assert.equal(orders().open, true);
+  const selection = card.querySelectorAll('p').find(p => p.textContent.startsWith('AUTO chose'));
+  assert.equal(selection.getAttribute('role'), 'status');
+  assert.equal(g.button('REVEAL ARCHIVE ANSWER').disabled, false);
+  g.button('REVEAL ARCHIVE ANSWER').focus();
+  g.button('REVEAL ARCHIVE ANSWER').onclick();
+  assert.match(text(), /Fabricators planted the urgency tag/);
+  assert.match(text(), /verify the courier’s original timestamp/);
+  assert.equal(g.button('REVEAL ARCHIVE ANSWER').disabled, true);
+  assert.equal(g.context.document.activeElement.textContent, 'REVEAL ARCHIVE ANSWER');
+});
+
+test('fictional AUTO maps signal context to distinct specialists and never mutates battle or FPS state', () => {
+  const g = game();
+  g.fps.startTactics(0);
+  const before = JSON.stringify(g.battle());
+  const fpsBefore = JSON.stringify([g.fps.player(), g.fps.enemies(), g.fps.pickups(), g.fps.stats(), g.fps.state()]);
+  g.button('INSPECT STRANGE TRANSMISSION').onclick();
+  const text = () => g.nodes.get('card').querySelectorAll('p').map(p => p.textContent).join('\n');
+  for (const [signal, model, reason, twist] of [
+    ['dispatch', 'Relay Finch', /low-complexity.*fast dispatch/, /diversion predates the alarm/],
+    ['verify', 'Ledger Moth', /source-comparison capability/, /splice of my own briefing/],
+    ['plan', 'Fork Lantern', /complex branching.*scenario-planning.*speed/, /transmitter, not a shelter/]
+  ]) {
+    g.select('Archive signal', signal);
+    assert.doesNotMatch(text(), /AUTO chose|I read the SI/);
+    assert.equal(g.button('REVEAL ARCHIVE ANSWER').disabled, true);
+    g.press('KeyE', false, g.button('RUN FICTIONAL AUTO'));
+    g.press('Space', false, { tagName: 'SELECT' });
+    g.button('RUN FICTIONAL AUTO').onclick();
+    assert.ok(text().includes('AUTO chose ' + model));
+    assert.match(text(), reason);
+    assert.doesNotMatch(text(), twist);
+    g.button('REVEAL ARCHIVE ANSWER').onclick();
+    assert.match(text(), twist);
+    assert.match(text(), /lead, not proof/);
+  }
+  assert.equal(JSON.stringify(g.battle()), before);
+  assert.equal(JSON.stringify([g.fps.player(), g.fps.enemies(), g.fps.pickups(), g.fps.stats(), g.fps.state()]), fpsBefore);
+  assert.equal(g.calls.length, 0);
+  g.button('RUN FICTIONAL AUTO').onclick();
+  assert.match(text(), /AUTO chose Fork Lantern/);
+  assert.doesNotMatch(text(), /I read the SI/);
+});
+
+test('archive state and disclosure remain through normal moves, turns and closing the optional terminal', () => {
+  const g = game();
+  g.fps.startTactics(0);
+  g.button('INSPECT STRANGE TRANSMISSION').onclick();
+  g.select('Archive signal', 'verify');
+  g.button('RUN FICTIONAL AUTO').onclick();
+  g.button('REVEAL ARCHIVE ANSWER').onclick();
+  const assertArchive = () => {
+    const card = g.nodes.get('card');
+    assert.equal(card.querySelectorAll('details')[0].open, true);
+    assert.equal(card.querySelectorAll('select').find(s => s.getAttribute('aria-label') === 'Archive signal').value, 'verify');
+    assert.ok(card.querySelectorAll('p').some(p => p.textContent.startsWith('AUTO chose Ledger Moth')));
+    assert.ok(card.querySelectorAll('p').some(p => p.textContent.includes('splice of my own briefing')));
+  };
+  g.select('Destination', '1,0');
+  g.button('MOVE').onclick();
+  assert.equal(g.calls.at(-1).name, 'move');
+  assertArchive();
+  g.button('END TURN [E]').onclick();
+  assert.equal(g.battle().turn, 2);
+  assertArchive();
+  g.button('INSPECT STRANGE TRANSMISSION').onclick();
+  assert.equal(g.button('INSPECT STRANGE TRANSMISSION').getAttribute('aria-expanded'), 'false');
+  assert.equal(g.nodes.get('card').querySelectorAll('section').length, 0);
+  g.button('INSPECT STRANGE TRANSMISSION').onclick();
+  assertArchive();
+  g.fps.startTactics(1);
+  assert.equal(g.nodes.get('card').querySelectorAll('section').length, 0);
+  g.button('INSPECT STRANGE TRANSMISSION').onclick();
+  assert.equal(g.button('REVEAL ARCHIVE ANSWER').disabled, true);
+});
+
 test('conditions, Jack weapons, native keyboard focus, tactical loss retry and breach cleanup survive the view change', () => {
   const g = game();
   g.fps.startTactics(0);

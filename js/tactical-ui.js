@@ -66,6 +66,24 @@
       var battle = Tactics.createBattle(mission, jack), selected = battle.jack, weapon = 'sidearm';
       var angle = 0, destination = null, target = null, held = {}, drag = null;
       var notice = 'Plan through Jack’s eyes. Choose a move or target; enemies act only on END TURN.';
+      var ordersOpen = false, terminalOpen = false, signal = 'dispatch', routing = null, revealed = false;
+      var signals = {
+        dispatch: {
+          text: 'Urgent relay ping', model: 'Relay Finch',
+          reason: 'A short, low-complexity signal favors a fast dispatch specialist.',
+          answer: 'I read the SI relay reply: “Courier diverted to the archive.” The Fabricators planted the urgency tag to rush me past the ledger. I verify the courier’s original timestamp; the diversion predates the alarm.'
+        },
+        verify: {
+          text: 'Conflicting source seals', model: 'Ledger Moth',
+          reason: 'Conflicting claims favor source-comparison capability over a quick reply.',
+          answer: 'I read the SI source reply: “Both seals cite the same witness.” The Fabricators forged two reports from one recording. I check the original reel: the supposed witness is a splice of my own briefing.'
+        },
+        plan: {
+          text: 'Branching evacuation routes', model: 'Fork Lantern',
+          reason: 'A complex branching task favors scenario-planning capability over speed.',
+          answer: 'I read the SI scenario reply: “Every suggested route passes the same relay.” The Fabricators want my squad to carry their broadcast out. I verify the old maintenance map: the relay is a transmitter, not a shelter.'
+        }
+      };
       card.classList.add('tactical-card');
       function element(tag, text, className) {
         var node = document.createElement(tag);
@@ -108,6 +126,41 @@
       function face(p) {
         var position = world(p), origin = world(battle.jack);
         angle = Math.atan2(position.y - origin.y, position.x - origin.x);
+      }
+      function renderTerminal(parent) {
+        var inspect = button('INSPECT STRANGE TRANSMISSION', function () {
+          terminalOpen = !terminalOpen; ordersOpen = true; render();
+        });
+        inspect.setAttribute('aria-expanded', String(terminalOpen));
+        parent.appendChild(inspect);
+        if (!terminalOpen) return;
+        var terminal = element('section');
+        terminal.setAttribute('aria-label', 'SI archive routing simulation');
+        terminal.appendChild(element('h3', 'SI ARCHIVE // AUTO'));
+        terminal.appendChild(element('p', 'I uncover a fictional offline local simulation, not a live assistant. All model names and replies are invented; no actual vendor routing or private reasoning is shown.', 'tactical-help'));
+        terminal.appendChild(element('p', 'Public theory: match task complexity, speed and specialist capabilities. Selection is not evidence. I’m Jack Slade; I still verify sources. This archive changes no combat orders or stats.', 'tactical-help'));
+        var controls = element('div', undefined, 'tactical-controls');
+        choice(controls, 'Archive signal', Object.keys(signals).map(function (key) {
+          return { text: signals[key].text, value: key };
+        }), signal, function (value) { signal = value; routing = null; revealed = false; });
+        controls.appendChild(button('RUN FICTIONAL AUTO', function () {
+          routing = signals[signal]; revealed = false; render();
+        }));
+        terminal.appendChild(controls);
+        var selection = element('p', routing ? 'AUTO chose ' + routing.model + ' — ' + routing.reason :
+          'I select a signal and run AUTO to see a fictional specialist match before its answer.', 'tactical-help');
+        selection.setAttribute('role', 'status'); terminal.appendChild(selection);
+        var revealControls = element('div', undefined, 'tactical-controls');
+        revealControls.appendChild(button('REVEAL ARCHIVE ANSWER', function () {
+          if (!routing || revealed) return;
+          revealed = true; render();
+        }, !routing || revealed));
+        terminal.appendChild(revealControls);
+        if (revealed) {
+          var answer = element('p', routing.answer + ' I mark the reply as a lead, not proof.', 'tactical-help');
+          answer.setAttribute('role', 'status'); terminal.appendChild(answer);
+        }
+        parent.appendChild(terminal);
       }
       function render() {
         var focused = document.activeElement;
@@ -167,12 +220,15 @@
         var status = element('p', notice, 'tactical-help');
         status.setAttribute('role', 'status'); card.appendChild(status);
         var details = element('details'), summary = element('summary', 'Orders & combat log');
+        details.open = ordersOpen;
+        details.ontoggle = function () { ordersOpen = details.open; };
         details.appendChild(summary);
         details.appendChild(element('p', 'Drag the view or use arrows to look freely. WASD: one adjacent move per press for the commanded unit. Space: chosen target. E: END TURN. Tab/Enter: controls. Reach the objective with Jack or defeat every hostile. Jack rolls d20 vs AC; others use terrain hit chance.', 'tactical-help'));
         var log = element('ol', undefined, 'tactical-log');
         log.setAttribute('aria-label', 'Combat log');
         battle.log.slice(-5).forEach(function (line) { log.appendChild(element('li', line)); });
-        details.appendChild(log); card.appendChild(details);
+        details.appendChild(log);
+        renderTerminal(details); card.appendChild(details);
         if (focusLabel || focusText) {
           Array.from(card.querySelectorAll('select,button')).some(function (node) {
             if ((focusLabel && node.getAttribute('aria-label') === focusLabel) || (focusText && node.textContent === focusText)) {

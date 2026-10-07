@@ -41,6 +41,14 @@ the first-person view with labels. There is no required overhead board.
   controls and activate buttons with **Enter / Space**. Expand **Orders & combat log**
   for instructions and resolved strikes.
 
+- Optional Easter egg: in **Orders & combat log**, **INSPECT STRANGE TRANSMISSION**.
+  Pick an archive signal and **RUN FICTIONAL AUTO** to see an invented specialist
+  and a short task-matching reason **before** separately revealing its SI/Fabricator
+  story reply. This is an offline local simulation, not actual vendor routing or
+  private reasoning: complexity, speed and capabilities inform selection, but Jack
+  still verifies sources. It changes no combat stats or turns; its state survives
+  ordinary tactical moves and turns.
+
 - Move the squad, attack once per unit per turn, then choose **END TURN** for the Fabricator AI.
 - Entering an enemy zone of control ends movement, except for the skirmishing
   Field Reader. Occupied hexes block movement.
