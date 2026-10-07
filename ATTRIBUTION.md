@@ -8,7 +8,10 @@ the game from Apache-2.0. See [LICENSE](LICENSE) for the grant and full GPL text
 Source code is distributed directly with this offline, no-build game.
 
 `index.html` retains the original FPS, procedural graphics and synthesized
-WebAudio. `js/tactical-ui.js`, `css/tactics.css` and the tests are original
+WebAudio. Its original Canvas raycaster now also accepts Jack's first-person
+tactical scene: parity-correct hex floors, segment-cast walls and labelled
+procedural squad/hostile sprites. No external renderer or engine was added.
+`js/tactical-ui.js`, `css/tactics.css` and the tests are original
 integration/UI/test code. All tactical unit and weapon statistics, faction names,
 hex layouts, colours and letter glyphs are original. No upstream art, music,
 sprites, unit-stat files, WML maps or campaigns are imported. No Games Workshop
@@ -53,7 +56,7 @@ is included.
 | Combat → Making an Attack → Attack Rolls, Modifiers to the Roll, Rolling 1 or 20 | `js/tactics.js`: Jack attack/retaliation | d20 plus ability modifier and proficiency against AC; natural 1 misses and natural 20 hits critically. Original sci-fi weapons and adjacent-hex engagements, not a complete tabletop ranged-combat system. |
 | Combat → Damage and Healing → Critical Hits | `js/tactics.js`: Jack damage | Double damage dice on a critical hit, not the ability modifier. |
 | Combat → Movement and Position → Being Prone | `js/tactics.js`: crawl/stand | Additional crawl cost and half-speed standing cost on weighted hex terrain. |
-| Appendix A: Conditions → Blinded, Frightened, Prone, Stunned; Incapacitated | `js/tactics.js`: conditions and `js/tactical-ui.js`: condition HUD | Attack advantage/disadvantage, blocked stunned actions/reactions/movement, fear-source approach restriction, crawling/standing. Fixed durations and weapon/enemy applications are original; no ability checks, speech or saving throws are simulated. All tactical units are visible on the small map; no fog-of-war system. |
+| Appendix A: Conditions → Blinded, Frightened, Prone, Stunned; Incapacitated | `js/tactics.js`: conditions and `js/tactical-ui.js`: condition HUD | Attack advantage/disadvantage, blocked stunned actions/reactions/movement, fear-source approach restriction, crawling/standing. Fixed durations and weapon/enemy applications are original; no ability checks, speech or saving throws are simulated. Tactical units are listed in command/target controls and rendered within Jack's field of view; no fog-of-war system. |
 
 SRD mechanics are implemented as JavaScript, not imported textual rule files.
 The mirror used to cross-check the release's legal notice and rules is

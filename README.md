@@ -1,6 +1,10 @@
 # HAIL TO THE ANALYST
 
-A retro FPS and turn-based hex tactics game starring **Jack Slade**, a Strategic Intelligence operative, against the disinformation syndicate **The Fabricators**.
+A first-person game starring **Jack Slade**, a Strategic Intelligence operative, against the disinformation syndicate **The Fabricators**: turn-based tactical approaches followed by continuous retro FPS missions.
+
+**Vision:** trace the source, break the network, verify everything—from Jack’s eyes.
+Plan terrain-aware moves, command your Analyst squad and resolve deliberate
+turn-based combat before breaching into the original real-time firefight.
 
 > "It's time to kick ass and verify sources."
 
@@ -21,10 +25,21 @@ Works on desktop and iPhone. For the best experience on mobile, use the touch co
 
 ### Tactical controls
 
-Before **each** mission, choose **TACTICAL APPROACH**. Click or tap an Analyst hex
-to select that unit, then a highlighted empty hex to move or an adjacent hostile
-hex to attack. Keyboard users can Tab through hexes and buttons and activate them
-with Enter or Space. Hex labels/tooltips show terrain defence and movement costs.
+Before **each** mission, choose **TACTICAL APPROACH**. The camera stays with Jack,
+even when commanding an ally. Terrain is drawn as actual staggered hex floors;
+allies, hostiles, reachable destinations and the gold breach objective appear in
+the first-person view with labels. There is no required overhead board.
+
+- Drag the view, press **← / →**, or tap **LOOK LEFT / RIGHT** to turn freely without spending movement or advancing turns.
+- Choose **Command unit**, then **Destination** and **MOVE**, or **Target** and **ATTACK**.
+  Destination choices show terrain defence and entry cost; targets show HP and hex range.
+  Choosing a destination/target looks toward it but does not execute an action.
+- With the view focused (click/tap it), **WASD** makes one adjacent hex move per
+  press relative to the view, **Space** attacks the chosen target, and **E** ends
+  the turn. Holding/repeating an action key does not repeat orders.
+- All touch actions have native buttons/selects; keyboard users can **Tab** between
+  controls and activate buttons with **Enter / Space**. Expand **Orders & combat log**
+  for instructions and resolved strikes.
 
 - Move the squad, attack once per unit per turn, then choose **END TURN** for the Fabricator AI.
 - Entering an enemy zone of control ends movement, except for the skirmishing
@@ -36,19 +51,19 @@ with Enter or Space. Hex labels/tooltips show terrain defence and movement costs
 - Surviving squad members supply armour and ammo; squad losses add FPS enemies.
   Restarting an FPS mission preserves its original breach result without stacking bonuses.
 
-### Desktop controls
+### FPS desktop controls (after breach)
 
 | Key | Action |
 |-----|--------|
 | W A S D / Arrows | Move / strafe |
-| Mouse | Look |
-| Click | Fire |
+| Left / Right arrows | Turn |
+| Click / Space (hold) | Fire |
 | E | Use (doors, pickups) |
 | 1 / 2 / 3 | Sidearm / Breacher / Redactor |
 | M | Minimap |
 | P / Esc | Pause |
 
-### Mobile controls
+### FPS mobile controls
 
 Left-side virtual joystick to move, drag right side of screen to look. Dedicated **FIRE**, **WEAPON**, and **USE** buttons.
 
@@ -80,7 +95,9 @@ The FPS retains its original real-time rules.
 
 ## Tech
 
-- Canvas raycaster: ASCII grid maps, DDA wall casting, procedural textures and sprites, billboard enemies/pickups, z-buffering, fixed-timestep updates.
+- Shared original Canvas raycaster: FPS ASCII/DDA walls or a tactical scene adapter
+  with segment-cast hex walls, near-plane-clipped hex floors, procedural sprites,
+  labels and depth clipping. Tactical rendering never swaps or mutates FPS state.
 - **Chatter Engine**: deterministic, template-based "LLM element" — context-aware enemy taunts (idle, aggro, damaged, dying) and intel-style mission briefings generated from mission state. All local, no API calls.
 - Enemy AI: state machines (idle → patrol → chase → attack → die) with line-of-sight via the same DDA raycast the renderer uses — enemies can't see through walls either.
 - Synthesized WebAudio: all sound effects generated in code.
@@ -96,9 +113,10 @@ With Node.js (no packages to install), run from the repository root:
 node --test tests/*.test.js
 ```
 
-Tests cover hex geometry, terrain hit chance, d20 versus AC, conditions,
-tactical combat/movement and breach modifiers, plus both FPS mission handoffs,
-retries and keyboard isolation. There is no build or lint step.
+Tests cover hex/world geometry, scene rendering and actual tactical DOM/keyboard/
+touch controls, terrain hit chance, d20 versus AC, conditions, tactical combat/
+movement and breach modifiers, plus both FPS mission handoffs, retries and state
+isolation. There is no build or lint step.
 
 ## Publish as a playable site
 
