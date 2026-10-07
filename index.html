@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: GPL-2.0-or-later -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,6 +7,7 @@
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="data:,">
 <title>Hail to the Analyst</title>
+<link rel="stylesheet" href="css/tactics.css">
 <style>
 :root{color-scheme:dark;--ink:#f7e8bd;--muted:#bcb28f;--hot:#ff3e2f;--amber:#ffc400;--acid:#79ff4d;--panel:#11130f;--edge:#54583e;--void:#050604}
 @media(prefers-color-scheme:light){:root{color-scheme:light;--ink:#fff2ce;--muted:#c7bb91;--hot:#ff4738;--amber:#ffd020;--acid:#83ff58;--panel:#12150f;--edge:#656b49;--void:#050604}}
@@ -34,6 +36,8 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;background
 <div id="touch"><div id="look"></div><div id="joy" class="touchzone"><div class="nub"></div></div><button id="weapon" class="touchbtn">WEAPON</button><button id="use" class="touchbtn">USE</button><button id="fire" class="touchbtn">FIRE</button></div>
 <div id="overlay"><div class="card" id="card"></div></div>
 </div>
+<script src="js/tactics.js"></script>
+<script src="js/tactical-ui.js"></script>
 <script>
 (function(){
 'use strict';
@@ -41,6 +45,7 @@ var cv=document.getElementById('game'),ctx=cv.getContext('2d',{alpha:false});ctx
 var W=960,H=540,FOV=Math.PI/3,NUM=480,zbuf=new Float32Array(NUM),keys={},state='title',levelIndex=0,last=0,acc=0,shake=0,flash=0,hurtFlash=0,muted=false,mapVisible=false,audio=null;
 var overlay=document.getElementById('overlay'),card=document.getElementById('card'),touch=document.getElementById('touch');
 var player,enemies=[],pickups=[],shots=[],particles=[],doors={},stats={kills:0,shots:0,hits:0,intel:0,start:0};
+var campaignJack=null,breachModifiers=null,breachBase=null;
 var taunts=['ANALYST DETECTED. DEPLOYING COUNTER-NARRATIVE.','YOUR CLEARANCE IS REVOKED.','WE FABRICATE. YOU VALIDATE. CUTE.','THIS NARRATIVE IS ALREADY TRENDING.'];
 var levels=[
 {name:'THE ARCHIVE',objective:'Recover the red clearance card. Breach the archive exit.',brief:'The Fabricators seized the national archive and buried the source trail. Recover <b>RED CLEARANCE</b>, secure any intel caches, and reach the extraction switch.',map:[
@@ -53,9 +58,35 @@ var map=[],mw=0,mh=0,message='',messageT=0,levelTime=0,bossDead=false,lowSaid=fa
 function setMessage(s,t){message=s;messageT=t||2.3}
 function tone(type){if(muted)return;if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();var now=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);var f=220,d=.1,kind='square';if(type==='shot'){f=125;d=.08}else if(type==='boom'){f=72;d=.24}else if(type==='hurt'){f=58;d=.16}else if(type==='pick'){f=520;d=.15;kind='sine'}else if(type==='intel'){f=660;d=.34;kind='square'}else if(type==='door'){f=90;d=.3;kind='sawtooth'}else if(type==='boss'){f=44;d=.75;kind='sawtooth'}else if(type==='death'){f=170;d=.6;kind='sawtooth'}else if(type==='exit'){f=320;d=.5;kind='sine'}o.type=kind;o.frequency.setValueAtTime(f,now);o.frequency.exponentialRampToValueAtTime(type==='death'?45:f*1.45,now+d);g.gain.setValueAtTime(.11,now);g.gain.exponentialRampToValueAtTime(.001,now+d);o.start();o.stop(now+d)}
 function title(){state='title';overlay.classList.remove('hidden');touch.classList.remove('active');card.innerHTML='<div class="kicker">STRATEGIC INTELLIGENCE // EYES ONLY</div><h1 class="title">HAIL TO THE<span>ANALYST</span></h1><div class="brief"><b>THE FABRICATORS</b> seized the Archive. You are Jack Slade, SI operative—armed with a sidearm, a healthy distrust of trending narratives, and one order: trace the source. Break the network. Verify everything.</div><button class="action" id="primary">DEPLOY</button><div class="small desktop"><span class="keys">WASD</span> move · <span class="keys">← →</span> turn · <span class="keys">SPACE / CLICK</span> fire · <span class="keys">E</span> use · <span class="keys">1–3</span> weapons · <span class="keys">M</span> map</div><div class="small">Touch controls appear automatically on iPhone. Audio initializes on deploy.</div>';document.getElementById('primary').onclick=function(){initAudio();briefing(0)}}
-function briefing(i){levelIndex=i;state='brief';overlay.classList.remove('hidden');touch.classList.remove('active');var L=levels[i];card.innerHTML='<div class="kicker">MISSION '+(i+1)+' OF 2 // '+L.objective+'</div><h2 class="title" style="font-size:clamp(36px,7vw,72px)">'+L.name+'</h2><div class="brief">'+L.brief+'<br><br><b>CHATTER ENGINE:</b> Threat traffic indicates coordinated narrative activity. Expect hostile attribution and low-quality sourcing.</div><button class="action" id="primary">BREACH</button>';document.getElementById('primary').onclick=function(){loadLevel(i)}}
+function briefing(i){levelIndex=i;state='brief';overlay.classList.remove('hidden');touch.classList.remove('active');var L=levels[i];card.innerHTML='<div class="kicker">MISSION '+(i+1)+' OF 2 // '+L.objective+'</div><h2 class="title" style="font-size:clamp(36px,7vw,72px)">'+L.name+'</h2><div class="brief">'+L.brief+'<br><br><b>CHATTER ENGINE:</b> Threat traffic indicates coordinated narrative activity. Expect hostile attribution and low-quality sourcing.</div><button class="action" id="primary">TACTICAL APPROACH</button>';document.getElementById('primary').onclick=function(){startTactics(i)}}
+function startTactics(i){
+  state='tactical';
+  keys={};touchInput.active=false;touchInput.fire=false;touchInput.dx=touchInput.dy=0;
+  if(i===0)campaignJack=null;
+  TacticalUI.start(card,i,campaignJack,function(modifiers,jack){
+    campaignJack=jack;breachModifiers=modifiers;
+    breachBase=i&&player?{armor:player.armor,bullets:player.bullets,shells:player.shells,weapon:player.weapon}:null;
+    loadLevel(i);
+  });
+}
 function parseMap(L){map=L.map.map(function(r){return r.split('')});mh=map.length;mw=map[0].length;enemies=[];pickups=[];shots=[];particles=[];doors={};for(var y=0;y<mh;y++)for(var x=0;x<mw;x++){var c=map[y][x];if(c==='P'){player.x=x+.5;player.y=y+.5;map[y][x]='.'}else if('mdtF'.indexOf(c)>=0){spawnEnemy(c,x+.5,y+.5);map[y][x]='.'}else if('hasirq'.indexOf(c)>=0){pickups.push({type:c,x:x+.5,y:y+.5,alive:true,bob:Math.random()*6.2});map[y][x]='.'}else if('DRB'.indexOf(c)>=0){doors[x+','+y]={open:0,type:c}}}}
-function loadLevel(i){player={x:1.5,y:1.5,a:0,hp:100,armor:i?Math.max(0,player?player.armor:0):0,bullets:i?Math.max(45,player?player.bullets:45):45,shells:i?Math.max(8,player?player.shells:8):8,weapon:i?player.weapon:0,cool:0,bob:0,kick:0,red:false,blue:false};bossDead=false;lowSaid=false;parseMap(levels[i]);state='play';overlay.classList.add('hidden');touch.classList.add('active');levelTime=0;if(!stats.start)stats.start=performance.now();setMessage(i===0?"IT'S TIME TO KICK ASS AND VERIFY SOURCES.":'FIND THE SOURCE. END THE STORY.',3.8)}
+function loadLevel(i){
+  var base=breachBase||{armor:0,bullets:45,shells:8,weapon:0};
+  var bonus=breachModifiers||{armor:0,bullets:0,shells:0,extraEnemies:0};
+  player={x:1.5,y:1.5,a:0,hp:100,armor:Math.min(100,Math.max(0,base.armor)+bonus.armor),
+    bullets:Math.max(45,base.bullets)+bonus.bullets,shells:Math.max(8,base.shells)+bonus.shells,
+    weapon:base.weapon,cool:0,bob:0,kick:0,red:false,blue:false};
+  bossDead=false;lowSaid=false;parseMap(levels[i]);
+  var reinforcements=[];
+  for(var y=0;y<mh;y++)for(var x=0;x<mw;x++){
+    if(map[y][x]==='.'&&Math.hypot(x+.5-player.x,y+.5-player.y)>3&&
+      !enemies.some(function(e){return e.x===x+.5&&e.y===y+.5}))reinforcements.push({x:x+.5,y:y+.5});
+  }
+  for(var n=0;n<bonus.extraEnemies&&n<reinforcements.length;n++)spawnEnemy('m',reinforcements[n].x,reinforcements[n].y);
+  keys={};touchInput.fire=false;state='play';overlay.classList.add('hidden');touch.classList.add('active');levelTime=0;
+  if(!stats.start)stats.start=performance.now();
+  setMessage(i===0?"IT'S TIME TO KICK ASS AND VERIFY SOURCES.":'FIND THE SOURCE. END THE STORY.',3.8);
+}
 function spawnEnemy(c,x,y){var type=c==='m'?'MOLE':c==='d'?'DRONE':c==='t'?'TROLL':'FABRICATOR';var hp=type==='MOLE'?42:type==='DRONE'?62:type==='TROLL'?125:520;enemies.push({type:type,x:x,y:y,hp:hp,max:hp,alive:true,seen:false,cool:.5+Math.random(),pain:0,phase:Math.random()*6.2,death:0})}
 function solid(x,y){var X=Math.floor(x),Y=Math.floor(y);if(X<0||Y<0||X>=mw||Y>=mh)return true;var c=map[Y][X];if(c==='.'||c==='X')return false;if('DRB'.indexOf(c)>=0){var d=doors[X+','+Y];return !d||d.open<.88}return true}
 function moveEntity(o,dx,dy,r){r=r||.22;if(!solid(o.x+dx+Math.sign(dx)*r,o.y))o.x+=dx;if(!solid(o.x,o.y+dy+Math.sign(dy)*r))o.y+=dy}
@@ -88,13 +119,24 @@ function drawHUD(){ctx.fillStyle='rgba(4,5,3,.88)';ctx.fillRect(0,H-66,W,66);ctx
 function drawMap(){var scale=Math.min(13,220/Math.max(mw,mh)),ox=18,oy=62;ctx.globalAlpha=.9;ctx.fillStyle='#050706';ctx.fillRect(ox-8,oy-8,mw*scale+16,mh*scale+16);for(var y=0;y<mh;y++)for(var x=0;x<mw;x++){var c=map[y][x];ctx.fillStyle=c==='.'||c==='X'?'#20251e':c==='R'?'#a72a23':c==='B'?'#2859a9':'#686b55';ctx.fillRect(ox+x*scale,oy+y*scale,scale-1,scale-1)}ctx.fillStyle='#ffce2e';ctx.beginPath();ctx.arc(ox+player.x*scale,oy+player.y*scale,4,0,6.28);ctx.fill();ctx.strokeStyle='#ffce2e';ctx.beginPath();ctx.moveTo(ox+player.x*scale,oy+player.y*scale);ctx.lineTo(ox+(player.x+Math.cos(player.a))*scale,oy+(player.y+Math.sin(player.a))*scale);ctx.stroke();ctx.globalAlpha=1}
 function loop(t){var dt=Math.min(.05,(t-last)/1000||0);last=t;acc+=dt;while(acc>=1/60){update(1/60);acc-=1/60}if(state==='play')render();requestAnimationFrame(loop)}
 function initAudio(){if(!audio&&!muted){try{audio=new (window.AudioContext||window.webkitAudioContext)();tone('intel')}catch(e){}}}
-window.addEventListener('keydown',function(e){keys[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0)e.preventDefault();if((state==='title'||state==='brief')&&e.code==='Enter'){var b=document.getElementById('primary');if(b)b.click()}if(e.code==='KeyE')use();if(e.code==='KeyM'){mapVisible=!mapVisible;document.getElementById('mapBtn').setAttribute('aria-pressed',mapVisible)}if(e.code==='Digit1'||e.code==='Digit2'||e.code==='Digit3'){player.weapon=+e.code.slice(-1)-1;setMessage(weaponDefs[player.weapon].name)}if(e.code==='Escape')pause()});window.addEventListener('keyup',function(e){keys[e.code]=false});cv.addEventListener('mousedown',function(){initAudio();fire()});
+window.addEventListener('keydown',function(e){
+  if(state==='tactical')return;
+  keys[e.code]=true;
+  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0)e.preventDefault();
+  if((state==='title'||state==='brief')&&e.code==='Enter'){var b=document.getElementById('primary');if(b)b.click()}
+  if(e.code==='KeyE')use();
+  if(e.code==='KeyM'){mapVisible=!mapVisible;document.getElementById('mapBtn').setAttribute('aria-pressed',mapVisible)}
+  if(state==='play'&&(e.code==='Digit1'||e.code==='Digit2'||e.code==='Digit3')){player.weapon=+e.code.slice(-1)-1;setMessage(weaponDefs[player.weapon].name)}
+  if(e.code==='Escape'||e.code==='KeyP')pause();
+});window.addEventListener('keyup',function(e){keys[e.code]=false});cv.addEventListener('mousedown',function(){initAudio();fire()});
 function pause(){if(state==='play'){state='pause';overlay.classList.remove('hidden');touch.classList.remove('active');card.innerHTML='<div class="kicker">FIELD OPERATIONS SUSPENDED</div><h2 class="title" style="font-size:clamp(45px,8vw,86px)">PAUSED</h2><div class="brief">The Fabricators are still lying. They\'re just doing it more quietly.</div><button class="action" id="primary">RESUME</button>';document.getElementById('primary').onclick=pause}else if(state==='pause'){state='play';overlay.classList.add('hidden');touch.classList.add('active')}}
 document.getElementById('pauseBtn').onclick=pause;document.getElementById('muteBtn').onclick=function(){muted=!muted;this.textContent=muted?'SOUND OFF':'SOUND ON';this.setAttribute('aria-pressed',muted);if(!muted)initAudio()};document.getElementById('mapBtn').onclick=function(){mapVisible=!mapVisible;this.setAttribute('aria-pressed',mapVisible)};
 var touchInput={active:false,dx:0,dy:0,fire:false},joy=document.getElementById('joy'),nub=joy.querySelector('.nub'),jid=null,lid=null,lastLook=0;function joyMove(e){var r=joy.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2),m=Math.min(42,Math.hypot(x,y)),a=Math.atan2(y,x);touchInput.dx=Math.cos(a)*m/42;touchInput.dy=Math.sin(a)*m/42;nub.style.transform='translate('+(Math.cos(a)*m)+'px,'+(Math.sin(a)*m)+'px)'}joy.addEventListener('pointerdown',function(e){jid=e.pointerId;touchInput.active=true;joy.setPointerCapture(jid);joyMove(e)});joy.addEventListener('pointermove',function(e){if(e.pointerId===jid)joyMove(e)});function joyEnd(e){if(e.pointerId===jid){jid=null;touchInput.active=false;touchInput.dx=touchInput.dy=0;nub.style.transform=''}}joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',joyEnd);
 var look=document.getElementById('look');look.addEventListener('pointerdown',function(e){lid=e.pointerId;lastLook=e.clientX;look.setPointerCapture(lid)});look.addEventListener('pointermove',function(e){if(e.pointerId===lid&&state==='play'){player.a+=(e.clientX-lastLook)*.006;lastLook=e.clientX}});look.addEventListener('pointerup',function(e){if(e.pointerId===lid)lid=null});
 function bindHold(id,down,up){var el=document.getElementById(id);el.addEventListener('pointerdown',function(e){e.stopPropagation();initAudio();el.classList.add('pressed');down();el.setPointerCapture(e.pointerId)});el.addEventListener('pointerup',function(e){el.classList.remove('pressed');up()});el.addEventListener('pointercancel',function(){el.classList.remove('pressed');up()})}bindHold('fire',function(){touchInput.fire=true},function(){touchInput.fire=false});bindHold('use',use,function(){});bindHold('weapon',cycleWeapon,function(){});
-title();requestAnimationFrame(loop);
+title();
+card.insertAdjacentHTML('beforeend','<div class="small">Copyright 2026 Christopher R. Vessell. GPL-2.0-or-later; no warranty. Redistribution permitted under the <a href="LICENSE">licence</a>. See <a href="ATTRIBUTION.md">upstream and SRD credits</a>.</div>');
+requestAnimationFrame(loop);
 })();
 </script>
 </body>
