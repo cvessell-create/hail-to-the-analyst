@@ -1,0 +1,13 @@
+{
+  "name": "hail-to-the-analyst",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Offline FPS/tactics campaign and original math-driven engine workbench",
+  "license": "GPL-3.0-or-later",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "node server/index.js",
+    "package": "node scripts/package-source.js"
+  }
+}

@@ -6,6 +6,21 @@ A retro FPS and turn-based hex tactics game starring **Jack Slade**, a Strategic
 
 ## Play
 
+### Engine workbench and local co-op
+
+Open [the engine workbench](engine/workbench.html) for the map/asset editor,
+versioned save/load, ultra-boss control puzzle, editable payoff matrices,
+mixed strategies and backward-induction decision trees.
+The original two-mission FPS/tactics campaign remains this page's game.
+
+With Node.js 24+, run `npm test`, then `npm start` and visit
+`http://127.0.0.1:8787/engine/workbench.html`. Two local tabs can join the
+authoritative co-op arena before firing. Auction a power cell before combat;
+defeat NPCs together to unlock sealed-bid Knaster or Adjusted Winner loot.
+All currency is fictional; no wallets, purchases or blockchain activity.
+GitHub Pages runs offline tools, not the Node multiplayer server.
+See the [engine contracts, math and limitations](engine/README.md).
+
 **No build, no dependencies.** `index.html` is the entry point; keep its local `js/` and `css/` folders beside it. No network calls, remote assets or real LLM API. Open it in any modern browser:
 
 ```bash
@@ -96,7 +111,9 @@ With Node.js (no packages to install), run from the repository root:
 node --test tests/*.test.js
 ```
 
-Tests cover hex geometry, terrain hit chance, d20 versus AC, conditions,
+Tests cover engine algorithms, scenes/saves, collision/LOS, payoff/tree solvers,
+power indices, exact fair division, local HTTP and authoritative co-op, as well
+as hex geometry, terrain hit chance, d20 versus AC, conditions,
 tactical combat/movement and breach modifiers, plus both FPS mission handoffs,
 retries and keyboard isolation. There is no build or lint step.
 
@@ -105,6 +122,11 @@ retries and keyboard isolation. There is no build or lint step.
 This repo is GitHub Pages-ready: enable Pages on the `main` branch in repo settings, and play the game at [cvessell-create.github.io/hail-to-the-analyst](https://cvessell-create.github.io/hail-to-the-analyst/).
 
 ## License
+
+The combined 0.2 engine/game distribution uses **GPL-3.0-or-later**, exercising
+the campaign's existing "or later" permission so it can combine with Apache-2.0
+engine/JSNES code. See [COPYING-GPL-3](COPYING-GPL-3). File-level licenses and
+SRD attribution are retained; the following describes the prior campaign grant.
 
 Copyright 2026 Christopher R. Vessell. The sole author approved changing this
 game from **Apache-2.0 to GPL-2.0-or-later** so Battle for Wesnoth code can be

@@ -37,6 +37,8 @@
  */
 (function (root) {
   'use strict';
+  const Power = typeof module === 'object' && module.exports ? require('./power-index.js') : root.PowerIndex;
+  const MathEngine = typeof module === 'object' && module.exports ? require('../engine/math.js') : root.EngineMath;
 
   const terrain = Object.freeze({
     '.': Object.freeze({ name: 'Open floor', defense: 20, cost: 1, color: '#293c43' }),
@@ -176,7 +178,7 @@
     while (level < 5 && xp >= jackThresholds[level]) level++;
     return level;
   }
-  function createBattle(missionIndex, optionalJack) {
+  function createBattle(missionIndex, optionalJack, options = {}) {
     missionIndex = Number(missionIndex);
     missionIndex = Number.isFinite(missionIndex) ? Math.max(0, Math.floor(missionIndex)) : 0;
     const jack = makeUnit('jack', 'jack', 'analyst', 0, 2);
@@ -190,6 +192,8 @@
       jack.xp = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
       jack.level = Math.max(jackLevel(jack.xp), Number.isFinite(level) ? Math.max(1, Math.min(5, Math.floor(level))) : 1);
     }
+    jack.influence = optionalJack && optionalJack.influence ?
+      JSON.parse(JSON.stringify(optionalJack.influence)) : { xp: 0, awards: {} };
     jack.proficiency = jack.level >= 5 ? 3 : 2;
     jack.maxHp = 32 + (jack.level - 1) * 6;
     jack.hp = jack.maxHp;
@@ -201,9 +205,19 @@
     const originals = ['null-warden', 'ash-auditor', 'signal-reaver'];
     units.push(makeUnit(originals[missionIndex % 3], 'enemy-original-1', 'fabricator', 6, 1));
     units.push(makeUnit(originals[(missionIndex + 1) % 3], 'enemy-original-2', 'fabricator', 6, 3));
+    if (options.engineScaling) {
+      const npcs = units.filter(unit => unit.side === 'fabricator');
+      const allocation = MathEngine.npcLevels(npcs.map(unit => unit.maxHp), npcs.length + Math.min(4, missionIndex * 2));
+      npcs.forEach((unit, i) => {
+        unit.level = allocation.allocations[i];
+        unit.maxHp += (unit.level - 1) * 6; unit.hp = unit.maxHp;
+      });
+    }
     return { width: 7, height: 5, terrain: layouts[missionIndex % layouts.length].slice(),
       units: units, jack: jack, turn: 1, phase: 'player', activeSide: 'analyst',
       missionIndex: missionIndex, objective: { x: 6, y: 2 },
+      influenceModel: Power.encounter(units.filter(unit => unit.side === 'analyst'),
+        units.filter(unit => unit.side === 'fabricator'), missionIndex === 1),
       log: ['Reach the exit with Jack or defeat every Fabricator. Jack rolls d20 vs AC; squad and enemies use terrain hit percentages.'] };
   }
   function member(battle, unit) { return battle.units.includes(unit) && alive(unit); }
@@ -259,6 +273,7 @@
       !battle.units.some(function (unit) { return alive(unit) && unit.side === 'fabricator'; })) {
       battle.phase = 'won';
       grantXp(battle, battle.jack, 300);
+      awardInfluence(battle, 'tactics-' + battle.missionIndex);
       battle.log.push('Tactical objective secured. Squad survivors carry supplies forward.');
     }
     return battle.phase;
@@ -298,6 +313,19 @@
       unit.hp = unit.maxHp;
       battle.log.push(unit.name + ' reached level ' + unit.level + '.');
     }
+  }
+  function awardInfluence(battle, receiptId, survivingIds) {
+    const ledger = battle.jack.influence;
+    if (Object.hasOwn(ledger.awards, receiptId)) return ledger.awards[receiptId];
+    const result = Power.reward(battle.influenceModel, 'jack', survivingIds ||
+      battle.units.filter(unit => alive(unit) && unit.side === 'analyst').map(unit => unit.id));
+    ledger.awards[receiptId] = result;
+    ledger.xp += result.xp;
+    grantXp(battle, battle.jack, result.xp);
+    battle.log.push('Influence +' + result.xp + ' XP; Shapley-Shubik ' +
+      (100 * result.shapleyShubik).toFixed(1) + '%, Banzhaf ' +
+      (100 * result.banzhafNormalized).toFixed(1) + '%' + (result.critical ? '; Jack was critical.' : '.'));
+    return result;
   }
   function weaponFor(unit, name) {
     if (unit.type !== 'jack' && name && name !== unit.weapon) return null;
@@ -435,7 +463,8 @@
     neighbors: neighbors, hitChance: hitChance, d20Attack: d20Attack,
     applyCondition: applyCondition, removeCondition: removeCondition, tickConditions: tickConditions,
     conditions: Object.freeze({ apply: applyCondition, remove: removeCondition, tick: tickConditions }),
-    jackThresholds: Object.freeze(jackThresholds), modifier: modifier };
+    jackThresholds: Object.freeze(jackThresholds), modifier: modifier,
+    awardInfluence: awardInfluence, grantXp: grantXp };
   root.Tactics = Tactics;
   if (typeof module !== 'undefined' && module.exports) module.exports = Tactics;
 })(globalThis);

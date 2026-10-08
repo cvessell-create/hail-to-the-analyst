@@ -4,7 +4,7 @@
 
   window.TacticalUI = {
     start: function (card, mission, jack, onBreach) {
-      var battle = Tactics.createBattle(mission, jack);
+      var battle = Tactics.createBattle(mission, jack, { engineScaling: true });
       var selected = battle.jack;
       var weapon = 'sidearm';
       var notice = 'Select an Analyst, then a highlighted hex to move or an adjacent enemy to attack.';
@@ -33,6 +33,11 @@
         }).join(' · ');
         card.appendChild(element('p', 'Jack Slade · Level ' + sheet.level + ' · XP ' + sheet.xp +
           ' · Proficiency +' + sheet.proficiency + ' · ' + scores, 'tactical-sheet'));
+        var power = battle.influenceModel.players[0];
+        card.appendChild(element('p', 'Influence XP ' + sheet.influence.xp +
+          ' · Pivotal share ' + (100 * power.shapleyShubik).toFixed(1) + '%' +
+          ' · Critical share ' + (100 * power.banzhafNormalized).toFixed(1) +
+          '% · Encounter bonus cap ' + battle.influenceModel.cap, 'tactical-sheet'));
         card.appendChild(element('p', 'Round ' + battle.turn +
           ' · Reach the gold objective with Jack or defeat every Fabricator. Jack uses d20 vs AC; other units use terrain hit chance.', 'tactical-help'));
 

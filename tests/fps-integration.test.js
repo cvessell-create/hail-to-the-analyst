@@ -28,6 +28,7 @@ function game() {
     TacticalUI: { start(card, mission, jack, callback) { approach = { mission, jack, callback }; } },
     performance: { now() { return 1000; } },
     requestAnimationFrame() {},
+    VessellEngine: require('../engine/core.js'),
     console
   });
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -37,6 +38,7 @@ function game() {
       briefing, startTactics, loadLevel, finishLevel,
       state: () => state, player: () => player,
       enemies: () => enemies, keys: () => keys
+      , moveEntity, hasLOS, solid, engineClock, mission: () => missionMachine
     };
   `;
   vm.runInContext(source.replace('title();', hooks + '\ntitle();'), context);
@@ -108,4 +110,15 @@ test('entry point uses local classic scripts and styles that work without a buil
     assert.ok(fs.existsSync(path.join(root, target)), target);
   }
   assert.ok(!html.includes('type="module"'));
+});
+test('campaign uses shared collision/LOS, bounded clock and live mission emulator', () => {
+  const g = game(); g.fps.loadLevel(0);
+  g.nodes.get('muteBtn').onclick();
+  const player = g.fps.player(), x = player.x;
+  g.fps.moveEntity(player, 100, 0, 0.18);
+  assert.ok(player.x > x && player.x < 6);
+  assert.equal(g.fps.hasLOS(player, { x: -1, y: player.y }), false);
+  assert.equal(g.fps.mission().plan(7), false); assert.equal(g.fps.mission().plan(15), true);
+  assert.equal(g.fps.engineClock.advance(1).steps, 8);
+  assert.doesNotThrow(() => g.events.blur());
 });

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hail Engine Workbench</title>
+  <link rel="stylesheet" href="workbench.css">
+</head>
+<body>
+  <header><h1>Hail Engine Workbench</h1><nav><a href="../index.html">Campaign</a> · <a href="README.md">Engine guide</a></nav></header>
+  <p>Offline arena, editor and ultra-boss challenge. Multiplayer uses the local Node server. All credits are fictional.</p>
+  <main>
+    <section aria-labelledby="play-title">
+      <h2 id="play-title">Arena</h2>
+      <canvas id="view" width="800" height="450" tabindex="0" aria-label="First-person arena; W/S move, A/D strafe, arrow keys turn"></canvas>
+      <div class="controls" aria-label="Movement controls">
+        <button data-action="forward">Forward</button><button data-action="backward">Back</button>
+        <button data-action="left">Strafe left</button><button data-action="right">Strafe right</button>
+        <button data-action="turnLeft">Turn left</button><button data-action="turnRight">Turn right</button>
+        <button data-action="fire">Fire (online co-op)</button>
+      </div>
+      <p id="position" aria-live="off"></p>
+      <button id="sound">Play signal tone</button><button id="save">Save to browser</button>
+      <button id="load">Load saved arena</button><button id="download">Download save</button>
+      <label>Import save <input type="file" id="save-file" accept=".json,application/json"></label>
+      <details><summary>Render/audio/clock profile</summary><pre id="profile"></pre></details>
+    </section>
+    <section aria-labelledby="editor-title">
+      <h2 id="editor-title">Map and asset editor</h2>
+      <label>Paint <select id="paint"><option value="#">Wall</option><option value=".">Floor</option></select></label>
+      <div id="map" role="group" aria-label="Keyboard-accessible map cells"></div>
+      <label>Scene JSON <textarea id="scene-json" rows="10" spellcheck="false"></textarea></label>
+      <button id="apply-scene">Validate and apply scene/assets</button><button id="export-scene">Export scene</button>
+      <button id="resources">Allocate 12 environment resources (Dean)</button>
+      <p>Boundary cells are sealed. Edit spawn, sprite objects and pixel palettes in the validated scene JSON.</p>
+    </section>
+    <section aria-labelledby="boss-title">
+      <h2 id="boss-title">Ultra-boss control challenge</h2>
+      <p>Earn a boost, form a minimal team, break the veto shield, then test Jack's critical contribution.</p>
+      <div id="boosts"></div>
+      <label><input type="checkbox" id="ally-reader" checked> Recruit Reader</label>
+      <label><input type="checkbox" id="ally-medic" checked> Recruit Medic</label>
+      <button id="reform">Break shield with selected team</button><button id="boss-check">Control skill check</button>
+      <button id="strategy">Bottom-up + backward plan</button><button id="boss-reset">New challenge</button>
+      <p id="boss-summary" role="status"></p><pre id="boss-plan"></pre>
+    </section>
+    <section aria-labelledby="games-title">
+      <h2 id="games-title">Encounter game tree and mixed strategies</h2>
+      <label>Encounter <select id="encounter"><option value="chicken">Chicken</option>
+        <option value="constantSum">Constant-sum duel</option><option value="dominance">Dominance check</option></select></label>
+      <label>Player probability of first action <input id="player-prob" type="number" min="0" max="1" step="0.05" value="0.5"></label>
+      <label>NPC probability of first action <input id="npc-prob" type="number" min="0" max="1" step="0.05" value="0.5"></label>
+      <label>Payoff matrix builder (rows = player actions, columns = NPC actions; each cell is [player payoff, NPC payoff])
+        <textarea id="payoff-matrix" rows="6" spellcheck="false">[[[0,0],[-1,1]],[[1,-1],[-10,-10]]]</textarea>
+      </label>
+      <p>Use a 2x2 matrix for the playable mixed encounter. Nash output includes pure equilibria and, when nondegenerate, one interior mixed equilibrium; it is not an exhaustive solver for degenerate games.</p>
+      <button id="analyze-game">Compute expected values and Nash</button><button id="play-game">Play mixed encounter</button>
+      <pre id="game-output"></pre><p id="game-result" role="status"></p>
+      <label>Pure-strategy decision tree JSON (actor 0 = player, 1 = NPC, "chance" = known probabilities)
+        <textarea id="decision-tree" rows="8" spellcheck="false"></textarea></label>
+      <button id="tree-from-matrix">Build sequential tree from matrix</button>
+      <button id="solve-tree">Solve rational-choice outcome</button><pre id="tree-output"></pre>
+      <p>In this tree the NPC sees the player's move. That changes the information structure; it is not the simultaneous mixed game. Outcomes are rational only relative to the declared utilities and information.</p>
+    </section>
+    <section aria-labelledby="network-title">
+      <h2 id="network-title">Local multiplayer and fair loot</h2>
+      <label>Name <input id="name" maxlength="32" value="Analyst"></label>
+      <button id="join">Join authoritative arena</button><button id="disconnect">Return offline</button>
+      <label>Reward division <select id="division"><option value="knaster">Knaster (2–8 players)</option>
+        <option value="adjusted-winner">Adjusted Winner (2 players)</option><option value="vickrey">Vickrey power cell (before combat)</option></select></label>
+      <button id="start-round">Open sealed reward cache</button>
+      <p>Defeat the counterattack NPC squad together to unlock one reward cache. Aim with the arrows; hold Space or Fire. Values for relay charge, armour reserve and ammo reserve. AW: exactly 100 points. Knaster: total within your available fictional credits.</p>
+      <label>Relay <input id="bid-0" type="number" min="0" max="1000" value="40"></label>
+      <label>Armour <input id="bid-1" type="number" min="0" max="1000" value="35"></label>
+      <label>Ammo <input id="bid-2" type="number" min="0" max="1000" value="25"></label>
+      <button id="bid">Seal bid</button><pre id="network"></pre>
+      <p>Power auction: use Relay as the single bid. Highest bid wins and pays second-highest; ties use join order. One power cell per arena: +5 shot damage and +1 level. Credits plus treasury are conserved.</p>
+    </section>
+  </main>
+  <p id="error" role="alert"></p>
+  <script src="../vendor/jsnes/jsnes.cjs"></script>
+  <script src="../js/emulation-engine.js"></script>
+  <script src="core.js"></script><script src="systems.js"></script><script src="controls.js"></script>
+  <script src="../js/power-index.js"></script><script src="math.js"></script><script src="boss.js"></script>
+  <script src="fair-division.js"></script><script src="game-theory.js"></script><script src="workbench.js"></script>
+</body>
+</html>

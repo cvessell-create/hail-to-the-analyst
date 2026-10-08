@@ -1,5 +1,22 @@
 # Attribution and licence records
 
+## Engine integration, October 7, 2026
+
+The owner supplied `Vessell-engine-source.zip`, containing original Apache-2.0
+engine code and JSNES 2.1.0. Original engine extensions remain Apache-2.0 in
+`engine/`, `server/`, `scripts/`, `js/power-index.js`, and their marked tests.
+The imported engine notice/license remain in `engine/NOTICE` and `engine/LICENSE`.
+JSNES compiled runtime, source map, matching preferred JavaScript source,
+upstream README/package metadata and license are retained in `vendor/jsnes/`.
+No commercial ROM or BIOS is included; mission bytecode is original homebrew.
+
+The combined distribution selects GPL-3.0-or-later from the existing campaign
+GPL-2.0-or-later permission: Apache-2.0 is not GPLv2-only compatible.
+See `COPYING-GPL-3`; the original `LICENSE` and file notices are not erased.
+SRD material keeps the exact CC BY 4.0 attribution below.
+Procedural assets and mathematical algorithms do not import commercial
+game code/art. Mathematical references and access limits are in `engine/README.md`.
+
 ## Original game
 
 Copyright 2026 Christopher R. Vessell. Original contributions are licensed

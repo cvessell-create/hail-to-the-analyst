@@ -8,6 +8,16 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const T = require('../js/tactics.js');
+test('influence XP is capped, separately recorded, carried and not duplicated', () => {
+  const battle = T.createBattle(0), before = battle.jack.xp;
+  const first = T.awardInfluence(battle, 'tactics-0');
+  assert.ok(first.xp > 0 && first.xp <= 300);
+  assert.equal(battle.jack.xp, before + first.xp);
+  T.awardInfluence(battle, 'tactics-0'); assert.equal(battle.jack.xp, before + first.xp);
+  const next = T.createBattle(1, battle.jack, { engineScaling: true });
+  assert.equal(next.jack.influence.xp, first.xp);
+  assert.ok(next.units.filter(u => u.side === 'fabricator').some(u => u.level > 1));
+});
 
 function rng(values) {
   let index = 0;
@@ -28,6 +38,8 @@ function duel(attackerType) {
 
 test('classic file script and CommonJS expose the same dependency-free API', function () {
   const context = vm.createContext({});
+  vm.runInContext(fs.readFileSync(require.resolve('../js/power-index.js'), 'utf8'), context);
+  context.EngineMath = require('../engine/math.js');
   vm.runInContext(fs.readFileSync(require.resolve('../js/tactics.js'), 'utf8'), context);
   assert.equal(typeof context.Tactics.createBattle, 'function');
   assert.equal(globalThis.Tactics, T);

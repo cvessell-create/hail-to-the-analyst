@@ -1,0 +1,9 @@
+Vessell Engine original implementation
+Copyright 2026 Christopher R. Vessell
+Assistant-assisted development, October 7, 2026. Original contributions under Apache-2.0.
+
+JSNES 2.1.0
+Copyright 2020 Ben Firshman; JSNES contributors. Apache-2.0.
+https://github.com/bfirsh/jsnes/tree/v2.1.0
+Unmodified distributed runtime and matching preferred source in vendor/jsnes.
+JSNES credits vNES by James Sanders and Matt Wescott's JSSpeccy as project ancestry; see upstream README/licence.
