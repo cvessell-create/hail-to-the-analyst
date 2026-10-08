@@ -203,6 +203,10 @@
       "sha256": "10d591c9a31ef1f81fde2e968d071eaff5f8a042838b1ccfbf490baf99a879dc"
     },
     {
+      "path": "js/prediction.js",
+      "sha256": "6a78338c4b2ae031fd3de1f00625894f742ef880c9b1b3e4e1a806ddefcc7ed9"
+    },
+    {
       "path": "js/tactical-ui.js",
       "sha256": "e03870f69f2c7fce52c86d88d9d09c19e5fd4a1241f45c4f54a271b34496e5f6"
     },
@@ -285,6 +289,10 @@
     {
       "path": "tests/nes-visual.test.js",
       "sha256": "3be8cb6ed00ef02cc570e0d4698d8ebc6073f17d8a694fd1ad5e559f3b950dd5"
+    },
+    {
+      "path": "tests/prediction.test.js",
+      "sha256": "e34fd34952e728833b1592759027fda13627afb476855ca5e328f52ace3bf820"
     },
     {
       "path": "tests/request-clock.test.js",
