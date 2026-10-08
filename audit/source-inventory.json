@@ -136,6 +136,15 @@
     "vendor": false
   },
   {
+    "path": "engine/static-reserve.js",
+    "sha256": "daaaf14d199402928dbba4a9f44dd70a26db3d0946f694ca227aa01506d38e89",
+    "bytes": 1131,
+    "functions": [
+      "fromModel"
+    ],
+    "vendor": false
+  },
+  {
     "path": "engine/systems.js",
     "sha256": "d8213f2c11d803c9cb8e286764db14a741e3d7e78079161cb95e36509cc95154",
     "bytes": 11513,
@@ -359,11 +368,19 @@
     "vendor": false
   },
   {
+    "path": "scripts/prove-static-reserve.js",
+    "sha256": "8d5d13fc42b4eb5ab7c3de3651382f2e058c253de63ca864538101da70cc957e",
+    "bytes": 1394,
+    "functions": [],
+    "vendor": false
+  },
+  {
     "path": "server/arena.js",
-    "sha256": "303aab829ceba02ebd0861ded0c9234833f45f8d3b71791ef75aec2f13aafca4",
-    "bytes": 13610,
+    "sha256": "91e72f3568bdb97e66adf5edfa3c5f0cf2e754ad2c8a676d65d24021a4bcb36f",
+    "bytes": 15305,
     "functions": [
       "createArena",
+      "event",
       "allies",
       "damage",
       "settleCombat",
@@ -436,6 +453,13 @@
       "game",
       "node"
     ],
+    "vendor": false
+  },
+  {
+    "path": "tests/static-reserve.test.js",
+    "sha256": "357955a5f55ba74213f23a32ba79f57714193cb70f0b7dc8b09bc8a6367121c6",
+    "bytes": 1546,
+    "functions": [],
     "vendor": false
   },
   {
