@@ -58,8 +58,8 @@
   },
   {
     "path": "engine/core.js",
-    "sha256": "06f23341d2b95eeec2f6da3e21e731168d4d48c30b4924d40db6a82feafbb907",
-    "bytes": 9483,
+    "sha256": "bd608901042617f08632de0173385573dfc639272e100e85ae9fd32b976404be",
+    "bytes": 9765,
     "functions": [
       "finite",
       "validateGrid",
@@ -120,6 +120,16 @@
     "vendor": false
   },
   {
+    "path": "engine/harvest-policy.js",
+    "sha256": "70cb9f77fd52589f624089e48f163e091425632cdee5ce1b7980e8271116bf41",
+    "bytes": 1355,
+    "functions": [
+      "empty",
+      "step"
+    ],
+    "vendor": false
+  },
+  {
     "path": "engine/math.js",
     "sha256": "ab50286d55082a5504e2c176c48e61f05a9cc57976092a5f2b2cb079c971ac70",
     "bytes": 6635,
@@ -132,6 +142,26 @@
       "environment",
       "backwardInduction",
       "visit"
+    ],
+    "vendor": false
+  },
+  {
+    "path": "engine/seeded-rng.js",
+    "sha256": "647c3ac014b6f6b5832ae834cd7f8a639c7a4574da7798f48bb42157d355e6b3",
+    "bytes": 640,
+    "functions": [
+      "create"
+    ],
+    "vendor": false
+  },
+  {
+    "path": "engine/state-model.js",
+    "sha256": "a3c714728eb4749c18b7359c7d2c7b635e4fa0b2c1a6f56ab1113ed3ccd165c4",
+    "bytes": 2727,
+    "functions": [
+      "motion",
+      "project",
+      "difference"
     ],
     "vendor": false
   },
@@ -186,8 +216,8 @@
   },
   {
     "path": "engine/workbench.html",
-    "sha256": "2377986b30166d7cd2c42ffac77fda631db31dc898fc3a3b700dcc8e1f69adbd",
-    "bytes": 6877,
+    "sha256": "6c42f74c4ea3327a64b76b2f030fd63400c045fdf22a896d7521d41f0bd1ab9c",
+    "bytes": 7029,
     "functions": [],
     "vendor": false
   },
@@ -211,9 +241,11 @@
   },
   {
     "path": "index.html",
-    "sha256": "e38744d91fdb217d88f092f6e5f36dad958297b278eaa0c5414b6768cc096e5b",
-    "bytes": 34972,
+    "sha256": "1dbc817bfe34ef42e56c87d5efa251f4bcfede5c13f2ddece447ff9940c1ee1f",
+    "bytes": 40159,
     "functions": [
+      "gameRandom",
+      "wholeState",
       "setMessage",
       "tone",
       "title",
@@ -255,8 +287,8 @@
   },
   {
     "path": "js/emulation-engine.js",
-    "sha256": "55ce5b866db9f3177fd79b97aee4ff05d41b628ee9cc474bbe314b5938c98711",
-    "bytes": 3474,
+    "sha256": "3187383d1f96e8a4431d644beed8dff86cb0ed8d6c72b37dd7715db8c2fb908c",
+    "bytes": 3779,
     "functions": [
       "program",
       "label",
@@ -285,8 +317,8 @@
   },
   {
     "path": "js/tactical-ui.js",
-    "sha256": "7dcaf80c7dfdd9ad6161b6c70d90722f2d28dbd9cde49da0696f92fa64536725",
-    "bytes": 7904,
+    "sha256": "e03870f69f2c7fce52c86d88d9d09c19e5fd4a1241f45c4f54a271b34496e5f6",
+    "bytes": 8844,
     "functions": [
       "element",
       "button",
@@ -296,8 +328,8 @@
   },
   {
     "path": "js/tactics.js",
-    "sha256": "2dac2fa2169bbbe1619a3425195c62a85d86d174baa7b3b1f63fe97cf3664aaa",
-    "bytes": 26577,
+    "sha256": "909699c63717601140aae2a8f85fc721a56609d1c330f1a33af15e570de38dd9",
+    "bytes": 27182,
     "functions": [
       "neighbors",
       "hexDistance",
@@ -359,6 +391,20 @@
     "vendor": false
   },
   {
+    "path": "scripts/log-harvest-policy.js",
+    "sha256": "a8f077e65119ca7204942760bd3c94ccf3630e56f6dfbb2c67be03f182a908c9",
+    "bytes": 474,
+    "functions": [],
+    "vendor": false
+  },
+  {
+    "path": "scripts/log-state-model.js",
+    "sha256": "cfbd0caffee0e78eb0675dfe3b66689dab59e26be6832b4a61a7d1c4f8ea5ebd",
+    "bytes": 1318,
+    "functions": [],
+    "vendor": false
+  },
+  {
     "path": "scripts/package-source.js",
     "sha256": "19cb4eacd91a00182c309dca4689aa6ada76c38685531a5a29ca79525eb40414",
     "bytes": 2418,
@@ -376,8 +422,8 @@
   },
   {
     "path": "server/arena.js",
-    "sha256": "91e72f3568bdb97e66adf5edfa3c5f0cf2e754ad2c8a676d65d24021a4bcb36f",
-    "bytes": 15305,
+    "sha256": "b2ba6aafc08b89bb539e540e6cd81fa6ab466cbcd9b3cf11c7d8fecc0258c09b",
+    "bytes": 16916,
     "functions": [
       "createArena",
       "event",
@@ -391,8 +437,8 @@
   },
   {
     "path": "server/index.js",
-    "sha256": "b2ed98c5c9605d067dab73798f4b027d48e911212a490e3b9e73baf3e0c41771",
-    "bytes": 5133,
+    "sha256": "e8e1fe43ca15c7c444f4c71e8cd34ab8e5370337530a083667a30f6a745e6b39",
+    "bytes": 5335,
     "functions": [
       "createServer"
     ],
@@ -447,12 +493,26 @@
   },
   {
     "path": "tests/fps-integration.test.js",
-    "sha256": "18daa8d0f9217c79341e11fde144d45327b0841ec541d6b064db72f7a1f0b31f",
-    "bytes": 5133,
+    "sha256": "36cb10853c6a942c6bc221336d20f3a0a8bc95af1b1a27d739f27d8c4895f742",
+    "bytes": 6076,
     "functions": [
       "game",
       "node"
     ],
+    "vendor": false
+  },
+  {
+    "path": "tests/harvest-policy.test.js",
+    "sha256": "ff9c348e8ed7cb681027b1833c447b0aed6363eb25ffa3264688728c9dfe0b70",
+    "bytes": 2035,
+    "functions": [],
+    "vendor": false
+  },
+  {
+    "path": "tests/state-model.test.js",
+    "sha256": "0f6890d747e7705d3a3a24ad837d97d2257e6e155c7c2a811eb2b461dbd84123",
+    "bytes": 1403,
+    "functions": [],
     "vendor": false
   },
   {
@@ -464,8 +524,8 @@
   },
   {
     "path": "tests/tactics.test.js",
-    "sha256": "0acbf61517e734224fd0f6c766d93c2038adee1b46182c71359c60c0076267fa",
-    "bytes": 17709,
+    "sha256": "f82511fddcdf5674c58f0edc46232da9cf09c714f43ac7b172bbdb4322f730ae",
+    "bytes": 17821,
     "functions": [
       "rng",
       "duel"

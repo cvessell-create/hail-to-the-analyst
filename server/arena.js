@@ -7,6 +7,8 @@ const Fair = require('../engine/fair-division.js');
 const MathEngine = require('../engine/math.js');
 const Power = require('../js/power-index.js');
 const Reserve = require('../engine/static-reserve.js');
+const Harvest = require('../engine/harvest-policy.js');
+const Dynamics = require('../engine/state-model.js');
 function createArena(now = () => Date.now(), options = {}) {
   const scene = Systems.validateScene(options.scene || options.saved?.scene || MathEngine.environment(Systems.defaultScene()).scene), sessions = new Map();
   let tick = 0, round = null, roundId = 0, phase = 'playing', locked = false, influenceModel = null;
@@ -33,6 +35,7 @@ function createArena(now = () => Date.now(), options = {}) {
       phase = 'won';event('encounter_won',{});
       for (const player of players) {
         const power = Power.reward(influenceModel, player.id, players.filter(p => p.hp > 0).map(p => p.id));
+        const reserve=Reserve.fromModel(influenceModel).players.find(p=>p.id===player.id).baseReserve;const policy=Harvest.step(player.savings,power.xp,reserve);player.savings=policy.next;event('savings_updated',{player:player.id,...policy});
         player.xp += power.xp; player.influence = power;
         player.level = Math.max(player.level, Math.min(5, 1 + Math.floor(player.xp / 300)));
         event("xp_realized",{player:player.id,reserve:Reserve.fromModel(influenceModel).players.find(p=>p.id===player.id),survived:player.hp>0,critical:power.critical,awardedXp:power.xp,cumulativeXp:player.xp,nextLevel:player.level,formula:"alive?min(cap,floor(baseReserve)+25*critical):0"});
@@ -49,7 +52,7 @@ function createArena(now = () => Date.now(), options = {}) {
     return { tick, you: viewer.id, scene, strategy:influenceModel&&Reserve.fromModel(influenceModel),audit:{events,droppedEvents,retentionLimit:1000}, players: Array.from(sessions.values(), player => ({
       id: player.id, name: player.name, ...player.world.position(), sequence: player.sequence,
       credits: player.credits, inventory: player.inventory, hp: player.hp, level: player.level,
-      xp: player.xp, damage: player.damage, influence: player.influence, power: player.power })),
+      xp: player.xp, savings: player.savings||Harvest.empty(), damage: player.damage, influence: player.influence, power: player.power })),
     economy: { treasury, receipts, powerCellConsumed, rewardCacheConsumed },
     combat: { phase, locked, enemies: enemies.map(enemy => ({ id: enemy.id, hp: enemy.hp,
       maxHp: enemy.maxHp, level: enemy.level, ...enemy.world.position() })),
@@ -61,6 +64,7 @@ function createArena(now = () => Date.now(), options = {}) {
       result: round.result, reason: round.reason } };
   }
   return {
+    dynamicState() { return Dynamics.project(this.exportState()); },
     exportState() {
       const encode=p=>{const {world,...rest}=p;return {...rest,position:world.position()};};
       return {events,droppedEvents,tick,roundId,phase,locked,influenceModel,powerCellConsumed,rewardCacheConsumed,treasury,receipts,scene,sessions:Array.from(sessions,([token,p])=>[token,encode(p)]),enemies:enemies.map(encode),round:round&&{...round,players:undefined,playerTokens:round.players.map(p=>Array.from(sessions).find(([token,q])=>q===p)[0]),bids:Array.from(round.bids)}};
@@ -73,7 +77,7 @@ function createArena(now = () => Date.now(), options = {}) {
       const token = crypto.randomBytes(24).toString('hex'), player = {
         id: crypto.randomUUID(), name: name.trim(), seen: now(), sequence: 0,
         input: { forward: 0, strafe: 0, turn: 0, fire: false }, inputTime: 0, credits: Fair.fraction(1000), inventory: [],
-        hp: 100, maxHp: 100, level: 1, xp: 0, damage: 0, cooldown: 0, influence: null, power: 0,
+        savings:Harvest.empty(), hp: 100, maxHp: 100, level: 1, xp: 0, damage: 0, cooldown: 0, influence: null, power: 0,
         world: Engine.createWorld({ grid: scene.grid, x: spawn.x + index * 0.6, y: spawn.y, angle: 0 })
       };
       sessions.set(token, player);event("joined",{player:player.id,name:player.name,maxHp:player.maxHp,level:player.level});
@@ -142,6 +146,8 @@ function createArena(now = () => Date.now(), options = {}) {
       settleCombat();
       if (round?.state === 'bidding' && now() > round.deadline) { round.state = 'cancelled'; round.reason = 'Bid deadline expired; no assets or credits transferred.'; }
     },
+    replay(token) { const host=session(token);if(host!==allies()[0]||phase==='playing')throw Object.assign(Error('The host can replay after the encounter ends.'),{status:409});const next=createArena(now,{scene});for(const old of allies())next.join(old.name);const saved=next.exportState();saved.sessions=saved.sessions.map(([unused,p],i)=>{const [priorToken,old]=Array.from(sessions)[i];return [priorToken,{...p,id:old.id,xp:old.xp,level:old.level,savings:old.savings||Harvest.empty(),credits:old.credits,inventory:old.inventory}];});saved.events=[{tick:0,time:now(),type:'encounter_restarted',carried:saved.sessions.map(([,p])=>({id:p.id,xp:p.xp,level:p.level,savings:p.savings}))}];return createArena(now,{saved}); },
+    harvest(token,amount) { const player=session(token);if(phase!=='won')throw Object.assign(Error('Harvest after victory.'),{status:409});const reserve=Reserve.fromModel(influenceModel).players.find(p=>p.id===player.id).baseReserve;const policy=Harvest.step(player.savings,0,reserve,amount);player.savings=policy.next;event('savings_harvested',{player:player.id,...policy});return snapshot(token); },
     startRound(token, method) {
       session(token);
       const players = Array.from(sessions.values());

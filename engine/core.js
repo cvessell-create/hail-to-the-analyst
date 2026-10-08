@@ -134,7 +134,7 @@
       const lost = available - steps;
       dropped += lost; pending = Math.max(0, pending - lost / hz);
       return { ticks, droppedTicks: dropped, steps, alpha: pending * hz };
-    }, reset() { pending = 0; ticks = 0; dropped = 0; } };
+    }, exportState() {return {pending,ticks,dropped};}, restoreState(v) {if(!v||!Number.isFinite(v.pending)||v.pending<0||v.pending>=1/hz||![v.ticks,v.dropped].every(n=>Number.isSafeInteger(n)&&n>=0))throw Error("Invalid clock state.");pending=v.pending;ticks=v.ticks;dropped=v.dropped;}, reset() { pending = 0; ticks = 0; dropped = 0; } };
   }
   function bindInput(target) {
     const held = new Set();

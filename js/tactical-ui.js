@@ -3,10 +3,12 @@
   'use strict';
 
   window.TacticalUI = {
-    start: function (card, mission, jack, onBreach) {
-      var battle = Tactics.createBattle(mission, jack, { engineScaling: true });
-      var selected = battle.jack;
-      var weapon = 'sidearm';
+    start: function (card, mission, jack, onBreach, savedBattle) {
+      var battle = savedBattle || Tactics.createBattle(mission, jack, { engineScaling: true });
+      if(savedBattle){battle.jack=battle.units.find(u=>u.id===battle.jack.id);}
+      window.HailTacticalState=function(){battle.ui={selectedId:selected.id,weapon:weapon,notice:notice};return JSON.parse(JSON.stringify(battle));};
+      var selected = battle.ui?battle.units.find(u=>u.id===battle.ui.selectedId)||battle.jack:battle.jack;
+      var weapon = battle.ui?battle.ui.weapon:'sidearm';
       var notice = 'Select an Analyst, then a highlighted hex to move or an adjacent enemy to attack.';
       card.classList.add('tactical-card');
 
@@ -61,7 +63,7 @@
                   selected = unit;
                   notice = unit.name + ' selected.';
                 } else if (unit) {
-                  notice = Tactics.attack(battle, selected, unit, selected.type === 'jack' ? weapon : undefined) ?
+                  notice = Tactics.attack(battle, selected, unit, selected.type === 'jack' ? weapon : undefined, window.HailGameRandom) ?
                     'Combat resolved. Check the field log.' : 'Attack unavailable: approach an adjacent enemy, or end your turn.';
                 } else {
                   notice = Tactics.move(battle, selected, x, y) ? 'Position updated.' : 'Hex unavailable: check movement, terrain, fear and zones of control.';
@@ -110,12 +112,14 @@
             render();
           }));
           controls.appendChild(button('END TURN', function () {
-            Tactics.endTurn(battle);
+            Tactics.endTurn(battle,window.HailGameRandom);
             if (selected.hp <= 0) selected = battle.jack;
             notice = 'Fabricator turn resolved.';
             render();
           }));
         } else if (battle.phase === 'won') {
+          controls.appendChild(button('HARVEST SAVED XP',function(){const share=battle.influenceModel.players[battle.influenceModel.ids.indexOf('jack')],reserve=battle.influenceModel.cap*(share.banzhafNormalized+share.shapleyShubik)/2,receipt=window.HailHarvestPolicy.step(battle.jack.savings,0,reserve,1000000);battle.jack.savings=receipt.next;battle.savingsLog.push(receipt);render();}));
+          card.appendChild(element('p','Saved XP '+battle.jack.savings.bank+' · Available XP '+battle.jack.savings.available,'tactical-sheet'));
           var result = Tactics.handoff(battle);
           notice = 'Breach secured: +' + result.armor + ' armour, +' + result.bullets +
             ' bullets, +' + result.shells + ' shells; ' + result.extraEnemies + ' extra enemies from squad losses.';

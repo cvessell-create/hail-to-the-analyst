@@ -37,6 +37,7 @@
  */
 (function (root) {
   'use strict';
+  const Harvest = typeof module === 'object' && module.exports ? require('../engine/harvest-policy.js') : root.HailHarvestPolicy;
   const Power = typeof module === 'object' && module.exports ? require('./power-index.js') : root.PowerIndex;
   const MathEngine = typeof module === 'object' && module.exports ? require('../engine/math.js') : root.EngineMath;
 
@@ -194,6 +195,7 @@
     }
     jack.influence = optionalJack && optionalJack.influence ?
       JSON.parse(JSON.stringify(optionalJack.influence)) : { xp: 0, awards: {} };
+    jack.savings = optionalJack && optionalJack.savings ? JSON.parse(JSON.stringify(optionalJack.savings)) : Harvest.empty();
     jack.proficiency = jack.level >= 5 ? 3 : 2;
     jack.maxHp = 32 + (jack.level - 1) * 6;
     jack.hp = jack.maxHp;
@@ -320,6 +322,7 @@
     const result = Power.reward(battle.influenceModel, 'jack', survivingIds ||
       battle.units.filter(unit => alive(unit) && unit.side === 'analyst').map(unit => unit.id));
     ledger.awards[receiptId] = result;
+    const share=battle.influenceModel.players[battle.influenceModel.ids.indexOf('jack')];const reserve=battle.influenceModel.cap*(share.banzhafNormalized+share.shapleyShubik)/2;const savings=Harvest.step(battle.jack.savings,result.xp,reserve);battle.jack.savings=savings.next;battle.savingsLog=battle.savingsLog||[];battle.savingsLog.push(savings);
     ledger.xp += result.xp;
     grantXp(battle, battle.jack, result.xp);
     battle.log.push('Influence +' + result.xp + ' XP; Shapley-Shubik ' +

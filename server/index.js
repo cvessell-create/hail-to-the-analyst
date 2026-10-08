@@ -44,6 +44,7 @@ function createServer({ manual = false } = {}) {
           if (Object.keys(data).join(',') !== 'method') return json(422, { error: 'Only a division method is accepted.' });
           return json(201, arena.startRound(token, data.method));
         }
+        if (url.pathname === '/api/harvest') {if(Object.keys(data).join(',')!=='amount')return json(422,{error:'Only a harvest amount is accepted.'});return json(200,arena.harvest(token,data.amount));}
         if (url.pathname === '/api/bid') return json(200, arena.bid(token, data));
         return json(404, { error: 'Unknown API route.' });
       }

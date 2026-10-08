@@ -1,4 +1,4 @@
-## Slide 1: Hail to the Analyst
+## Slide 1: The Hybrid State Transition System: Discrete Event in Continuous Motion
 
 **Backward induction, algorithm provenance and weighting**
 
@@ -99,4 +99,15 @@ Input, algorithm, formula, output, units, normalization, source version, downstr
 
 **The game and audit remain separately testable**
 
-Room-code co-op, durable snapshots, shared battle and host replay. Source audit includes 58 passing tests. Remote GitHub branch creation is blocked by integration permissions. Final contest submission remains separate.
+Room-code co-op, durable snapshots, shared battle and host replay. Source audit includes 64 passing tests. Remote GitHub branch creation is blocked by integration permissions. Final contest submission remains separate.
+## Slide 17: Whole-state transition
+
+S_next = F(S, ordered action, dt, wall clock, random draws). Continuous-valued motion and discrete event guards share one hybrid state.
+
+## Slide 18: A constant coordinate
+
+The locked reserve is constant while position, health and cooldown evolve. Full kernel restoration is tested; public logs omit tokens and sealed bids. Seeded checkpoints reproduce the tested continuation with the same actions.
+
+## Slide 19: Savings and harvesting
+
+D=floor(A/4); protected target L=floor(R/2); H=min(request,remaining deposit budget,max(0,bank+D−L)). Savings plus available ledger equals total earned influence XP. No income is generated from reserve itself.

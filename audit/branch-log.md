@@ -29,3 +29,9 @@ The earlier history reported tests in another build. This continuation does not 
 ## Provenance rules
 
 Record source path, input, formula, output, units, status and downstream consumer for every weighting stage. Keep reported preferences, raw algorithm measures, designer weights, normalized power, cardinal utility and empirical efficacy distinct. No null utility is silently replaced with a numeric value. Feedback is a new forward computation at a later version, not proof that the original transformation can be inverted.
+
+### Whole-state continuation
+
+Owner named the slideshow log “The Hybrid State Transition System: Discrete Event in Continuous Motion”. Added hybrid state equations, code mappings, privacy-safe observations, restoration tests and campaign snapshot logging. This record includes the recovered branch records; it does not claim access to the complete original chat transcript.
+
+Owner requested deterministic whole-state execution, a sustainable-yield-like savings rule, campaign completion and final checks. Added seeded gameplay RNG, campaign checkpoint restoration, bounded harvest receipts and savings continuity across co-op encounters. Policy constants are provisional design choices; prior originality research remains separate.

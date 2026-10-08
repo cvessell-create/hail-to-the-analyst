@@ -38,10 +38,11 @@ function game() {
       briefing, startTactics, loadLevel, finishLevel,
       state: () => state, player: () => player,
       enemies: () => enemies, keys: () => keys
-      , moveEntity, hasLOS, solid, engineClock, mission: () => missionMachine
+      , update, fire, moveEntity, hasLOS, solid, engineClock, checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine
     };
   `;
-  vm.runInContext(source.replace('title();', hooks + '\ntitle();'), context);
+  const at=source.lastIndexOf('title();');
+  vm.runInContext(source.slice(0,at)+hooks+source.slice(at), context);
   return { fps: context.fps, nodes, events, approach: () => approach };
 }
 
@@ -121,4 +122,12 @@ test('campaign uses shared collision/LOS, bounded clock and live mission emulato
   assert.equal(g.fps.mission().plan(7), false); assert.equal(g.fps.mission().plan(15), true);
   assert.equal(g.fps.engineClock.advance(1).steps, 8);
   assert.doesNotThrow(() => g.events.blur());
+});
+
+test('campaign checkpoint restores RNG, mission CPU, controls and the same next gameplay transitions',()=>{
+ const a=game(),b=game();for(const g of [a,b]){g.fps.loadLevel(0);g.fps.keys().KeyW=true;}
+ for(let k=0;k<10;k++){a.fps.update(1/60);b.fps.update(1/60);}assert.equal(JSON.stringify(a.fps.checkpoint()),JSON.stringify(b.fps.checkpoint()));
+ a.fps.mission().clearance();a.fps.mission().plan(15);a.fps.fire();a.fps.engineClock.advance(.025);const saved=a.fps.checkpoint();b.fps.restore(saved);assert.equal(JSON.stringify(a.fps.checkpoint()),JSON.stringify(b.fps.checkpoint()));
+ for(let k=0;k<80;k++){a.fps.engineClock.advance(1/60);b.fps.engineClock.advance(1/60);if(k%20===0){a.fps.fire();b.fps.fire();}}
+ assert.equal(JSON.stringify(a.fps.checkpoint()),JSON.stringify(b.fps.checkpoint()));
 });

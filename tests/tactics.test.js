@@ -36,10 +36,11 @@ function duel(attackerType) {
   return { battle: battle, attacker: attacker, target: target };
 }
 
-test('classic file script and CommonJS expose the same dependency-free API', function () {
+test('classic file script and CommonJS expose the same API with explicit dependencies', function () {
   const context = vm.createContext({});
   vm.runInContext(fs.readFileSync(require.resolve('../js/power-index.js'), 'utf8'), context);
   context.EngineMath = require('../engine/math.js');
+  vm.runInContext(fs.readFileSync(require.resolve('../engine/harvest-policy.js'), 'utf8'), context);
   vm.runInContext(fs.readFileSync(require.resolve('../js/tactics.js'), 'utf8'), context);
   assert.equal(typeof context.Tactics.createBattle, 'function');
   assert.equal(globalThis.Tactics, T);

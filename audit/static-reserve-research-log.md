@@ -70,7 +70,7 @@ A separate declared fixture at quota 30 gives two surviving critical players 175
 
 ## Verification and continuation
 
-58 tests pass, including reserve invariance under injury, persistence restoration and the distinction between reserve and payout. `static-reserve-proof.json` stores the executed result. `static-reserve-proof.md` contains the formal conditional proof. `executed-weight-log.json` and `weighting-ledger.md` document weighting in both directions. `branch-log.md` preserves the recovered design history.
+64 tests pass, including reserve invariance under injury, persistence restoration and the distinction between reserve and payout. `static-reserve-proof.json` stores the executed result. `static-reserve-proof.md` contains the formal conditional proof. `executed-weight-log.json` and `weighting-ledger.md` document weighting in both directions. `branch-log.md` preserves the recovered design history.
 
 The originality side log contains prior-art citations and search scope. No “first ever” claim is established. A game-specific implementation, defined interpretation, proof and transparent provenance can be attributed to this project without claiming invention of Banzhaf or Shapley–Shubik power.
 
