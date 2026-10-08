@@ -12,6 +12,9 @@ manifests in the game audit remain historical records, not current hashes.
 - Catch-up ticks now advance a simulation clock from the persisted room time,
   rather than using request-end time for every step. Input expiration remains
   250 ms, but input is not prematurely stale for its whole valid interval.
+- Hosted multiplayer renders bounded, collision-aware local movement prediction
+  between server syncs and reconciles every frame from authoritative snapshots.
+  Predicted coordinates are display-only and are never sent to the server.
 - Short keyboard/touch fire presses are latched until the next sample.
 - All five solo missions enter first-person play directly; legacy tactical
   checkpoint restoration remains supported, not a required new-game stage.
