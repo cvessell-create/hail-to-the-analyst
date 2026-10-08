@@ -1,0 +1,24 @@
+/* Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: Apache-2.0 */
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101b20; color: #e9f4ee; }
+* { box-sizing: border-box; }
+body { max-width: 1200px; margin: auto; padding: 1rem; }
+main { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 1rem; }
+section { min-width: 0; background: #192b30; border: 1px solid #658e84; padding: 1rem; border-radius: .5rem; }
+canvas { width: 100%; display: block; }
+button, input, select, textarea { font: inherit; padding: .6rem; margin: .25rem; }
+button { min-height: 44px; cursor: pointer; }
+label { display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
+input, select { max-width: 100%; }
+textarea { width: 95%; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 28rem; overflow: auto; }
+a { color: #93e9ba; }
+:focus-visible { outline: 3px solid #ffe77c; outline-offset: 2px; }
+.controls button { touch-action: none; }
+#map { display: grid; gap: 2px; overflow-x: auto; margin: .6rem 0; }
+#map button { min-width: 32px; min-height: 32px; padding: 0; margin: 0; }
+#map .wall { background: #638171; }
+#map .floor { background: #15231c; }
+#map .occupied { border: 2px solid #ffe77c; }
+#error { position: sticky; bottom: 0; color: #fff; background: #7e2727; padding: .6rem; }
+#error:empty { display: none; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }

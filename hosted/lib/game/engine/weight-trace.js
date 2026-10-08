@@ -1,0 +1,10 @@
+// Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: Apache-2.0
+(function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('../js/power-index'):root.PowerIndex,typeof module==='object'&&module.exports?require('./math'):root.EngineMath);if(typeof module==='object'&&module.exports)module.exports=api;else root.WeightTrace=api;})(globalThis,function(Power,MathEngine){
+'use strict';
+function trace(participants,opponents,boss=false){
+ const model=Power.encounter(participants,opponents,boss),survivors=participants.filter(p=>p.hp>0).map(p=>p.id);
+ const steps=participants.map((p,i)=>{const output=Power.reward(model,p.id,survivors);return {id:p.id,input:{maxHp:p.maxHp,level:p.level,hp:p.hp},forward:{weightFormula:'ceil(maxHp/4)+2*level',weight:model.weights[i],quota:model.quota,quotaFormula:'ceil(sum(weights)*(0.5+min(0.4,sum(enemyMaxHp)/2000)))',shapleyShubik:output.shapleyShubik,banzhafNormalized:output.banzhafNormalized,meanPower:(output.shapleyShubik+output.banzhafNormalized)/2,xpFormula:'alive ? min(cap,floor(cap*meanPower)+(critical?25:0)) : 0',xp:output.xp},reverse:{output:'xp',dependsOn:['survival','criticality','cap','Shapley-Shubik','normalized Banzhaf','coalition quota','maxHp','level'],nextRoundEffect:'arena level=max(previousLevel,min(5,1+floor(cumulativeXP/300))); later encounter weight uses that level',automaticLearningUpdate:false},status:'EXISTING_GAME_RULE_REPRODUCED_FOR_AUDIT'};});
+ return {schema:'hail-weight-trace/v1',model,steps,utilityCalibration:null,warning:'The normalized power share is an output, not an input vote weight. Forward computation has a dependency trace, not a unique mathematical inverse.'};
+}
+function apportionTrace(weights,total,method){return {schema:'hail-allocation-trace/v1',inputs:{weights:weights.slice(),total,method},output:MathEngine.apportion(weights,total,method),reverse:{allocationToOriginalWeights:'nonunique; many weight vectors give the same allocation',automaticFeedback:false},origin:'supplied designer weights; algorithm does not infer them'};}
+return {trace,apportionTrace};});

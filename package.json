@@ -1,8 +1,8 @@
 {
   "name": "hail-to-the-analyst",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "Offline FPS/tactics campaign and original math-driven engine workbench",
+  "description": "Five-mission offline FPS campaign and original math-driven engine workbench",
   "license": "GPL-3.0-or-later",
   "engines": { "node": ">=24" },
   "scripts": {
