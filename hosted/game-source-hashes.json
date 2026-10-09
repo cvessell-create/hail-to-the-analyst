@@ -196,7 +196,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "f6c1026da761abfa6bebbf24cc8098273053371f6677c0224cefb5089f4a967d"
+      "sha256": "0cd521ba830d0c6be7ae70fbb5f84e2e6c6f517930c57384fdcb11779795001a"
     },
     {
       "path": "js/emulation-engine.js",
@@ -284,7 +284,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "0947eb183a1c93a9fc38e834f97411b7fc22638a54f5e5c2a9e6437f573cc101"
+      "sha256": "2ac06b893e51a034cc7a26c1246df7c01c783232fd0c2c6c3f85bbfab9661c50"
     },
     {
       "path": "tests/harvest-policy.test.js",

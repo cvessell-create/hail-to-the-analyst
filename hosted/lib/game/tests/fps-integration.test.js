@@ -157,6 +157,8 @@ test('entry point uses local classic scripts and styles that work without a buil
     assert.ok(fs.existsSync(path.join(root, target)), target);
   }
   assert.ok(!html.includes('type="module"'));
+  assert.ok(html.includes('canvas[hidden]{display:none}'));
+  assert.ok(html.includes('.card{max-height:100%;overflow-y:auto}'));
 });
 test('campaign uses shared collision/LOS, bounded clock and live mission emulator', () => {
   const g = game(); g.fps.loadLevel(0);
