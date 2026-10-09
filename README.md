@@ -1,6 +1,6 @@
 # HAIL TO THE ANALYST
 
-[**PLAY**](https://cvessell-create.github.io/hail-to-the-analyst/)
+[![PLAY](play-button.svg)](https://cvessell-create.github.io/hail-to-the-analyst/)
 
 ## Hosted continuation and first-person
 
