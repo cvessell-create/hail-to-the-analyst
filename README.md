@@ -94,11 +94,22 @@ Works on desktop and iPhone. For the best experience on mobile, use the touch co
 
 ### Tactical controls
 
-The optional/legacy tactical prototype is separate from new solo starts.
-In that prototype, click or tap an Analyst hex
-to select that unit, then a highlighted empty hex to move or an adjacent hostile
-hex to attack. Keyboard users can Tab through hexes and buttons and activate them
-with Enter or Space. Hex labels/tooltips show terrain defence and movement costs.
+The optional legacy tactical practice arenas are separate from all five normal
+solo starts. Choose **MISSION SELECT // PRACTICE**, then **TACTICAL ARCHIVE**
+or **TACTICAL PLANT**. The view stays with Jack while you command the squad;
+terrain, units and reachable destinations are shown in first person.
+
+- Drag the view, use arrows or **LOOK LEFT / RIGHT** to turn without spending
+  movement or advancing turns.
+- Choose **Command unit**, **Destination / MOVE**, or **Target / ATTACK**.
+  With the view focused, WASD issues one adjacent hex move per key press,
+  Space attacks the selected target, and E ends the turn. Held keys do not
+  repeatedly issue orders. Native buttons/selects retain keyboard navigation.
+- **Orders & combat log** contains an optional **INSPECT STRANGE TRANSMISSION**
+  Easter egg. **RUN FICTIONAL AUTO** displays an invented specialist and public
+  task-matching reason; separately reveal its story answer. This offline fiction
+  is not vendor routing or private reasoning, grants no combat bonus and advances
+  no turns. Its state is preserved in tactical checkpoints.
 
 - Move the squad, attack once per unit per turn, then choose **END TURN** for the Fabricator AI.
 - Entering an enemy zone of control ends movement, except for the skirmishing
@@ -110,20 +121,20 @@ with Enter or Space. Hex labels/tooltips show terrain defence and movement costs
 - Surviving squad members supply armour and ammo; squad losses add FPS enemies.
   Restarting an FPS mission preserves its original breach result without stacking bonuses.
 
-### Desktop controls
+### FPS desktop controls
 
 | Key | Action |
 |-----|--------|
 | W A S D / Arrows | Move / strafe |
-| Mouse | Look |
-| Click | Fire |
+| Left / Right arrows | Turn |
+| Click / Space (hold) | Fire |
 | E | Use (doors, pickups) |
 | J (hold) | Jetpack lift/hover, after collecting JET equipment |
 | 1 / 2 / 3 | Sidearm / Breacher / Redactor |
 | M | Minimap |
 | P / Esc | Pause |
 
-### Mobile controls
+### FPS mobile controls
 
 Left-side virtual joystick to move, drag right side of screen to look. Dedicated **FIRE**, **WEAPON**, **USE**, and hold-to-fly **JET** buttons.
 
@@ -155,7 +166,9 @@ The FPS retains its original real-time rules.
 
 ## Tech
 
-- Canvas raycaster: ASCII grid maps, DDA wall casting, procedural textures and sprites, billboard enemies/pickups, z-buffering, fixed-timestep updates.
+- Shared original Canvas raycaster: FPS ASCII/DDA walls or a tactical scene adapter
+  with segment-cast hex walls, near-plane-clipped hex floors, procedural sprites,
+  labels and depth clipping. Tactical rendering never swaps or mutates FPS state.
 - **Chatter Engine**: deterministic, template-based "LLM element" — context-aware enemy taunts (idle, aggro, damaged, dying) and intel-style mission briefings generated from mission state. All local, no API calls.
 - Enemy AI: state machines (idle → patrol → chase → attack → die) with line-of-sight via the same DDA raycast the renderer uses — enemies can't see through walls either.
 - Synthesized WebAudio: all sound effects generated in code.
@@ -173,9 +186,10 @@ node --test tests/*.test.js
 
 Tests cover engine algorithms, scenes/saves, collision/LOS, payoff/tree solvers,
 power indices, exact fair division, local HTTP and authoritative co-op, as well
-as hex geometry, terrain hit chance, d20 versus AC, conditions,
-tactical combat/movement and breach modifiers, plus both FPS mission handoffs,
-retries and keyboard isolation. There is no build or lint step.
+as hex geometry, first-person tactical rendering and native controls, terrain
+hit chance, d20 versus AC, conditions, tactical checkpoint replay, breach
+modifiers, live minimap markers and all five solo missions. The offline game
+needs no build; the separate hosted app has TypeScript and production builds.
 
 ## Publish as a playable site
 

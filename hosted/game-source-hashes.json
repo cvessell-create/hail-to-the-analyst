@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "8534cd10d62c2067fb8d90626f60bf6a6e18073e58729241955a1c5ae1427cb1"
+      "sha256": "610a6cfb41c267ba4f8dd52b27ffb85de4ab6bc1538c521db628623c9fa98d2e"
     },
     {
       "path": "COPYING-GPL-3",
@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "9bb0f35f0e7ae97a273f39216377ae5c9c3d4a1b62ab24f99890c292cbbcf2ce"
+      "sha256": "08f3fdb5cac935bd9f8a6a62900602d7700aa884233b500cbf3198b936eb5ab5"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -104,7 +104,7 @@
     },
     {
       "path": "css/tactics.css",
-      "sha256": "6d6f6496af130b6379c42af7727f569f39733f878e962fe7c18508a747f9110d"
+      "sha256": "69edb9d1ac2c399b78c4732f244cd5b1f17fcbccca248d2fc16552072de8a9e1"
     },
     {
       "path": "engine/LICENSE",
@@ -175,6 +175,10 @@
       "sha256": "d8213f2c11d803c9cb8e286764db14a741e3d7e78079161cb95e36509cc95154"
     },
     {
+      "path": "engine/tactical-renderer.js",
+      "sha256": "ef65a92850ad258777f70dde9465a47d7398e3a729ae289206d0af5a5d856c0c"
+    },
+    {
       "path": "engine/weight-trace.js",
       "sha256": "52c084649c62b5bc424e89926c2420fcdaf3c5032f8a605971a860686e4ff411"
     },
@@ -192,7 +196,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "dfadbb2a55d1605403ccc51b50e57e1b879f67b66ab40d85730588912d9b1c31"
+      "sha256": "117aa1f07fea526c2aca146b76eb7dd486e52b8d8331284a83ac4042ecf1f535"
     },
     {
       "path": "js/emulation-engine.js",
@@ -208,7 +212,7 @@
     },
     {
       "path": "js/tactical-ui.js",
-      "sha256": "e03870f69f2c7fce52c86d88d9d09c19e5fd4a1241f45c4f54a271b34496e5f6"
+      "sha256": "269321bf2aa90681504e74f754feb5f9faca8a28307f2a23168811ac37dc8a0c"
     },
     {
       "path": "js/tactics.js",
@@ -309,6 +313,10 @@
     {
       "path": "tests/static-reserve.test.js",
       "sha256": "357955a5f55ba74213f23a32ba79f57714193cb70f0b7dc8b09bc8a6367121c6"
+    },
+    {
+      "path": "tests/tactical-view.test.js",
+      "sha256": "09979ed9ef2f9855f6431f2e3dfd9311164ebac82379ab7ce465ae9e1ef5aba6"
     },
     {
       "path": "tests/tactics.test.js",
