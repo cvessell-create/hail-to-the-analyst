@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d8e95052132e9cea3d41cc2377564cd199bb04bad83b12da84a7638fff6f69bd"
+      "sha256": "9bb0f35f0e7ae97a273f39216377ae5c9c3d4a1b62ab24f99890c292cbbcf2ce"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -92,7 +92,7 @@
     },
     {
       "path": "audit/sustainable-yield-policy.md",
-      "sha256": "f62f52344cfd037bd4f71829d704fa5af7193213f19e9907a9ceee5f147ec567"
+      "sha256": "4fd56bb2eb83be99b624e92c4ed361bc6b1d0e3bb8c946269d36f0a11082396f"
     },
     {
       "path": "audit/test-results.txt",
@@ -100,7 +100,7 @@
     },
     {
       "path": "audit/weighting-ledger.md",
-      "sha256": "48185521e18e027942844d1503595b19a3b3b9eec5475c3c840564463fb68249"
+      "sha256": "de24355ed4f9e44054341f5a08aba09d2cf4bf254ab14c3c493fc4ffe9b68468"
     },
     {
       "path": "css/tactics.css",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "ab20734a478ed1d9ca3ca6993c45ddf34bfb490f32b3522a9232c0c85b536c7d"
+      "sha256": "26d5877c7538ce580b745813dfb528b9c35f7a667bc8c097dd4b5003e0b4269c"
     },
     {
       "path": "engine/boss.js",
@@ -192,7 +192,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "082ef0725a2c4e37f124d6c667a19416ddd6adfa51d12ee69115692f212037af"
+      "sha256": "655e63b6c0c806376775e47b5e88a86f0bf67aa2b302976a3f2ff9eb0adae188"
     },
     {
       "path": "js/emulation-engine.js",
@@ -276,7 +276,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "f33d78a6098f07cccf65fb4b52b19a94bd72d48494345342679b425de05b723a"
+      "sha256": "d4d74678b761a08251ecdef6ab7e35ff060122292bd155999377ca59fa333969"
     },
     {
       "path": "tests/harvest-policy.test.js",
