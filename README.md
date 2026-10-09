@@ -1,5 +1,7 @@
 # HAIL TO THE ANALYST
 
+[**PLAY**](https://cvessell-create.github.io/hail-to-the-analyst/)
+
 ## Hosted continuation and first-person
 
 All five solo missions enter first-person play directly. The original hex-grid
