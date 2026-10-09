@@ -251,6 +251,8 @@
         }
       }
       function keydown(e) {
+        var panel=document.getElementById('gameDataPanel');
+        if(panel&&panel.hidden===false)return;
         if (/^(INPUT|SELECT|BUTTON|SUMMARY)$/.test((e.target || {}).tagName)) return;
         if (!['ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'KeyE'].includes(e.code)) return;
         e.preventDefault();

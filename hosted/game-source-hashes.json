@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "625663cb188f61fa3ba376573308097920f2fb57f04ca72bb7fe139426ed35c5"
+      "sha256": "47820e7f38680adbc2fbc02c79c4ea709e0375cd14988577fa0681d65e2ea03b"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "26d5877c7538ce580b745813dfb528b9c35f7a667bc8c097dd4b5003e0b4269c"
+      "sha256": "11e5d6435d9bf06ad48a62cd1a4fa769c6fc7647941dcfb534fb8a1f482f5c8a"
     },
     {
       "path": "engine/boss.js",
@@ -141,6 +141,10 @@
     {
       "path": "engine/game-theory.js",
       "sha256": "41747b0fed73975b478578f793e5b57bbc4ad0d20efec55291caa82b37257a61"
+    },
+    {
+      "path": "engine/gameplay-data.js",
+      "sha256": "a85358e606be38108738317f2ff627ab3dc6b07fde89ee757344f9b02565f5d2"
     },
     {
       "path": "engine/harvest-policy.js",
@@ -196,7 +200,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "0cd521ba830d0c6be7ae70fbb5f84e2e6c6f517930c57384fdcb11779795001a"
+      "sha256": "8aab0e6cffabd6e40181c4e8b1a3649cc8104ebc40b3a095e9f3e7b558cb3eb0"
     },
     {
       "path": "js/emulation-engine.js",
@@ -212,7 +216,7 @@
     },
     {
       "path": "js/tactical-ui.js",
-      "sha256": "269321bf2aa90681504e74f754feb5f9faca8a28307f2a23168811ac37dc8a0c"
+      "sha256": "3cf80ade07bb688cfd068b85967dacb08d68723dc84098af0b4361e4b77b526e"
     },
     {
       "path": "js/tactics.js",
@@ -284,7 +288,11 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "2ac06b893e51a034cc7a26c1246df7c01c783232fd0c2c6c3f85bbfab9661c50"
+      "sha256": "21d58bd5bbbe19465a6e0ac6cb319cf0b4cff180f1921a7b3ef4f629b5364e52"
+    },
+    {
+      "path": "tests/gameplay-data.test.js",
+      "sha256": "fda585273a918d27f512d9e35900f7d93646b3eb270e7c9f6713609c27b56234"
     },
     {
       "path": "tests/harvest-policy.test.js",
@@ -320,7 +328,7 @@
     },
     {
       "path": "tests/tactical-view.test.js",
-      "sha256": "09979ed9ef2f9855f6431f2e3dfd9311164ebac82379ab7ce465ae9e1ef5aba6"
+      "sha256": "8b4e275750d969675507d98f10179566d3320b03f09ec4b127611d4ab020caba"
     },
     {
       "path": "tests/tactics.test.js",

@@ -39,6 +39,13 @@ manifests in the game audit remain historical records, not current hashes.
 
 ## Deployment
 
+The recovered gameplay-metadata branch adds an optional local data/feedback
+panel. Collection is off by default, requires consent, and sends no telemetry
+over the network. It retains bounded summaries and category-only feedback;
+export/import/delete/revoke remain explicit owner actions. Suggestions require
+declared sample thresholds and human review, never automatic game changes.
+The panel suspends gameplay and controls while open.
+
 The 0.3.1 consolidation retains all branch histories and mirrors the live hex
 minimap, optional first-person tactical practice, fictional archive terminal,
 README Play image and hosted collision-aware movement prediction. New solo

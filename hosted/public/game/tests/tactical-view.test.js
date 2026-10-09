@@ -67,6 +67,7 @@ function game() {
   const context = vm.createContext({ window, document, Tactics: tactics,
     VessellEngine: require('../engine/core.js'),HailSoloExpansion: require('../engine/solo-expansion.js'),
     HailTacticalRenderer: require('../engine/tactical-renderer.js'),
+    HailGameplayData: require('../engine/gameplay-data.js'),
     performance: { now: () => 1000 }, requestAnimationFrame() {} });
   vm.runInContext(fs.readFileSync(path.join(root, 'js/tactical-ui.js'), 'utf8'), context);
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
