@@ -51,6 +51,37 @@ two tactical handoffs and campaign progression. New tactical influence XP is
 capped, logged separately and guarded against duplicate encounter awards.
 NPC level scaling is enabled by the browser tactical adapter.
 
+## Optional gameplay data
+
+`gameplay-data.js` implements the campaign's opt-in, local-only gameplay event
+store and suggestion report. Consent is a separate, explicit browser-profile
+setting and defaults off. Telemetry starts only after consent and is attached to
+first-person mission start, death and objective completion; practice and
+campaign attempts remain separate. On revoke, an active attempt is left
+unfinished/censored. Per-tab random session IDs are not persisted as user or
+device identifiers. Events allow only mission/mode, start/end, bounded
+kills/shots/hits, elapsed time, optional coarse death grid cells, aggregate
+frame-time quantiles, and category-only feedback. There is no network sink or
+background uploader.
+
+Browser storage is bounded to 500 events and 30 days. Data can be exported,
+validated/imported locally, retained while revoking consent, or deleted.
+Reports compute completion/death rates only over attempts with known terminal
+outcomes and include 95% Wilson score intervals; attempts without an end event
+are censored and excluded. The interval follows Wilson's score construction
+(E. B. Wilson, 1927, “Probable Inference, the Law of Succession, and Statistical
+Inference,” *JASA* 22(158), 209–212,
+[doi:10.1080/01621459.1927.10502953](https://doi.org/10.1080/01621459.1927.10502953)).
+Potential completion suggestions require at least 20 known outcomes across
+five sessions; category/death-location signals require five sessions, and
+performance signals require five sessions with 300 measured frames each. A death
+location is only an observed count, not a normalized difficulty estimate.
+Suggestions include source event IDs and are human-review prompts, never
+automatic game changes. Wilson intervals are nominal attempt-level intervals:
+repeated runs may be correlated, and separate browser sessions do not establish
+separate people. These are descriptive local summaries, not causal claims or
+validated player models; no neural model is trained.
+
 ## Mathematics and game rules
 
 ### Decisions

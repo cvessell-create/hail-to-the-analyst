@@ -88,6 +88,31 @@ python3 -m http.server 8000
 
 Works on desktop and iPhone. For the best experience on mobile, use the touch controls.
 
+### Optional gameplay data and improvement suggestions
+
+Gameplay telemetry is **off by default**. Use **GAME DATA & FEEDBACK** at the
+bottom-left of the page, or **REVIEW PRIVACY & DATA** on the title screen, to
+review and change consent. If enabled, only this first-person campaign's
+allowlisted attempt summaries, coarse death-map cells, frame-time summaries,
+and explicitly selected feedback categories are stored in this browser's
+local storage. No telemetry is sent to a server. There are no accounts or
+stable player/device identifiers, and the feature does not collect IP
+addresses, chat, free text, raw keystrokes, or device fingerprints.
+
+The same panel provides **REVOKE**, **DELETE DATA & REVOKE**, and JSON export
+and validated import. Revoking stops new collection but keeps prior data;
+deletion removes local data and consent. Local browser data is not encrypted
+or secret from someone with access to that browser profile. It is not tracked
+by Git or uploaded by the game. The UI displays aggregate summaries and evidence-linked improvement
+suggestions only when minimum sample thresholds are met. Completion prompts
+require at least 20 terminal attempts across five sessions; other prompts have
+their own session/frame thresholds. Wilson intervals are nominal attempt-level
+uncertainty estimates, not guarantees that sessions represent different
+people. Suggestions are review prompts for a human; they never change a map,
+difficulty, or game code. Attempts with no recorded ending are censored, not
+counted as deaths or failures. See the [gameplay-data module](engine/gameplay-data.js)
+for event bounds and thresholds.
+
 ### Tactical controls
 
 The optional/legacy tactical prototype is separate from new solo starts.

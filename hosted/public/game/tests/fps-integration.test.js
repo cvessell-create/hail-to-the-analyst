@@ -11,6 +11,12 @@ const root = path.resolve(__dirname, '..');
 function game() {
   const nodes = new Map();
   const drawing = [];
+  const stored = new Map();
+  const localStorage = {
+    getItem(key) { return stored.has(key) ? stored.get(key) : null; },
+    setItem(key, value) { stored.set(key, String(value)); },
+    removeItem(key) { stored.delete(key); }
+  };
   const canvas = {
     save() {}, restore() {}, translate() {}, rotate() {}, beginPath() {}, moveTo() {}, lineTo() {}, fill() {}, stroke() {}, arc() {},
     fillRect(...args) { drawing.push({kind:'fillRect',color:this.fillStyle,args}); },
@@ -24,6 +30,7 @@ function game() {
       classList: { add() {}, remove() {} }, style: {},
       innerHTML: '', textContent: '', onclick: null,
       setAttribute() {}, addEventListener() {}, insertAdjacentHTML() {},
+      focus() {}, click() {},
       querySelector() { return node('nub'); },
       getContext() { return canvas; }
     });
@@ -33,7 +40,8 @@ function game() {
   let approach;
   const context = vm.createContext({
     document: { getElementById: node },
-    window: { addEventListener(name, handler) { events[name] = handler; } },
+    window: { localStorage, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; } },
+    HailGameplayData: require('../engine/gameplay-data.js'),
     TacticalUI: { start(card, mission, jack, callback) { approach = { mission, jack, callback }; } },
     performance: { now() { return 1000; } },
     requestAnimationFrame() {},
@@ -45,17 +53,18 @@ function game() {
   const source = html.match(/<script>([\s\S]*?)<\/script>/i)[1];
   const hooks = `
     globalThis.fps = {
-      briefing, startTactics, loadLevel, finishLevel,
+      briefing, startTactics, loadLevel, finishLevel, die,
       state: () => state, player: () => player,
       enemies: () => enemies, keys: () => keys
       , update, fire, use, moveEntity, hasLOS, solid, engineClock, drawDoorStrip, drawEntrances, render,
       levels: () => levels, pickups: () => pickups,
+      telemetry: gameplayData,
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine
     };
   `;
   const at=source.lastIndexOf('title();');
   vm.runInContext(source.slice(0,at)+hooks+source.slice(at), context);
-  return { fps: context.fps, nodes, events, drawing, approach: () => approach };
+  return { fps: context.fps, nodes, events, drawing, stored, approach: () => approach };
 }
 
 test('all five solo missions enter first-person play directly and victory follows the final map', () => {
@@ -82,6 +91,42 @@ test('all five solo missions enter first-person play directly and victory follow
     assert.equal(g.fps.checkpoint().missionIndex, i);
   }
   g.fps.finishLevel(); assert.equal(g.fps.state(), 'victory');
+});
+test('visible privacy controls default off and consented telemetry follows real mission starts, deaths and completions', () => {
+  const g = game();
+  assert.equal(g.fps.telemetry.hasConsent(), false);
+  assert.ok(g.nodes.get('card').innerHTML.includes('Gameplay data is off unless you opt in'));
+  assert.ok(g.nodes.get('gameDataOpen'));
+  g.nodes.get('gameDataOpen').onclick();
+  assert.equal(g.nodes.get('gameDataPanel').hidden, false);
+  assert.equal(g.nodes.get('gameDataConsent').checked, false);
+  g.fps.loadLevel(0);
+  g.fps.finishLevel();
+  assert.deepEqual(g.fps.telemetry.events(), []);
+
+  g.nodes.get('gameDataConsent').checked = true;
+  g.nodes.get('gameDataSaveConsent').onclick();
+  assert.equal(g.fps.telemetry.hasConsent(), true);
+  g.fps.loadLevel(0);
+  g.fps.finishLevel();
+  g.fps.loadLevel(0);
+  Object.assign(g.fps.player(), { x: 6.9, y: 10.2 });
+  g.fps.die();
+  let report = g.fps.telemetry.report();
+  assert.equal(report.counts.attemptsStarted, 2);
+  assert.equal(report.counts.terminalOutcomes, 2);
+  assert.equal(report.missions[0].completed, 1);
+  assert.equal(report.missions[0].deaths, 1);
+  assert.deepEqual([g.fps.telemetry.events()[3].deathX, g.fps.telemetry.events()[3].deathY], [6, 10]);
+
+  g.fps.loadLevel(0);
+  g.nodes.get('gameDataRevoke').onclick();
+  g.fps.finishLevel();
+  report = g.fps.telemetry.report();
+  assert.equal(report.counts.attemptsStarted, 3);
+  assert.equal(report.counts.terminalOutcomes, 2);
+  assert.equal(report.counts.censoredAttempts, 1);
+  assert.equal(g.fps.telemetry.hasConsent(), false);
 });
 test('legacy tactical checkpoint handoff retains its breach result without stacking on retry', () => {
   const g = game();

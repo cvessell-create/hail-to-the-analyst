@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d8e95052132e9cea3d41cc2377564cd199bb04bad83b12da84a7638fff6f69bd"
+      "sha256": "2e992fb93eb88c8c491ec77624cef9bd14e29cd8690ba6754228e075b7117efd"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "ab20734a478ed1d9ca3ca6993c45ddf34bfb490f32b3522a9232c0c85b536c7d"
+      "sha256": "7480238341c29147b5d21ca2ec629f474a4b11523ce08bc1f9f2baee8a7e055b"
     },
     {
       "path": "engine/boss.js",
@@ -141,6 +141,10 @@
     {
       "path": "engine/game-theory.js",
       "sha256": "41747b0fed73975b478578f793e5b57bbc4ad0d20efec55291caa82b37257a61"
+    },
+    {
+      "path": "engine/gameplay-data.js",
+      "sha256": "a85358e606be38108738317f2ff627ab3dc6b07fde89ee757344f9b02565f5d2"
     },
     {
       "path": "engine/harvest-policy.js",
@@ -192,7 +196,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "082ef0725a2c4e37f124d6c667a19416ddd6adfa51d12ee69115692f212037af"
+      "sha256": "7eaa5b10318d207deac3797c2380cdcdea102f9d20ae8b7987d4a2360ca5c6bb"
     },
     {
       "path": "js/emulation-engine.js",
@@ -276,7 +280,11 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "f33d78a6098f07cccf65fb4b52b19a94bd72d48494345342679b425de05b723a"
+      "sha256": "bdf953dfb5c7d383efb728a05c2608c0305e59d5a5e3a1c6b53ef6e8ac0771de"
+    },
+    {
+      "path": "tests/gameplay-data.test.js",
+      "sha256": "fda585273a918d27f512d9e35900f7d93646b3eb270e7c9f6713609c27b56234"
     },
     {
       "path": "tests/harvest-policy.test.js",
