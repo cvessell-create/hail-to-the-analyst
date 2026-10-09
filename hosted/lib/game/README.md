@@ -15,9 +15,14 @@ Movement and combat continue in real time while the map is visible.
 
 ### Expanded solo campaign
 
-Version **0.3.0**. Extract the complete source ZIP and open `index.html` for
+Version **0.3.1**. Extract the complete source ZIP and open `index.html` for
 offline solo play. Keep the extracted folders together. The hosted backend
 source is also included, but is not needed to run the offline campaign.
+
+The consolidated update includes the prominent Play button, collision-aware
+hosted movement prediction, live hex minimap fixes, and optional first-person
+tactical practice with a clearly fictional archive-routing Easter egg. All
+branch histories are retained; normal solo missions still enter FPS directly.
 
 The campaign continues through **THE ARCHIVE**, **FABRICATION PLANT**,
 **FROST YARD** (32 × 26), **STARLIGHT BOULEVARD** (40 × 30), and

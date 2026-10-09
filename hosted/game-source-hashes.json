@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "08f3fdb5cac935bd9f8a6a62900602d7700aa884233b500cbf3198b936eb5ab5"
+      "sha256": "625663cb188f61fa3ba376573308097920f2fb57f04ca72bb7fe139426ed35c5"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -196,7 +196,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "117aa1f07fea526c2aca146b76eb7dd486e52b8d8331284a83ac4042ecf1f535"
+      "sha256": "f6c1026da761abfa6bebbf24cc8098273053371f6677c0224cefb5089f4a967d"
     },
     {
       "path": "js/emulation-engine.js",
@@ -217,6 +217,10 @@
     {
       "path": "js/tactics.js",
       "sha256": "909699c63717601140aae2a8f85fc721a56609d1c330f1a33af15e570de38dd9"
+    },
+    {
+      "path": "play-button.svg",
+      "sha256": "b8a5480f5ab55ac58872eec42c122a529e337c7796f7d9eac53fb4c27d391361"
     },
     {
       "path": "scripts/audit-math.js",
@@ -240,7 +244,7 @@
     },
     {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "1bd7874b4794ae073aba078885fb7553bdc3da03beb2e914b8a0fbe3aa6d99ab"
+      "sha256": "3099bbb15f5c7b8dd5a23966e893782c4277beb02aeb28d48f315426fb51ccac"
     },
     {
       "path": "server/arena.js",
