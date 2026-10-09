@@ -289,6 +289,28 @@ test('live hex minimap renders all five current arenas and tracks units, loot, d
   assert.ok(g.drawing.some(d=>d.kind==='strokeRect'&&d.color==='#7bffe0'));
 });
 
+test('fractional player positions stay inside the hex for their actual FPS tile', () => {
+  const g=game();g.fps.loadLevel(0);
+  for(const x of [1.01,1.1,1.5,1.9,1.99,2.01,2.9]){
+    for(const y of [1.01,1.2,1.5,1.8,1.99]){
+      Object.assign(g.fps.player(),{x,y});
+      g.drawing.length=0;g.fps.drawMap();
+      const vertices=[],polygons=[];
+      for(const d of g.drawing){
+        if(d.kind==='beginPath')vertices.length=0;
+        if(d.kind==='moveTo'||d.kind==='lineTo')vertices.push(d.args);
+        if(d.kind==='closePath')polygons.push(vertices.slice());
+      }
+      const map=g.fps.checkpoint().map,polygon=polygons[Math.floor(y)*map[0].length+Math.floor(x)];
+      const p=g.drawing.find(d=>d.kind==='arc'&&d.color==='#ffce2e').args;
+      for(let i=0;i<6;i++){
+        const a=polygon[i],b=polygon[(i+1)%6];
+        assert.ok((b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0])>=-1e-9,`${x},${y}`);
+      }
+    }
+  }
+});
+
 test('ranged enemies target flight altitude and matching projectiles can still damage hovering players', () => {
   const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(2);
   Object.assign(g.fps.player(),{height:1.2,jetpack:true,fuel:100,x:25.5,y:10.5});

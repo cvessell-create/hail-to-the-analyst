@@ -250,9 +250,11 @@ function drawMap(){
   var rowHeight=Math.sqrt(3)*radius,ox=18+radius,oy=88+rowHeight/2;
   var height=(mh+.5)*rowHeight;
   function point(x,y){
-    var col=x-.5,left=Math.floor(col),fraction=col-left;
-    var offset=((left%2+2)%2)*(1-fraction)+(((left+1)%2+2)%2)*fraction;
-    return {x:ox+col*1.5*radius,y:oy+(y-.5+offset/2)*rowHeight};
+    var col=Math.floor(x),row=Math.floor(y),u=2*(x-col-.5),v=2*(y-row-.5);
+    // Fit fractional square-tile positions inside their corresponding hex.
+    var extent=Math.max(Math.abs(u),Math.abs(v)),edge=Math.max(Math.abs(v),Math.abs(u)+Math.abs(v)/2);
+    var fit=edge?extent/edge:1;
+    return {x:ox+col*1.5*radius+u*radius*fit,y:oy+(row+(col%2)/2)*rowHeight+v*rowHeight/2*fit};
   }
   function marker(o,color,size){
     var p=point(o.x,o.y);ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,size,0,Math.PI*2);ctx.fill();
