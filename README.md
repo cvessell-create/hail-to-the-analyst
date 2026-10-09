@@ -4,7 +4,7 @@
 
 All five solo missions enter first-person play directly. The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
-The story is a civilian training simulation.
+
 
 
 ### Expanded solo campaign
