@@ -12,7 +12,13 @@ function game() {
   const nodes = new Map();
   const drawing = [];
   const canvas = {
-    save() {}, restore() {}, translate() {}, rotate() {}, beginPath() {}, moveTo() {}, lineTo() {}, fill() {}, stroke() {}, arc() {},
+    save() {}, restore() {}, translate() {}, rotate() {},
+    beginPath() { drawing.push({kind:'beginPath'}); },
+    closePath() { drawing.push({kind:'closePath'}); },
+    moveTo(...args) { drawing.push({kind:'moveTo',args}); },
+    lineTo(...args) { drawing.push({kind:'lineTo',args}); },
+    fill() {}, stroke() {},
+    arc(...args) { drawing.push({kind:'arc',color:this.fillStyle,args}); },
     fillRect(...args) { drawing.push({kind:'fillRect',color:this.fillStyle,args}); },
     strokeRect(...args) { drawing.push({kind:'strokeRect',color:this.strokeStyle,args}); },
     fillText(text,...args) { drawing.push({kind:'text',text:String(text),args}); },
@@ -23,7 +29,8 @@ function game() {
     if (!nodes.has(id)) nodes.set(id, {
       classList: { add() {}, remove() {} }, style: {},
       innerHTML: '', textContent: '', onclick: null,
-      setAttribute() {}, addEventListener() {}, insertAdjacentHTML() {},
+      attributes: {},
+      setAttribute(name, value) { this.attributes[name] = String(value); }, addEventListener() {}, insertAdjacentHTML() {},
       querySelector() { return node('nub'); },
       getContext() { return canvas; }
     });
@@ -48,7 +55,7 @@ function game() {
       briefing, startTactics, loadLevel, finishLevel,
       state: () => state, player: () => player,
       enemies: () => enemies, keys: () => keys
-      , update, fire, use, moveEntity, hasLOS, solid, engineClock, drawDoorStrip, drawEntrances, render,
+      , update, fire, use, moveEntity, hasLOS, solid, engineClock, drawDoorStrip, drawEntrances, render, drawMap,
       levels: () => levels, pickups: () => pickups,
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine
     };
@@ -225,6 +232,83 @@ test('doors have luminous frames, handles and labels, including an open entrance
   g.fps.use();assert.equal(g.fps.solid(3.5,6.5),false);
   g.drawing.length=0;g.fps.drawEntrances();assert.ok(g.drawing.some(d=>d.text==='OPEN'));
   g.drawing.length=0;g.fps.render();assert.ok(g.drawing.some(d=>d.kind==='text'&&d.text.startsWith('JET')));
+});
+
+test('hex minimap toggles in FPS play without a separate stage, ignores held M and restores its button state', () => {
+  const g=game(),button=g.nodes.get('mapBtn');
+  g.events.keydown({code:'KeyM'});
+  assert.equal(g.fps.checkpoint().presentation.mapVisible,false);
+  g.fps.loadLevel(0);
+  button.onclick();
+  assert.equal(g.fps.state(),'play');
+  assert.equal(g.approach(),undefined);
+  assert.equal(button.attributes['aria-pressed'],'true');
+  g.events.keydown({code:'KeyM',repeat:true});
+  assert.equal(g.fps.checkpoint().presentation.mapVisible,true);
+  const saved=g.fps.checkpoint();
+  g.events.keydown({code:'KeyM',repeat:false});
+  assert.equal(button.attributes['aria-pressed'],'false');
+  g.fps.restore(saved);
+  assert.equal(button.attributes['aria-pressed'],'true');
+  g.drawing.length=0;g.fps.render();
+  assert.ok(g.drawing.some(d=>d.text==='LIVE HEX // THE ARCHIVE'));
+  button.onclick();g.drawing.length=0;g.fps.render();
+  assert.ok(!g.drawing.some(d=>d.text?.startsWith('LIVE HEX')));
+});
+
+test('live hex minimap renders all five current arenas and tracks units, loot, doors and exits without mutating gameplay', () => {
+  const g=game();g.nodes.get('muteBtn').onclick();
+  for(let mission=0;mission<5;mission++){
+    g.fps.loadLevel(mission);
+    const saved=JSON.stringify(g.fps.checkpoint());
+    g.drawing.length=0;g.fps.drawMap();
+    assert.equal(JSON.stringify(g.fps.checkpoint()),saved);
+    const map=g.fps.checkpoint().map;
+    assert.equal(g.drawing.filter(d=>d.kind==='closePath').length,map.length*map[0].length);
+    const first=g.drawing.findIndex(d=>d.kind==='closePath');
+    assert.equal(g.drawing.slice(first-6,first).filter(d=>d.kind==='moveTo'||d.kind==='lineTo').length,6);
+    assert.equal(g.drawing.filter(d=>d.kind==='arc'&&d.color==='#ff4738').length,g.fps.enemies().filter(e=>e.alive).length);
+    assert.equal(g.drawing.filter(d=>d.kind==='arc'&&['#8ae7ff','#ff3b30','#3489f0'].includes(d.color)).length,g.fps.pickups().filter(p=>p.alive).length);
+    const bounds=g.drawing.find(d=>d.kind==='strokeRect'&&d.color==='#79a579').args;
+    for(const d of g.drawing.filter(d=>d.kind==='arc')){
+      assert.ok(d.args[0]>=bounds[0]&&d.args[0]<=bounds[0]+bounds[2]);
+      assert.ok(d.args[1]>=bounds[1]&&d.args[1]<=bounds[1]+bounds[3]);
+    }
+    assert.ok(g.drawing.some(d=>d.text==='EXIT'));
+  }
+  g.fps.loadLevel(0);g.drawing.length=0;g.fps.drawMap();
+  const before=g.drawing.find(d=>d.kind==='arc'&&d.color==='#ffce2e').args;
+  g.fps.player().x+=.1;g.fps.enemies()[0].alive=false;g.fps.pickups()[0].alive=false;
+  g.drawing.length=0;g.fps.drawMap();
+  const after=g.drawing.find(d=>d.kind==='arc'&&d.color==='#ffce2e').args;
+  assert.ok(after[0]>before[0]);
+  assert.equal(g.drawing.filter(d=>d.kind==='arc'&&d.color==='#ff4738').length,g.fps.enemies().length-1);
+  assert.equal(g.drawing.filter(d=>d.kind==='arc'&&['#8ae7ff','#ff3b30','#3489f0'].includes(d.color)).length,g.fps.pickups().length-1);
+  Object.assign(g.fps.player(),{x:3.5,y:5.5,a:Math.PI/2});g.fps.use();
+  g.drawing.length=0;g.fps.drawMap();
+  assert.ok(g.drawing.some(d=>d.kind==='strokeRect'&&d.color==='#7bffe0'));
+});
+
+test('fractional player positions stay inside the hex for their actual FPS tile', () => {
+  const g=game();g.fps.loadLevel(0);
+  for(const x of [1.01,1.1,1.5,1.9,1.99,2.01,2.9]){
+    for(const y of [1.01,1.2,1.5,1.8,1.99]){
+      Object.assign(g.fps.player(),{x,y});
+      g.drawing.length=0;g.fps.drawMap();
+      const vertices=[],polygons=[];
+      for(const d of g.drawing){
+        if(d.kind==='beginPath')vertices.length=0;
+        if(d.kind==='moveTo'||d.kind==='lineTo')vertices.push(d.args);
+        if(d.kind==='closePath')polygons.push(vertices.slice());
+      }
+      const map=g.fps.checkpoint().map,polygon=polygons[Math.floor(y)*map[0].length+Math.floor(x)];
+      const p=g.drawing.find(d=>d.kind==='arc'&&d.color==='#ffce2e').args;
+      for(let i=0;i<6;i++){
+        const a=polygon[i],b=polygon[(i+1)%6];
+        assert.ok((b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0])>=-1e-9,`${x},${y}`);
+      }
+    }
+  }
 });
 
 test('ranged enemies target flight altitude and matching projectiles can still damage hovering players', () => {

@@ -6,6 +6,10 @@
 
 All five solo missions enter first-person play directly. The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
+Press **M** or tap **HEX MAP** during play for the live hex tactical minimap
+of your current mission—not a separate level. It shows your position and facing,
+living enemies, remaining loot, clearance doors, open entrances and the exit.
+Movement and combat continue in real time while the map is visible.
 
 
 

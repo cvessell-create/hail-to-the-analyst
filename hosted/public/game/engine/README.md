@@ -184,6 +184,4 @@ Reviewed accessible descriptions, not full proofs of every original paper:
   Dean's harmonic threshold is the explicit formula above; no claim of reading
   Dean's original paper or validating political fairness is made.
 
-Your textbook research can supply revised payoffs, costs and source references.
-Changing them changes the game being solved; keep fixtures and expected results
-versioned together.
+
