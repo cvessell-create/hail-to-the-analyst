@@ -1,12 +1,11 @@
 # HAIL TO THE ANALYST
 
-## Hosted continuation and first-person repair
+## Hosted continuation and first-person
 
 All five solo missions enter first-person play directly. The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
-The story is a civilian training simulation, not a political attribution.
-Use **NES VIEW** during play for an original JSNES CPU/PPU companion display;
-the browser first-person renderer remains primary.
+The story is a civilian training simulation.
+
 
 ### Expanded solo campaign
 
@@ -46,8 +45,7 @@ authoritative rules and map.
 The supplied hosted app is in [hosted](hosted/). Read its
 [repair/deployment handoff](hosted/GAME_REPAIR.md).
 Run `node scripts/sync-hosted-game.js` after canonical engine changes to keep
-server and browser copies identical. GitHub publication does not deploy the
-separate ChatGPT-hosted site.
+server and browser copies identical. 
 
 Allocated relay/armour/ammo loot equips proportional, capped combat effects
 on the next host replay. In-game credits have purchasing effects through the
