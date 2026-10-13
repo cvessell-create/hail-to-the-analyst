@@ -113,3 +113,11 @@ test('a target too far to hit inside engage range is approached instead of held 
   const near = A.act(s, {}, A.DEFAULT_PARAMS);
   assert.ok(near.keys.has('Space') && !near.keys.has('KeyW'), 'stops and fires once the hit window is alignable');
 });
+
+test('exitOutcome scores only real level clears as complete', () => {
+  assert.equal(A.exitOutcome('dead'), 'dead');
+  assert.equal(A.exitOutcome('brief'), 'complete');
+  assert.equal(A.exitOutcome('victory'), 'complete');
+  assert.equal(A.exitOutcome('title'), 'interrupted');
+  assert.equal(A.exitOutcome('tactical'), 'interrupted');
+});

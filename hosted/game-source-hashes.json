@@ -120,7 +120,7 @@
     },
     {
       "path": "engine/autopilot.js",
-      "sha256": "ad928651579d79308f0065e6aacbdde0fbc5c49a534b6aca32e59d3993b3e25c"
+      "sha256": "a5a734af497621371904dfd6941d6e6517a30c6f8c34bebcdb29e73cadf7a974"
     },
     {
       "path": "engine/boss.js",
@@ -296,7 +296,7 @@
     },
     {
       "path": "tests/autopilot.test.js",
-      "sha256": "dc2bd25af81cd7ae49c627609342713a032608361b0c9c68c0963421bfa95ec4"
+      "sha256": "9edb6bd0c256f07c2539f700d7d9072d34a8212e78a6bd966947271d33d50515"
     },
     {
       "path": "tests/emulation-engine.test.js",

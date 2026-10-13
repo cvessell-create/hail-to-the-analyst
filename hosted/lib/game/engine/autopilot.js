@@ -292,7 +292,8 @@
       try { s = win.HailCampaignState(); } catch (e) { return; }
       if (s.mode !== 'play') {
         release();
-        if (lastMode === 'play') finish(s, s.mode === 'dead' ? 'dead' : 'complete');
+        // Pause keeps the episode open; only real exits from play are scored.
+        if ((lastMode === 'play' || lastMode === 'pause') && s.mode !== 'pause') finish(s, exitOutcome(s.mode));
         if (s.mode !== 'pause') clickPrimary(); else send('keydown', 'Escape');
       } else {
         if (!episode || lastMission !== s.missionIndex) { if (episode) finish(s, 'complete'); begin(s); }
@@ -322,6 +323,12 @@
     return handle;
   }
 
-  return { PARAM_SPACE, DEFAULT_PARAMS, isSolidTile, lineOfSight, planPath, chooseGoal, act, fitness,
+  // finishLevel() moves play -> brief (or victory on the last level); title/tactical are aborts.
+  function exitOutcome(mode) {
+    if (mode === 'dead') return 'dead';
+    return mode === 'brief' || mode === 'victory' ? 'complete' : 'interrupted';
+  }
+
+  return { exitOutcome, PARAM_SPACE, DEFAULT_PARAMS, isSolidTile, lineOfSight, planPath, chooseGoal, act, fitness,
     mutate, createLearner, recordEpisode, serialize, start };
 });
