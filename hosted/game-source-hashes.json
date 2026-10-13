@@ -119,6 +119,10 @@
       "sha256": "ab20734a478ed1d9ca3ca6993c45ddf34bfb490f32b3522a9232c0c85b536c7d"
     },
     {
+      "path": "engine/autopilot.js",
+      "sha256": "efb3238c42d674a646d7e6fdbad09178e31ad1f91f780a9a4c64dc3bad6d0502"
+    },
+    {
       "path": "engine/boss.js",
       "sha256": "ddc8f28f6ffd8ecb3a4e4084c48cccefc60e0057ceb8345b70cf71609d4b62f5"
     },
@@ -159,6 +163,14 @@
       "sha256": "647c3ac014b6f6b5832ae834cd7f8a639c7a4574da7798f48bb42157d355e6b3"
     },
     {
+      "path": "engine/si-dialogue.js",
+      "sha256": "ff6229870126500de1b3536c17b05dc07eca27983f6fdee71008b9a242aa2df9"
+    },
+    {
+      "path": "engine/si-story-corpus.js",
+      "sha256": "a8ef8da2ab368e7755bf5042e593887d20bb779723a94d41aa0e4b4e23abf4e4"
+    },
+    {
       "path": "engine/solo-expansion.js",
       "sha256": "146b74c90c4ff8aeacda1902c139b725c2d099794f9cf125ec666040e431842f"
     },
@@ -192,7 +204,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "082ef0725a2c4e37f124d6c667a19416ddd6adfa51d12ee69115692f212037af"
+      "sha256": "76a27d13fbc70b4c1574f64ae852c7f02cec067129636f724b1397b4c03c3aa8"
     },
     {
       "path": "js/emulation-engine.js",
@@ -283,6 +295,10 @@
       "sha256": "3f221f55fb74bb21d7f9e3748601578362db62dca93655c4d4768ff09865871c"
     },
     {
+      "path": "tests/autopilot.test.js",
+      "sha256": "49c1c53812351d6125d606dc550f63b09ad7058db1d3e4c3b2cfd38c89fdb4d3"
+    },
+    {
       "path": "tests/emulation-engine.test.js",
       "sha256": "21f962ee5a3106bd8dafd32c5f2eddebae7e76dad15528634db9988c96524d72"
     },
@@ -325,6 +341,10 @@
     {
       "path": "tests/request-clock.test.js",
       "sha256": "286131cee3a403c378f0b0eb44453483924d80e83845d2a67d0d4e6738286144"
+    },
+    {
+      "path": "tests/si-dialogue.test.js",
+      "sha256": "3ac98cf92b510165d6afe2226cdcb5c97cf985e08b8a47edaf7e4bd79a546fc5"
     },
     {
       "path": "tests/solo-expansion.test.js",
