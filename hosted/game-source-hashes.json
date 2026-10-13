@@ -219,6 +219,10 @@
       "sha256": "2d44ed4e8b1a867a1fa94c902a813bd9d8a7382db53c7e97c4cc7ba87374170f"
     },
     {
+      "path": "scripts/hf-client.js",
+      "sha256": "3be85f2adc46646e3b4e714a03bf6eb37868a823c844ff325c6dc254b09c823a"
+    },
+    {
       "path": "scripts/log-harvest-policy.js",
       "sha256": "a8f077e65119ca7204942760bd3c94ccf3630e56f6dfbb2c67be03f182a908c9"
     },
@@ -243,8 +247,12 @@
       "sha256": "8d3a32ab04db0851f6f34aa5422b4d333d53239c15373f7424051087fe04b7cc"
     },
     {
+      "path": "server/huggingface.js",
+      "sha256": "a2ba3ea141f16a30be963773f7c9b0842e30df4e6c84fa5d18b9481dcaff3279"
+    },
+    {
       "path": "server/index.js",
-      "sha256": "e8e1fe43ca15c7c444f4c71e8cd34ab8e5370337530a083667a30f6a745e6b39"
+      "sha256": "272a17220f16245ec4b2e202eb32d2bde36562d5551bfa8935dc2468232d2770"
     },
     {
       "path": "server/request-clock.js",
@@ -285,6 +293,10 @@
     {
       "path": "tests/hosted-mirror.test.js",
       "sha256": "f0c22f235590f43f8315d77bd97ec3216082e6613d2c7dcd6e1922f09f6e257e"
+    },
+    {
+      "path": "tests/huggingface.test.js",
+      "sha256": "b7ce982c1e94ab6ea369a06dc7ea3ed46dc98987df18dc82f3b7129a306ba485"
     },
     {
       "path": "tests/nes-visual.test.js",

@@ -4,10 +4,12 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { createArena } = require('./arena.js');
+const { createHuggingFaceClient } = require('./huggingface.js');
 const Engine = require('../engine/core.js');
 const root = path.resolve(__dirname, '..');
-function createServer({ manual = false } = {}) {
+function createServer({ manual = false, hfClient = null } = {}) {
   const arena = createArena(), rates = new Map();
+  const hf = hfClient || createHuggingFaceClient();
   const server = http.createServer(async (req, res) => {
     const json = (status, body) => {
       res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body));
@@ -24,6 +26,7 @@ function createServer({ manual = false } = {}) {
       if (url.pathname.startsWith('/api/')) {
         const token = (req.headers.authorization || '').replace(/^Bearer /, '');
         if (req.method === 'GET' && url.pathname === '/api/state') return json(200, arena.snapshot(token));
+        if (req.method === 'GET' && url.pathname === '/api/hf/status') return json(200, await hf.status());
         if (req.method !== 'POST') return json(405, { error: 'Unsupported API method.' });
         if (!req.headers['content-type']?.startsWith('application/json')) return json(415, { error: 'JSON required.' });
         let body = '', size = 0;
@@ -35,6 +38,16 @@ function createServer({ manual = false } = {}) {
         let data;
         try { data = JSON.parse(body); } catch { return json(400, { error: 'Malformed JSON.' }); }
         if (!data || typeof data !== 'object' || Array.isArray(data)) return json(422, { error: 'Expected a JSON object.' });
+        if (url.pathname === '/api/hf/spaces') return json(200, await hf.listSpaces(data));
+        if (url.pathname === '/api/hf/models') return json(200, await hf.listModels(data));
+        if (url.pathname === '/api/hf/generate') {
+          if (!data.model || !data.prompt) return json(422, { error: 'Both model and prompt are required.' });
+          try {
+            return json(200, await hf.generateText(data));
+          } catch (err) {
+            return json(502, { error: err.message });
+          }
+        }
         if (url.pathname === '/api/join') {
           if (Object.keys(data).join(',') !== 'name') return json(422, { error: 'Only a name is accepted.' });
           return json(201, arena.join(data.name));
@@ -76,7 +89,7 @@ function createServer({ manual = false } = {}) {
   }, 1000 / 60);
   server.on('close', () => { if (timer) clearInterval(timer); });
   server.requestTimeout = 5000; server.headersTimeout = 5000;
-  return { server, arena };
+  return { server, arena, hf };
 }
 if (require.main === module) {
   const port = Number(process.env.PORT || 8787);
