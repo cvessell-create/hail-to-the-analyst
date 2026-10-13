@@ -65,7 +65,7 @@ function createServer({ manual = false, hfClient = null } = {}) {
       let name;
       try { name = decodeURIComponent(url.pathname === '/' ? '/engine/workbench.html' : url.pathname); }
       catch { return json(400, { error: 'Invalid URL encoding.' }); }
-      if (!/^\/(index\.html|README\.md|LICENSE|COPYING-GPL-3|ATTRIBUTION\.md|engine\/[\w.-]+|js\/[\w.-]+|css\/[\w.-]+|vendor\/jsnes\/[\w.-]+)$/.test(name)) {
+      if (!/^\/(index\.html|README\.md|LICENSE|COPYING-GPL-3|ATTRIBUTION\.md|engine\/[\w.-]+|js\/[\w.-]+|css\/[\w.-]+|vendor\/(jsnes|twgl|tsparticles)\/[\w.-]+)$/.test(name)) {
         return json(404, { error: 'Unknown static file.' });
       }
       const file = path.join(root, name);

@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "8534cd10d62c2067fb8d90626f60bf6a6e18073e58729241955a1c5ae1427cb1"
+      "sha256": "2adebcef5466a49188155256453150a496a54946cff7a8939d537db913c44613"
     },
     {
       "path": "COPYING-GPL-3",
@@ -135,12 +135,20 @@
       "sha256": "bd608901042617f08632de0173385573dfc639272e100e85ae9fd32b976404be"
     },
     {
+      "path": "engine/deception-ops.js",
+      "sha256": "0f457639acf807625d7a8d8241cef0d9d97390223a7daf7c799072003113ea48"
+    },
+    {
       "path": "engine/demo.html",
       "sha256": "1a6a4984a33f9cad17112acb882ac85a197ecad159f246125f869ef53b04bb05"
     },
     {
       "path": "engine/fair-division.js",
       "sha256": "8d3f7850da966029c68e9b1995608f873c2f1bd640e7b30dffed1e204cbff2fa"
+    },
+    {
+      "path": "engine/fx.js",
+      "sha256": "732bbb16544f9bf276aa905cc7276f0fc13896bb36891f868cbc40e391536ada"
     },
     {
       "path": "engine/game-theory.js",
@@ -204,7 +212,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "76a27d13fbc70b4c1574f64ae852c7f02cec067129636f724b1397b4c03c3aa8"
+      "sha256": "bc5252abbb0e550f5d556383b9f1bfc6befba98e369780fa160d2d8ae8b741e1"
     },
     {
       "path": "js/emulation-engine.js",
@@ -276,7 +284,7 @@
     },
     {
       "path": "server/index.js",
-      "sha256": "272a17220f16245ec4b2e202eb32d2bde36562d5551bfa8935dc2468232d2770"
+      "sha256": "1c950fdfad0229e96088c72cb7d8398366acb3815d0b7404085b4e938181c80e"
     },
     {
       "path": "server/request-clock.js",
@@ -299,6 +307,10 @@
       "sha256": "9edb6bd0c256f07c2539f700d7d9072d34a8212e78a6bd966947271d33d50515"
     },
     {
+      "path": "tests/deception-ops.test.js",
+      "sha256": "de3fcb8e96d73e4a51be963eb28682639e1fb27697165b1ffe7e4c9d0f8e31bd"
+    },
+    {
       "path": "tests/emulation-engine.test.js",
       "sha256": "21f962ee5a3106bd8dafd32c5f2eddebae7e76dad15528634db9988c96524d72"
     },
@@ -317,6 +329,10 @@
     {
       "path": "tests/fps-integration.test.js",
       "sha256": "f33d78a6098f07cccf65fb4b52b19a94bd72d48494345342679b425de05b723a"
+    },
+    {
+      "path": "tests/fx.test.js",
+      "sha256": "818028a5a69449b1e72701f6cc0bec6869bb80b14f9f2c38297ceb0195134f3f"
     },
     {
       "path": "tests/harvest-policy.test.js",
@@ -581,6 +597,30 @@
     {
       "path": "vendor/jsnes/upstream-package.json",
       "sha256": "84884fb82a3e50290d69aab75184a26412a546c72b1db5b2500733685821aea6"
+    },
+    {
+      "path": "vendor/tsparticles/LICENSE",
+      "sha256": "c5c18dbc27f490f2ef90e0b574b8c40f534e495d2cb8a6f1c4bb1183a9c381a4"
+    },
+    {
+      "path": "vendor/tsparticles/package.json",
+      "sha256": "13a760a035227e308a388fe7c1cc76cf50653ae1b177e98abda683736bdcb32d"
+    },
+    {
+      "path": "vendor/tsparticles/tsparticles.slim.bundle.min.js",
+      "sha256": "5074f51a355702b6b3a07a13ad9a94b603ce7613fb7a8cae70660de0fbe4d92b"
+    },
+    {
+      "path": "vendor/twgl/LICENSE.md",
+      "sha256": "87a5a44b12faff1205d5325b67b26216404fec66f08db2df4d448bff42f4d668"
+    },
+    {
+      "path": "vendor/twgl/package.json",
+      "sha256": "293c365686f571470dec089d44e1a2b05dd5dba68982ee3ff5a4a7040b8da6ca"
+    },
+    {
+      "path": "vendor/twgl/twgl.js",
+      "sha256": "bc94a897aa369db1af4b32b33d069ad92aa1032688dfec4ace0656eca404b032"
     }
   ]
 }

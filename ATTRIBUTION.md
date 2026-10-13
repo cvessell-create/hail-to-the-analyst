@@ -114,3 +114,11 @@ Wesnoth assets must not be assumed uniformly CC BY-SA.
 **Merge order:** the parallel accessibility/links/security review PR should
 merge first. This expansion keeps the FPS in `index.html` and isolates tactical
 logic/UI to make reconciliation easier.
+
+## Visual FX libraries, October 13, 2026
+
+`vendor/twgl/` holds twgl.js 7.0.0 (`dist/7.x/twgl.js`, MIT, Copyright (c) 2015
+Gregg Tavares) and `vendor/tsparticles/` holds @tsparticles/slim 4.4.0
+(`tsparticles.slim.bundle.min.js`, MIT, Copyright (c) Matteo Bruni). Both are
+unmodified npm package files with their licence and package metadata retained.
+`engine/fx.js` is original Apache-2.0 presentation code; `?fx=0` disables it.
