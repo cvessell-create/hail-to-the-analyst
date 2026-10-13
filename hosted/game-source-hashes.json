@@ -247,6 +247,10 @@
       "sha256": "8d3a32ab04db0851f6f34aa5422b4d333d53239c15373f7424051087fe04b7cc"
     },
     {
+      "path": "server/autonomous-agent.js",
+      "sha256": "96b0987991f805bcc23f9ac14c312f719ac855a842348347b71e02d9a6ae06b8"
+    },
+    {
       "path": "server/huggingface.js",
       "sha256": "a2ba3ea141f16a30be963773f7c9b0842e30df4e6c84fa5d18b9481dcaff3279"
     },
@@ -265,6 +269,10 @@
     {
       "path": "tests/arena.test.js",
       "sha256": "0563d8d7ee230b27e6478e6d0d06678885c7380ad9b22cf3e8aecf81f9f9d536"
+    },
+    {
+      "path": "tests/autonomous-agent.test.js",
+      "sha256": "3f221f55fb74bb21d7f9e3748601578362db62dca93655c4d4768ff09865871c"
     },
     {
       "path": "tests/emulation-engine.test.js",
