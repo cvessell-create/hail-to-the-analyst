@@ -101,3 +101,15 @@ test('fitness rewards completion over survival-only play', () => {
   assert.ok(A.fitness({ levelsCompleted: 1, seconds: 120 }) > A.fitness({ hp: 100, seconds: 30 }));
   assert.ok(A.fitness({ died: true }) < A.fitness({}));
 });
+
+test('a target too far to hit inside engage range is approached instead of held at range', () => {
+  const s = makeState();
+  s.map = Array.from({ length: 14 }, (_, y) => Array.from({ length: 14 }, (_, x) => (x === 0 || y === 0 || x === 13 || y === 13 ? '#' : '.')));
+  s.doors = {}; s.player.x = 1.5; s.player.y = 1.5; s.player.a = 0;
+  s.enemies = [{ type: 'ICE_PIG', x: 8.5, y: 1.5, alive: true }];
+  const far = A.act(s, {}, A.DEFAULT_PARAMS);
+  assert.ok(far.mode.startsWith('combat') && far.keys.has('KeyW'), 'closes distance on a 7-tile target');
+  s.enemies[0].x = 4.5;
+  const near = A.act(s, {}, A.DEFAULT_PARAMS);
+  assert.ok(near.keys.has('Space') && !near.keys.has('KeyW'), 'stops and fires once the hit window is alignable');
+});

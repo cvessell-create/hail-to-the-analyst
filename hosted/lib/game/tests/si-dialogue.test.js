@@ -46,3 +46,58 @@ test('chatbot reply retrieves a cited owner line, or nothing', () => {
   assert.ok(corpus.lines.some(l => l.id === r.id && SI.display(l.text) === r.text));
   assert.equal(d.respond('the and of'), null);
 });
+
+function fakeWindow(fetchImpl) {
+  class El {
+    constructor() { this.children = []; this.style = {}; this.textContent = ''; this.listeners = {}; this.kids = {}; this.value = ''; }
+    set innerHTML(v) { this._html = v; } get innerHTML() { return this._html; }
+    appendChild(c) { this.children.push(c); c.parent = this; return c; }
+    get firstChild() { return this.children[0]; }
+    remove() { if (this.parent) this.parent.children.splice(this.parent.children.indexOf(this), 1); }
+    querySelector(sel) { return this.kids[sel] || (this.kids[sel] = new El()); }
+    addEventListener(t, f) { this.listeners[t] = f; }
+  }
+  const store = new Map();
+  return {
+    document: { body: new El(), createElement: () => new El() },
+    localStorage: { getItem: k => store.get(k) || null, setItem: (k, v) => store.set(k, v) },
+    fetch: fetchImpl, setTimeout, clearTimeout
+  };
+}
+const rows = win => win.document.body.children[0].querySelector('#siLog').children.map(r => ({
+  who: r.querySelector('b').textContent, text: r.querySelector('span').textContent, cite: r.querySelector('i').textContent }));
+const tick = () => new Promise(r => setTimeout(r, 5));
+
+test('framework LLM replies show in game with sources hidden but recorded', async () => {
+  const calls = [];
+  const win = fakeWindow(async (url, init) => {
+    calls.push({ url, body: init && init.body ? JSON.parse(init.body) : null });
+    const body = url.endsWith('/status') ? { backend: 'ollama:test', model_ready: true, loop: { episodes: 3 } }
+      : { kind: 'generated', label: 'SI generated (derivative of owner sources)', model: 'ollama:test', text: 'Hold the corridor, Analyst.',
+        sources: [{ id: corpus.lines[0].id, cite: 'SKILL.md:1', sha256: corpus.lines[0].sha256 }] };
+    return { ok: true, json: async () => body };
+  });
+  const learner = { generation: 2, bestFitness: 10, history: [{ mission: 0, outcome: 'dead', kills: 1, died: true }] };
+  const ch = SI.mount(win, corpus, { learner: () => learner });
+  await tick();
+  ch.onEpisode(learner, learner.history[0], { score: -50, improved: false });
+  await tick();
+  const si = rows(win).find(r => r.who === 'SI:');
+  assert.equal(si.text, 'Hold the corridor, Analyst.');
+  assert.equal(si.cite, '', 'citation hidden in game play');
+  assert.equal(ch.records.at(-1).sources[0].cite, 'SKILL.md:1');
+  const ev = calls.find(c => c.body && c.body.event).body.event;
+  assert.equal(ev.outcome, 'dead');
+  assert.equal(ch.linkReady(), true);
+});
+
+test('game falls back to verbatim owner lines when the framework link is down', async () => {
+  const win = fakeWindow(async () => { throw new Error('offline'); });
+  const ch = SI.mount(win, corpus, {});
+  await tick();
+  const author = rows(win).filter(r => r.who === 'AUTHOR:');
+  assert.ok(author.length >= 1);
+  assert.ok(corpus.lines.some(l => SI.display(l.text) === author[0].text));
+  assert.ok(rows(win).some(r => /link down/.test(r.text)));
+  assert.equal(ch.records[0].kind, 'owner');
+});

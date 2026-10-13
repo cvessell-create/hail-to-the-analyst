@@ -147,8 +147,12 @@
       if (p.weapon !== weapon) taps.push('Digit' + (weapon + 1));
       const diff = steerTo(p, target.e.x, target.e.y, keys, true);
       const size = (target.e.type === 'FABRICATOR' ? 0.8 : 0.35) / Math.max(target.dist, 0.1);
-      if (Math.abs(diff) < Math.min(params.aimTolerance, size * 0.8)) keys.add('Space');
+      const hitWindow = Math.min(params.aimTolerance, size * 0.8);
+      if (Math.abs(diff) < hitWindow) keys.add('Space');
       if (MELEE.has(target.e.type) && target.dist < params.retreatRange && !keys.has('KeyJ')) keys.add('KeyS');
+      // A hit window narrower than the turn deadband can never be aligned; close in along the clear sight line.
+      else if (hitWindow < 0.05 && Math.abs(diff) < 0.4) keys.add('KeyW');
+      if (keys.has('KeyW') && stuck(memory, p)) { keys.clear(); keys.add('KeyS'); keys.add(memory.t % 2 ? 'ArrowLeft' : 'ArrowRight'); memory.mode = 'unstick'; return { keys, taps, mode: memory.mode }; }
       memory.mode = 'combat:' + target.e.type;
       return { keys, taps, mode: memory.mode };
     }
@@ -246,7 +250,7 @@
     let saved = null;
     try { saved = JSON.parse(store.getItem(opts.storageKey)); } catch (e) { saved = null; }
     const learner = createLearner(saved);
-    let held = new Set(), memory = {}, episode = null, lastMode = null, lastMission = null;
+    let held = new Set(), memory = {}, episode = null, lastMode = null, lastMission = null, facts = null;
     const hud = doc.createElement('div');
     hud.id = 'autopilotHud';
     hud.style.cssText = 'position:fixed;right:8px;top:8px;z-index:99;background:#000c;color:#9f9;font:12px/1.35 Courier New,monospace;padding:6px 8px;border:1px solid #3a3;pointer-events:none;white-space:pre';
@@ -255,7 +259,7 @@
     if (nes) nes.style.display = 'none';
 
     const si = win.HailSIDialogue && win.HailStoryCorpus
-      ? win.HailSIDialogue.mount(win, win.HailStoryCorpus, { learner: () => learner }) : null;
+      ? win.HailSIDialogue.mount(win, win.HailStoryCorpus, { learner: () => learner, facts: () => facts }) : null;
     if (si) si.status(learner);
 
     const send = (type, code) => win.dispatchEvent(new win.KeyboardEvent(type, { code, key: code, bubbles: true }));
@@ -298,6 +302,10 @@
         for (const c of out.keys) send('keydown', c); // re-sent each tick: the game clears keys on load/blur
         held = out.keys;
         for (const c of out.taps) { send('keydown', c); send('keyup', c); }
+        const pl = s.player;
+        facts = { mission: s.missionIndex + 1, hp: Math.round(pl.hp), bullets: pl.bullets || 0, shells: pl.shells || 0,
+          red_clearance: Boolean(pl.red), blue_clearance: Boolean(pl.blue), boss_down: Boolean(s.bossDead),
+          enemies_left: (s.enemies || []).filter(e => e.hp > 0).length, autopilot_goal: out.mode };
         hud.textContent = 'AUTOPILOT GEN ' + learner.generation + '\nbest ' + (Number.isFinite(learner.bestFitness) ? learner.bestFitness.toFixed(0) : '-') +
           '\nmission ' + (s.missionIndex + 1) + '  hp ' + Math.round(s.player.hp) + '\n' + out.mode;
       }

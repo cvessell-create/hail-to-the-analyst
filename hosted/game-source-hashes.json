@@ -120,7 +120,7 @@
     },
     {
       "path": "engine/autopilot.js",
-      "sha256": "efb3238c42d674a646d7e6fdbad09178e31ad1f91f780a9a4c64dc3bad6d0502"
+      "sha256": "ad928651579d79308f0065e6aacbdde0fbc5c49a534b6aca32e59d3993b3e25c"
     },
     {
       "path": "engine/boss.js",
@@ -164,7 +164,7 @@
     },
     {
       "path": "engine/si-dialogue.js",
-      "sha256": "ff6229870126500de1b3536c17b05dc07eca27983f6fdee71008b9a242aa2df9"
+      "sha256": "ee75c1ddb8ff5503256d4fa47c7aee334f3572be17c21a6f11899a00e6038135"
     },
     {
       "path": "engine/si-story-corpus.js",
@@ -296,7 +296,7 @@
     },
     {
       "path": "tests/autopilot.test.js",
-      "sha256": "49c1c53812351d6125d606dc550f63b09ad7058db1d3e4c3b2cfd38c89fdb4d3"
+      "sha256": "dc2bd25af81cd7ae49c627609342713a032608361b0c9c68c0963421bfa95ec4"
     },
     {
       "path": "tests/emulation-engine.test.js",
@@ -344,7 +344,7 @@
     },
     {
       "path": "tests/si-dialogue.test.js",
-      "sha256": "3ac98cf92b510165d6afe2226cdcb5c97cf985e08b8a47edaf7e4bd79a546fc5"
+      "sha256": "a820c5f40142aa058498f163279df3afa43bc1e1ce269cd81e10a94c89fb1f67"
     },
     {
       "path": "tests/solo-expansion.test.js",

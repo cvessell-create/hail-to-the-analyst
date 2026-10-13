@@ -73,8 +73,26 @@
   }
 
   function mount(win, corpus, options) {
-    const opts = { storageKey: 'hail-si-level1/v1', ...options };
+    const opts = { storageKey: 'hail-si-level1/v1', chatUrl: 'http://127.0.0.1:8790', hideSources: true, ...options };
     const doc = win.document, dlg = createDialogue(corpus);
+    // Provenance for every line shown in game; citations stay out of game play when hideSources is set.
+    const records = [];
+    let linkReady = false;
+    async function remote(path, body) {
+      if (!opts.chatUrl || typeof win.fetch !== 'function') return null;
+      const ctl = typeof win.AbortController === 'function' ? new win.AbortController() : null;
+      const timer = ctl ? win.setTimeout(() => ctl.abort(), 30000) : 0;
+      try {
+        const res = await win.fetch(opts.chatUrl + path, body === undefined ? { signal: ctl && ctl.signal } :
+          { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl && ctl.signal });
+        return res.ok ? await res.json() : null;
+      } catch (e) { return null; } finally { if (timer) win.clearTimeout(timer); }
+    }
+    function postReply(r) {
+      records.push({ at: Date.now(), kind: r.kind, label: r.label, model: r.model, text: r.text, sources: r.sources });
+      if (records.length > 200) records.shift();
+      post(r.kind === 'generated' ? 'SI' : r.kind === 'telemetry' ? 'LOOP' : 'AUTHOR', r.text, opts.hideSources ? null : (r.sources[0] || {}).cite);
+    }
     let floor = 0;
     try { floor = JSON.parse(win.localStorage.getItem(opts.storageKey)).stage | 0; } catch (e) { floor = 0; }
 
@@ -90,7 +108,7 @@
     function post(who, text, cite) {
       const row = doc.createElement('div');
       row.style.margin = '3px 0';
-      const color = who === 'AUTHOR' ? '#ffd27a' : who === 'YOU' ? '#9cf' : '#9f9';
+      const color = who === 'AUTHOR' ? '#ffd27a' : who === 'YOU' ? '#9cf' : who === 'SI' ? '#7ff' : '#9f9';
       row.innerHTML = '<b style="color:' + color + '"></b> <span></span>' + (cite ? ' <i style="color:#7a7"></i>' : '');
       row.querySelector('b').textContent = who + ':';
       row.querySelector('span').textContent = text;
@@ -118,14 +136,24 @@
           post('LOOP', 'gen ' + learner.generation + ' · best ' + Math.round(learner.bestFitness) + ' · milestones ' +
             corpus.stages.map((s, i) => (i < p.stage ? '✓' : '·') + s.name).join(' '));
         }
-        const r = dlg.respond(q, learner ? progress(corpus, learner.history, floor).current.id : null);
-        if (r) post('AUTHOR', r.text, r.cite); else post('LOOP', 'No matching line in the owner corpus.');
+        const stageId = learner ? progress(corpus, learner.history, floor).current.id : null;
+        remote('/chat', { message: q, view: 'game', game: opts.facts ? opts.facts() : null }).then(rr => {
+          if (rr && rr.text) return postReply(rr);
+          const r = dlg.respond(q, stageId);
+          if (r) postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: r.text, sources: [r] });
+          else post('LOOP', 'No matching line in the owner corpus.');
+        });
       }
     }));
 
     post('LOOP', 'Corpus loaded: ' + corpus.lines.length + ' owner lines from ' + corpus.sources.length + ' sources. Text is selected, never rewritten.');
     const intro = dlg.say('intake', 0);
-    post('AUTHOR', intro.text, intro.cite);
+    postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: intro.text, sources: [intro] });
+    remote('/status').then(st => {
+      linkReady = Boolean(st && st.model_ready);
+      post('LOOP', st ? 'Framework link up: ' + st.backend + (linkReady ? ' online' : ' offline, owner-text fallback') +
+        ' · loop memory ' + st.loop.episodes + ' episodes.' : 'Framework link down; local Level 1 chatbot only.');
+    });
 
     return {
       dialogue: dlg,
@@ -140,16 +168,25 @@
             const st = corpus.stages[s];
             post('LOOP', 'STAGE ' + (s + 1) + '/' + p.total + ' ' + st.name.toUpperCase() + ' reached: ' + st.milestone + '.');
             const q = dlg.say(st.id, learner.generation);
-            post('AUTHOR', q.text, q.cite);
+            postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: q.text, sources: [q] });
           }
           if (p.complete) post('LOOP', 'SI LEVEL 1 milestones complete for this browser profile.');
-        } else if (result.improved || episode.died) {
-          const q = dlg.say(p.current.id, learner.generation * 7 + (episode.died ? 3 : 0));
-          post('AUTHOR', q.text, q.cite);
         }
+        const event = { generation: learner.generation - 1, mission: episode.mission, outcome: episode.outcome,
+          kills: episode.kills, fitness: Math.round(result.score), improved: result.improved, died: episode.died,
+          seconds: episode.seconds, stage: p.complete ? 'correction' : p.current.id };
+        remote('/chat', { message: '', view: 'game', event, game: opts.facts ? opts.facts() : null }).then(rr => {
+          if (rr && rr.text) return postReply(rr);
+          if (p.stage === before && (result.improved || episode.died)) {
+            const q = dlg.say(p.current.id, learner.generation * 7 + (episode.died ? 3 : 0));
+            postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: q.text, sources: [q] });
+          }
+        });
       },
       status,
-      post
+      post,
+      records,
+      linkReady: () => linkReady
     };
   }
 
