@@ -219,6 +219,10 @@
       "sha256": "2d44ed4e8b1a867a1fa94c902a813bd9d8a7382db53c7e97c4cc7ba87374170f"
     },
     {
+      "path": "scripts/autonomous-interop.js",
+      "sha256": "fb17d74b5bb310da017ff5c76107e316ebc7387d82cde38cda5c531408b92ecd"
+    },
+    {
       "path": "scripts/hf-client.js",
       "sha256": "3be85f2adc46646e3b4e714a03bf6eb37868a823c844ff325c6dc254b09c823a"
     },
