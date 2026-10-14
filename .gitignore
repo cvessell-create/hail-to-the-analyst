@@ -7,3 +7,4 @@ node_modules/
 .wrangler/
 next-env.d.ts
 
+/outputs/
