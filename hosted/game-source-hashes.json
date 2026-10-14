@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "7860e6bc63cf4cfa9452a44b71b3fafe0450f3a41f5c8618edcd2357f35387ab"
+      "sha256": "d90ff87cd32bb1037879beaf8aca08f4c446f99be136729c3a37543557714b0e"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -212,7 +212,7 @@
     },
     {
       "path": "engine/si-dialogue.js",
-      "sha256": "8103f52c28f5652af34c4b83d5bc31be94886e5548ab55e836c89d27cb0b698a"
+      "sha256": "1b448094c3de0365696a979818130b79d654695cb3f9ff8315879fe442618eea"
     },
     {
       "path": "engine/si-story-corpus.js",
@@ -247,6 +247,10 @@
       "sha256": "f1c709b9d1ff6bbeaef71c0b02a82e02c277d1b7f70cf630b453ab57d4d85aca"
     },
     {
+      "path": "engine/vessell-formula.js",
+      "sha256": "5d1057379506f30e775c62e11e9e1b2b12a84f56cf498c6fdc32147f5dafaba2"
+    },
+    {
       "path": "engine/weight-trace.js",
       "sha256": "52c084649c62b5bc424e89926c2420fcdaf3c5032f8a605971a860686e4ff411"
     },
@@ -264,7 +268,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "722890a763878bdf2ad4c0394972a3824a76085c51fff7a8c1c759dd4b4ac330"
+      "sha256": "3b5ca3b842032281a52c37c98492ac3b89228b94922bb0ab1ebf05af7fa6b6d9"
     },
     {
       "path": "js/emulation-engine.js",
@@ -344,7 +348,7 @@
     },
     {
       "path": "server/index.js",
-      "sha256": "f374e8951bd49abf131acea36a5caba4e81675de1587767df953950b8708c9c0"
+      "sha256": "3e661d03f64813dee96a458c19f0442aeb0f5c2d873f813aaa37185179797fa5"
     },
     {
       "path": "server/request-clock.js",
@@ -444,7 +448,7 @@
     },
     {
       "path": "tests/si-dialogue.test.js",
-      "sha256": "6a122ab311adb18e6bfae6a0247ace480fa007259340c6609a897c07eeb7d20a"
+      "sha256": "cc8064f0edb02bb03f8f5e035177826e6137dbc7b022ca1aeb913bc6341d78fb"
     },
     {
       "path": "tests/solo-expansion.test.js",
@@ -477,6 +481,10 @@
     {
       "path": "tests/upgrades.test.js",
       "sha256": "c4e421db541e6e7dfcad0d1c07b1dc824b1ade1bfb0398b9dbb9cdd2d9aa38d7"
+    },
+    {
+      "path": "tests/vessell-formula.test.js",
+      "sha256": "f0f3c8cd2605950a513efe5d93f73d456e70b942c85e042c202508e7ddc9433b"
     },
     {
       "path": "tests/weight-trace.test.js",

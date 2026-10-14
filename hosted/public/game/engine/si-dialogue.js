@@ -3,10 +3,11 @@
 // owner-authored corpus exported by VessellFramework; it is never generated or
 // rewritten here. The loop only contributes measured telemetry.
 (function (root, factory) {
-  const api = factory();
+  const formula = typeof module === 'object' && module.exports ? require('./vessell-formula.js') : root.HailVessellFormula;
+  const api = factory(formula);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.HailSIDialogue = api;
-})(typeof globalThis === 'object' ? globalThis : this, function () {
+})(typeof globalThis === 'object' ? globalThis : this, function (formula) {
   'use strict';
 
   const STOP = new Set('a an and are as at be by for from has have how i in is it its of on or that the this to was what when where which who why with you your me my do does did can'.split(' '));
@@ -100,6 +101,7 @@
 
     // One channel per page: a later mount (e.g. autopilot) replaces the earlier panel.
     const prior = doc.getElementById ? doc.getElementById('siChannel') : null;
+    if (prior && prior.formulaTimer && win.clearInterval) win.clearInterval(prior.formulaTimer);
     if (prior && prior.parentNode) prior.parentNode.removeChild(prior);
     const panel = doc.createElement('div');
     panel.id = 'siChannel';
@@ -117,6 +119,16 @@
       doc.body.appendChild(panel);
     }
     const log = panel.querySelector('#siLog'), head = panel.querySelector('#siHead'), ask = panel.querySelector('#siAsk');
+    const formulaView = doc.createElement('div');
+    formulaView.id = 'siFormula';
+    formulaView.textContent = formula.describe(null);
+    panel.appendChild(formulaView);
+    let formulaStatus = null;
+    async function refreshFormula() {
+      formulaStatus = await remote('/formula');
+      formulaView.textContent = formula.describe(formulaStatus);
+      return formulaStatus;
+    }
     if (dock && head.addEventListener) head.addEventListener('click', (e) => {
       if (e && e.stopPropagation) e.stopPropagation();
       const narrow = win.matchMedia && win.matchMedia('(pointer:coarse),(max-width:760px),(max-aspect-ratio:1/1)').matches;
@@ -172,10 +184,13 @@
       post('LOOP', st ? 'Framework link up: ' + st.backend + (linkReady ? ' online' : ' offline, owner-text fallback') +
         ' · loop memory ' + st.loop.episodes + ' episodes.' : 'Framework link down; local Level 1 chatbot only.');
     });
+    refreshFormula();
+    if (win.setInterval) panel.formulaTimer = win.setInterval(refreshFormula, 30000);
 
     return {
       dialogue: dlg,
       onEpisode(learner, episode, result) {
+        refreshFormula();
         const before = floor, p = status(learner);
         post('LOOP', 'gen ' + (learner.generation - 1) + ' · mission ' + (episode.mission + 1) + ' · ' + episode.outcome +
           ' · kills ' + episode.kills + ' · fitness ' + Math.round(result.score) + (result.improved ? ' · NEW CHAMPION' : ''));
@@ -208,6 +223,8 @@
       status,
       post,
       records,
+      refreshFormula,
+      formulaStatus: () => formulaStatus,
       linkReady: () => linkReady
     };
   }

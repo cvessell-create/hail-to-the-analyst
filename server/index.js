@@ -29,7 +29,8 @@ function createServer({ manual = false, hfClient = null, publicMode = process.en
       if (Date.now() - rate.start > 1000) { rate.start = Date.now(); rate.count = 0; }
       rates.set(address, rate);
       if (++rate.count > 300) return json(429, { error: 'Local request budget exceeded.' });
-      if (url.pathname === '/si/status' || url.pathname === '/si/chat') {
+      if (url.pathname === '/si/status' || url.pathname === '/si/chat' || url.pathname === '/si/formula') {
+        if (remote && url.pathname === '/si/formula') return json(403, { error: 'Formula status is local only.' });
         const post = url.pathname === '/si/chat';
         if (req.method !== (post ? 'POST' : 'GET')) return json(405, { error: 'Unsupported SI method.' });
         let body;
@@ -49,7 +50,7 @@ function createServer({ manual = false, hfClient = null, publicMode = process.en
           }
         }
         try {
-          const upstream = await fetchImpl(siUrl + (post ? '/chat' : '/status'), post ?
+          const upstream = await fetchImpl(siUrl + (post ? '/chat' : url.pathname === '/si/formula' ? '/formula' : '/status'), post ?
             { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(30000) } :
             { signal: AbortSignal.timeout(5000) });
           return json(upstream.status, await upstream.json());

@@ -264,6 +264,20 @@ search record and sources are listed in the module header:
 
 Flood-wall statistics were not verified and are not used.
 
+### Vessell formula and local SI receipts
+
+`engine/vessell-formula.js` implements strict current-run conjunction over
+nonempty required check IDs: missing, duplicate, unknown, failed or mixed-run
+observations are DOWN. It is a check-compliance rule, not a truth or authority
+claim. The SI channel displays local Phase 0/1 status through `/si/formula`,
+refreshing every 30 seconds and after episodes. The framework supplies a
+sanitized status, checks freshness (one hour) and verifies local HMAC receipts.
+Unavailable service status is shown as DOWN; offline owner dialogue remains
+available. No mission rules, autopilot promotion or progression changes.
+Private formula status is not exposed to tunnel players. The hosted source
+mirrors include the same module; a deployment without the local SI service
+shows unavailable status rather than claiming a successful run.
+
 ### FPS mobile controls
 
 Left-side virtual joystick to move, drag right side of screen to look. Dedicated **FIRE**, **WEAPON**, **USE**, and hold-to-fly **JET** buttons.

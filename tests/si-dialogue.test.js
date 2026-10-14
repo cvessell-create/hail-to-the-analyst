@@ -68,6 +68,18 @@ const rows = win => win.document.body.children[0].querySelector('#siLog').childr
   who: r.querySelector('b').textContent, text: r.querySelector('span').textContent, cite: r.querySelector('i').textContent }));
 const tick = () => new Promise(r => setTimeout(r, 5));
 
+test('game displays the local formula status without changing milestone progression', async () => {
+  const win = fakeWindow(async url => ({ ok: true, json: async () => url.endsWith('/formula')
+    ? { schema: 'vessell-formula/v1', state: 'UP', phase1: 'LOCAL_RECEIPT_VERIFIED' }
+    : { backend: 'test', model_ready: true, loop: { episodes: 0 } } }));
+  const ch = SI.mount(win, corpus, {});
+  await tick();
+  assert.equal(ch.formulaStatus().state, 'UP');
+  const panel = win.document.body.children[0];
+  assert.match(panel.children.find(el => el.id === 'siFormula').textContent, /UP.*LOCAL_RECEIPT_VERIFIED/);
+  assert.equal(SI.progress(corpus, []).stage, 0);
+});
+
 test('framework LLM replies show in game with sources hidden but recorded', async () => {
   const calls = [];
   const win = fakeWindow(async (url, init) => {
