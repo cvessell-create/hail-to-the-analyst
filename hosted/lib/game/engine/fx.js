@@ -11,19 +11,22 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // missionIndex (0-based) -> theme. Levels: Archive, Fabrication Plant, Frost Yard,
-  // Starlight Boulevard, Glacier Dock.
+  // Levels may declare `fx: '<theme name>'`. Snow/blizzard only on ice levels; the
+  // index fallback (for levels without a declaration) never returns snow.
   const THEMES = [
     { name: 'archive-dust', tint: [1.0, 0.97, 0.88], bloom: 0.25, particle: 'dust' },
     { name: 'forge-embers', tint: [1.08, 0.94, 0.84], bloom: 0.55, particle: 'embers' },
     { name: 'frost-snow', tint: [0.88, 0.97, 1.1], bloom: 0.35, particle: 'snow' },
-    { name: 'starlight', tint: [0.94, 0.94, 1.08], bloom: 0.6, particle: 'stars' },
+    { name: 'neon-city', tint: [1.0, 0.94, 1.1], bloom: 0.65, particle: 'neon' },
     { name: 'glacier-blizzard', tint: [0.84, 0.95, 1.14], bloom: 0.4, particle: 'blizzard' }
   ];
+  const byName = Object.fromEntries(THEMES.map((t) => [t.name, t]));
 
-  function themeFor(missionIndex) {
+  function themeFor(missionIndex, levels) {
     const i = Number.isInteger(missionIndex) ? missionIndex : 0;
-    return THEMES[Math.max(0, Math.min(THEMES.length - 1, i))];
+    const declared = levels && levels[i] && levels[i].fx;
+    if (declared && byName[declared]) return byName[declared];
+    return i === 1 ? byName['forge-embers'] : byName['archive-dust'];
   }
 
   function particleOptions(kind) {
@@ -38,9 +41,9 @@
       snow: { number: { value: 110 }, color: { value: '#eef6ff' }, opacity: { value: { min: 0.35, max: 0.85 } },
         size: { value: { min: 0.8, max: 2.6 } },
         move: { enable: true, speed: 1.2, direction: 'bottom', random: true, outModes: { default: 'out' } } },
-      stars: { number: { value: 70 }, color: { value: ['#ffffff', '#ffd9a8', '#a8d8ff'] },
-        opacity: { value: { min: 0.1, max: 0.9 }, animation: { enable: true, speed: 0.8 } },
-        size: { value: { min: 0.4, max: 1.6 } }, move: { enable: true, speed: 0.15, direction: 'none', random: true } },
+      neon: { number: { value: 28 }, color: { value: ['#ff55c4', '#43e8ff', '#ffd36b'] },
+        opacity: { value: { min: 0.05, max: 0.7 }, animation: { enable: true, speed: 0.6 } },
+        size: { value: { min: 0.6, max: 1.8 } }, move: { enable: false } },
       blizzard: { number: { value: 190 }, color: { value: '#f4fbff' }, opacity: { value: { min: 0.3, max: 0.9 } },
         size: { value: { min: 0.6, max: 2.2 } },
         move: { enable: true, speed: 3.2, direction: 'bottom-left', random: true, outModes: { default: 'out' } } }
@@ -112,11 +115,11 @@
       css.textContent = '#fxParticles canvas{background:transparent!important}';
       doc.head.appendChild(css);
     }
-    { const s0 = getState(); state.theme = themeFor(s0 ? s0.missionIndex : 0); loadParticles(state.theme); }
+    { const s0 = getState(); state.theme = themeFor(s0 ? s0.missionIndex : 0, win.HailLevels); loadParticles(state.theme); }
 
     const frame = (t) => {
       const s = getState();
-      const theme = themeFor(s ? s.missionIndex : 0);
+      const theme = themeFor(s ? s.missionIndex : 0, win.HailLevels);
       if (theme !== state.theme) { state.theme = theme; loadParticles(theme); }
       if (gl) try {
         if (src.width && (gl.canvas.width !== src.width || gl.canvas.height !== src.height)) {

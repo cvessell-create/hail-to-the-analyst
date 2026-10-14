@@ -5,8 +5,8 @@
 All five solo missions enter first-person play directly. The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
 The story is a civilian training simulation, not a political attribution.
-Use **NES VIEW** during play for an original JSNES CPU/PPU companion display;
-the browser first-person renderer remains primary.
+The browser first-person renderer is the only gameplay view; the NES companion
+display was removed from the UI (`engine/nes-visual.js` remains as a tested module).
 
 ### Expanded solo campaign
 
@@ -113,7 +113,10 @@ with Enter or Space. Hex labels/tooltips show terrain defence and movement costs
 | W A S D / Arrows | Move / strafe |
 | Mouse | Look |
 | Click | Fire |
-| E | Use (doors, pickups) |
+| E | Use (doors, pickups, metro: call train / press again to change stop) |
+| Q | Dodge roll (brief invulnerability, 1.1 s cooldown) |
+| R (hold) | Raise weapon over low cover (slower movement, exposed) |
+| G | Mark the route to the current objective on the radar (8 s) |
 | J (hold) | Jetpack lift/hover, after collecting JET equipment |
 | 1 / 2 / 3 | Sidearm / Breacher / Redactor |
 | M | Minimap |

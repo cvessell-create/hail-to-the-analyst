@@ -1,11 +1,24 @@
 // Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: GPL-2.0-or-later
 (function(root,factory){
   'use strict';
-  var api=factory();
+  var tuning=root.HailLevelTuning||(typeof require==='function'?require('./level-tuning.js'):null);
+  var api=factory(tuning);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.HailSoloExpansion=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(tuning){
   'use strict';
+  // Airspace layer: 'L' is a low rooftop. It blocks ground movement and low shots;
+  // a jetpack at ROOF altitude flies over it and can stand on it.
+  var ROOF=0.9,ROOF_FRAC=0.7;
+  function rooftop(grid,x0,y0,w,h,courtyard,loot){
+    for(var y=y0;y<y0+h;y++)for(var x=x0;x<x0+w;x++){
+      var edge=y===y0||y===y0+h-1||x===x0||x===x0+w-1;
+      grid[y][x]=courtyard&&!edge?'.':'L';
+    }
+    (loot||[]).forEach(function(item,i){grid[y0+1+Math.floor(i/(w-2))][x0+1+i%(w-2)]=item;});
+  }
+  function roofBlocks(tile,height){return tile==='L'&&!((height||0)>=ROOF-1e-9);}
+  function standing(tile,height){return tile==='L'?Math.max(ROOF,height||0):height;}
   function arena(width,height,final){
     var grid=Array.from({length:height},function(_,y){
       return Array.from({length:width},function(_,x){return x===0||y===0||x===width-1||y===height-1?'#':'.';});
@@ -17,6 +30,8 @@
     for(var y=9;y<height-5;y+=5)for(var x=3;x<width-3;x+=6){
       if(grid[y][x]==='.')grid[y][x]='I';
     }
+    rooftop(grid,13,18,5,5,true,['v','a','i']);
+    rooftop(grid,25,11,3,2,false);
     var items=[
       [1,1,'P'],[2,1,'j'],[4,2,'v'],[6,3,'b'],[7,5,'h'],
       [8,6,'p'],[6,11,'p'],[4,15,'a'],[8,height-4,'v'],
@@ -29,19 +44,95 @@
     items.forEach(function(item){grid[item[1]][item[0]]=item[2];});
     return grid.map(function(row){return row.join('');});
   }
+  // Evidence-status rules adapted from the VessellFramework Evidence Dossier method
+  // (Vessel_Evidence_Assurance_Validation_Orchestrator_SKILL_v0.1.md). Method only; no personal data.
+  var DOSSIER_FILES=[
+    'SEARCH SNIPPETS ARE LEADS, NOT EVIDENCE.',
+    'COPIES OF ONE SOURCE ARE ONE LINEAGE.',
+    'PRESTIGE DOES NOT PROVE RELEVANCE.',
+    'CURRENT CLAIMS NEED CURRENT EVIDENCE.',
+    'WORKING HYPOTHESIS IS NOT ESTABLISHED.',
+    'RECORD THE CONTRARY EVIDENCE.'];
+  function dossierFile(n){return 'FILE '+(n%DOSSIER_FILES.length+1)+'/'+DOSSIER_FILES.length+': '+DOSSIER_FILES[n%DOSSIER_FILES.length];}
+  function dossier(){
+    var W=40,H=32,grid=Array.from({length:H},function(_,y){
+      return Array.from({length:W},function(_,x){return x===0||y===0||x===W-1||y===H-1?'#':'.';});
+    });
+    var xs=[3,12,21,30],ys=[3,13,23];
+    var fill=[['i','d','m','i'],['a','F','v','q'],['h','i','d','s']];
+    ys.forEach(function(y0,r){xs.forEach(function(x0,c){
+      var wall=(r+c)%2?'N':'I';
+      for(var i=0;i<7;i++){grid[y0][x0+i]=wall;grid[y0+6][x0+i]=wall;grid[y0+i][x0]=wall;grid[y0+i][x0+6]=wall;}
+      grid[y0][x0+3]='D';grid[y0+6][x0+3]='D';grid[y0+3][x0]='D';grid[y0+3][x0+6]='D';
+      grid[y0+3][x0+3]=fill[r][c];
+    });});
+    [[2,2,'P'],[3,1,'j'],[10,10,'d'],[28,10,'d'],[19,20,'d'],[37,20,'m'],[10,20,'t'],[28,1,'i'],
+     [19,11,'h'],[37,11,'a'],[2,20,'b'],[19,30,'v'],[37,30,'X'],[35,30,'h'],[11,30,'d'],[29,21,'m'],[24,11,'p'],[6,21,'p'],
+     [24,1,'L'],[15,11,'L'],[33,21,'L'],[6,11,'L']]
+      .forEach(function(it){grid[it[1]][it[0]]=it[2];});
+    return grid.map(function(row){return row.join('');});
+  }
   function levels(){
     return [
-      {name:'FROST YARD',outdoor:true,requires:'red',objective:'Recover red clearance and cross the ice-droid yard.',
+      {name:'FROST YARD',outdoor:true,fx:'frost-snow',requires:'red',objective:'Recover red clearance and cross the ice-droid yard.',
         brief:'A larger, open-air training yard is guarded by <b>ICE PIG DROIDS</b>: original robotic opponents with armored snouts and icy plating. Collect a <b>JETPACK</b>, hold <b>J / JET</b> to hover, and search for fuel canisters. Fuel never regenerates. Hovering avoids ground melee, not walls or aimed projectiles. Recover red clearance and reach extraction.',
         map:arena(32,26,false)},
-      {name:'STARLIGHT BOULEVARD',outdoor:true,theme:'city',requires:'red',objective:'Recover theater clearance and extract through the city district.',
+      {name:'STARLIGHT BOULEVARD',outdoor:true,theme:'city',fx:'neon-city',requires:'red',objective:'Recover theater clearance and extract through the city district.',
         brief:'An original Hollywood-inspired district: neon theaters, palm-lined streets, star-patterned sidewalks and a <b>STARLIGHT</b> hillside sign. Ice pig droids patrol the boulevard. Search the side streets for red clearance, ammunition and jet fuel before reaching extraction. All scenery is original; no movie characters, celebrity likenesses or studio logos are used.',
         map:city()},
-      {name:'GLACIER DOCK',outdoor:true,requires:'blue-boss',objective:'Recover blue clearance, disable the dock controller and extract.',
+      {name:'GLACIER DOCK',outdoor:true,fx:'glacier-blizzard',requires:'blue-boss',objective:'Recover blue clearance, disable the dock controller and extract.',
         brief:'The final 36-by-28 dock has wider patrol lanes, fuel caches and another automated controller. Ice pig droids rush on the ground; drones and controllers can aim at your flight altitude. Recover <b>BLUE CLEARANCE</b>, disable the controller and use the marked exit. These machines are fictional training opponents, not real people or institutions.',
-        map:arena(36,28,true)}
+        map:arena(36,28,true)},
+      {name:'SKYLINE DISTRICT',outdoor:true,theme:'city',fx:'neon-city',requires:'blue-boss',
+        objective:'Search the buildings for blue clearance, disable the plaza controller and extract.',
+        brief:'An original night cityscape built from the training loop data. Streets run between <b>enterable buildings</b> (use the doors) and flat <b>ROOFTOPS</b>. Climb to altitude 0.9 on the <b>JETPACK</b> to fly over a roof, land on it, and shoot down into the streets; walled rooftop courtyards hide supplies that can only be reached from the air. Recover <b>BLUE CLEARANCE</b>, disable the plaza controller and extract at the far corner.',
+        tuning:tuning?{enemies:tuning.enemies,fuelCaches:tuning.fuelCaches,healthKits:tuning.healthKits,source:tuning.source}:null,
+        map:skyline(tuning)},
+      {name:'SHADOW DOSSIER',theme:'dossier',fx:'neon-city',requires:'blue-boss',dossier:true,
+        objective:'Recover blue clearance, shut down the aggregator and extract.',
+        brief:'A fictional surveillance vault where an automated <b>AGGREGATOR</b> stitches scraps into dossiers. Glass cells hold <b>EVIDENCE FILES</b>; each one teaches a sourcing rule. Watcher drones patrol the halls. Recover <b>BLUE CLEARANCE</b>, shut down the aggregator in the central vault and extract. No real accounts, people or agencies are depicted.',
+        map:dossier()}
     ];
   }
+  function skyline(t){
+    var W=44,H=36,grid=Array.from({length:H},function(_,y){
+      return Array.from({length:W},function(_,x){return x===0||y===0||x===W-1||y===H-1?'#':'.';});
+    });
+    var xs=[3,13,23,33],ys=[3,11,19,27];
+    var plan=[['building','rooftop','building','courtyard'],['rooftop','plaza','building','rooftop'],
+      ['building','courtyard','rooftop','building'],['courtyard','building','plaza','rooftop']];
+    var special={'1,2':'q','2,3':'a','0,0':'i','3,1':'h'},n=0;
+    plan.forEach(function(row,r){row.forEach(function(kind,c){
+      var x0=xs[c],y0=ys[r];
+      if(kind==='rooftop')rooftop(grid,x0,y0,8,6,false);
+      else if(kind==='courtyard')rooftop(grid,x0,y0,8,6,true,['v','i','a']);
+      else if(kind==='plaza'){[[0,0],[7,0],[0,5],[7,5]].forEach(function(o){grid[y0+o[1]][x0+o[0]]='T';});
+        if(r===1)grid[y0+3][x0+4]='F';}
+      else{
+        var wall=(n++)%2?'N':'C';
+        for(var y=y0;y<y0+6;y++)for(var x=x0;x<x0+8;x++)
+          grid[y][x]=y===y0||y===y0+5||x===x0||x===x0+7?wall:'.';
+        grid[y0+5][x0+3]='D';grid[y0+1][x0+4]=wall;grid[y0+2][x0+4]=wall;
+        grid[y0+1][x0+2]=special[r+','+c]||'b';grid[y0+3][x0+6]='h';
+      }
+    });});
+    var streets=[];
+    [1,9,17,25,33].forEach(function(y,i){[6,16,26,36].forEach(function(x,j){streets.push([x,y+(i+j)%2]);});});
+    [1,11,21,31,41].forEach(function(x,i){[6,14,22,30].forEach(function(y,j){streets.push([x+(i+j)%2,y]);});});
+    streets=streets.filter(function(p){return Math.hypot(p[0]-1,p[1]-1)>8;});
+    var order=streets.map(function(_,i){return (i*7)%streets.length;});
+    var count=t?t.enemies:12,fuel=t?t.fuelCaches:3,health=t?t.healthKits:3,types='pdmpdt',k=0;
+    for(var e=0;e<count;e++)grid[streets[order[k]][1]][streets[order[k++]][0]]=types[e%types.length];
+    for(var f=0;f<fuel;f++)grid[streets[order[k]][1]][streets[order[k++]][0]]='v';
+    for(var h=0;h<health;h++)grid[streets[order[k]][1]][streets[order[k++]][0]]='h';
+    [[11,2],[32,9],[11,26],[41,25]].forEach(function(p){if(grid[p[1]][p[0]]==='.')grid[p[1]][p[0]]='U';});
+    grid[1][1]='P';grid[1][2]='j';grid[2][1]='v';grid[H-2][W-2]='X';
+    return grid.map(function(row){return row.join('');});
+  }
+  // Metro: walkable 'U' tiles; E on a station calls a train to the next one (free).
+  var METRO_WAIT=1.2;
+  function stations(map){var out=[];for(var y=0;y<map.length;y++)for(var x=0;x<map[y].length;x++)if(map[y][x]==='U')out.push({x:x,y:y});return out;}
+  function nextStation(map,x,y){var all=stations(map),i=all.findIndex(function(s){return s.x===Math.floor(x)&&s.y===Math.floor(y);});return i<0||all.length<2?null:all[(i+1)%all.length];}
   function city(){
     var grid=arena(40,30,false).map(function(row){return row.replace(/I/g,'C').split('');});
     for(var y=3;y<20;y++)grid[y][10]='.';
@@ -108,5 +199,5 @@
       ctx.fillStyle='#fff2da';ctx.font='900 '+Math.max(9,s*.07)+'px Courier New';ctx.textAlign='center';ctx.fillText(label,0,s*.4);
     }
   }
-  return {levels:levels,flight:flight,ready:ready,pig:pig,backdrop:backdrop,scenery:scenery};
+  return {METRO_WAIT:METRO_WAIT,stations:stations,nextStation:nextStation,ROOF:ROOF,ROOF_FRAC:ROOF_FRAC,roofBlocks:roofBlocks,standing:standing,skyline:skyline,levels:levels,dossier:dossier,dossierFile:dossierFile,DOSSIER_FILES:DOSSIER_FILES,flight:flight,ready:ready,pig:pig,backdrop:backdrop,scenery:scenery};
 });

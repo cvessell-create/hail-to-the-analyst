@@ -253,8 +253,12 @@
     let held = new Set(), memory = {}, episode = null, lastMode = null, lastMission = null, facts = null;
     const hud = doc.createElement('div');
     hud.id = 'autopilotHud';
-    hud.style.cssText = 'position:fixed;right:8px;top:8px;z-index:99;background:#000c;color:#9f9;font:12px/1.35 Courier New,monospace;padding:6px 8px;border:1px solid #3a3;pointer-events:none;white-space:pre';
-    doc.body.appendChild(hud);
+    const dock = doc.getElementById ? doc.getElementById('dock') : null;
+    if (dock) dock.insertBefore(hud, dock.firstChild);
+    else {
+      hud.style.cssText = 'position:fixed;right:8px;top:8px;z-index:99;background:#000c;color:#9f9;font:12px/1.35 Courier New,monospace;padding:6px 8px;border:1px solid #3a3;pointer-events:none;white-space:pre';
+      doc.body.appendChild(hud);
+    }
     const nes = doc.querySelector('[aria-label*="NES"]');
     if (nes) nes.style.display = 'none';
 

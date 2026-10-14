@@ -98,12 +98,24 @@
 
     const panel = doc.createElement('div');
     panel.id = 'siChannel';
-    panel.style.cssText = 'position:fixed;left:8px;bottom:8px;width:min(440px,46vw);max-height:42vh;z-index:99;display:flex;flex-direction:column;background:#000d;border:1px solid #3a3;font:12px/1.35 Courier New,monospace;color:#cfc';
-    panel.innerHTML = '<div id="siHead" style="padding:4px 6px;background:#132;color:#9f9">SI LEVEL 1 // CHATBOT CHANNEL</div>' +
-      '<div id="siLog" style="overflow-y:auto;padding:4px 6px;flex:1"></div>' +
-      '<input id="siAsk" placeholder="ask the channel (Enter)" style="background:#010;color:#cfc;border:0;border-top:1px solid #3a3;padding:5px;font:inherit">';
-    doc.body.appendChild(panel);
+    // Docked under the game view when the page provides #dock; otherwise a floating panel.
+    const dock = doc.getElementById ? doc.getElementById('dock') : null;
+    if (dock) {
+      panel.innerHTML = '<div id="siHead" title="click to collapse / expand">SI LEVEL 1 // CHATBOT CHANNEL</div>' +
+        '<div id="siLog"></div><input id="siAsk" placeholder="ask the channel (Enter)">';
+      dock.insertBefore(panel, doc.getElementById('dockTools'));
+    } else {
+      panel.style.cssText = 'position:fixed;left:8px;bottom:8px;width:min(440px,46vw);max-height:42vh;z-index:99;display:flex;flex-direction:column;background:#000d;border:1px solid #3a3;font:12px/1.35 Courier New,monospace;color:#cfc';
+      panel.innerHTML = '<div id="siHead" style="padding:4px 6px;background:#132;color:#9f9">SI LEVEL 1 // CHATBOT CHANNEL</div>' +
+        '<div id="siLog" style="overflow-y:auto;padding:4px 6px;flex:1"></div>' +
+        '<input id="siAsk" placeholder="ask the channel (Enter)" style="background:#010;color:#cfc;border:0;border-top:1px solid #3a3;padding:5px;font:inherit">';
+      doc.body.appendChild(panel);
+    }
     const log = panel.querySelector('#siLog'), head = panel.querySelector('#siHead'), ask = panel.querySelector('#siAsk');
+    if (dock && head.addEventListener) head.addEventListener('click', () => {
+      const narrow = win.matchMedia && win.matchMedia('(max-aspect-ratio:1/1)').matches;
+      panel.classList.toggle(narrow ? 'expanded' : 'collapsed');
+    });
 
     function post(who, text, cite) {
       const row = doc.createElement('div');

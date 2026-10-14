@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d8e95052132e9cea3d41cc2377564cd199bb04bad83b12da84a7638fff6f69bd"
+      "sha256": "4e792e534d3dda39af82c1b5a73dfda30456a61f231b866a41314843297f85ed"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -120,11 +120,15 @@
     },
     {
       "path": "engine/autopilot.js",
-      "sha256": "a5a734af497621371904dfd6941d6e6517a30c6f8c34bebcdb29e73cadf7a974"
+      "sha256": "52afd2de0870e77b6b97280c0fc117ff2a1b453ca0b1fb957a8ab3f242e3c3d9"
     },
     {
       "path": "engine/boss.js",
       "sha256": "ddc8f28f6ffd8ecb3a4e4084c48cccefc60e0057ceb8345b70cf71609d4b62f5"
+    },
+    {
+      "path": "engine/combat-assist.js",
+      "sha256": "a73baf6e108017a5162313b46a5f48636fb2bd24be3907e5323dfdda5e0e8541"
     },
     {
       "path": "engine/controls.js",
@@ -148,7 +152,7 @@
     },
     {
       "path": "engine/fx.js",
-      "sha256": "732bbb16544f9bf276aa905cc7276f0fc13896bb36891f868cbc40e391536ada"
+      "sha256": "787064ee18901688f8fdbe666b3a36a5d6d70ced2321d77bc02a4256c4aba23b"
     },
     {
       "path": "engine/game-theory.js",
@@ -159,6 +163,10 @@
       "sha256": "70cb9f77fd52589f624089e48f163e091425632cdee5ce1b7980e8271116bf41"
     },
     {
+      "path": "engine/level-tuning.js",
+      "sha256": "bdfbff46417137cb62433a75e57d96753b6137dde03b2f14e1fa85ea1d499831"
+    },
+    {
       "path": "engine/math.js",
       "sha256": "ab50286d55082a5504e2c176c48e61f05a9cc57976092a5f2b2cb079c971ac70"
     },
@@ -167,12 +175,16 @@
       "sha256": "75cdbe8da6fd0ee3fb06cb7e101762273ce9ffb564a8860c872e8944356ee58b"
     },
     {
+      "path": "engine/progression.js",
+      "sha256": "19746d5cacef5b76ad356d8bf34c42bdb3a1e49b7e1cd36f1b8d63c9ca7ce780"
+    },
+    {
       "path": "engine/seeded-rng.js",
       "sha256": "647c3ac014b6f6b5832ae834cd7f8a639c7a4574da7798f48bb42157d355e6b3"
     },
     {
       "path": "engine/si-dialogue.js",
-      "sha256": "ee75c1ddb8ff5503256d4fa47c7aee334f3572be17c21a6f11899a00e6038135"
+      "sha256": "2795cc8f54790b1e06c065e59697790d54076879684e6715428b8b68e75b8985"
     },
     {
       "path": "engine/si-story-corpus.js",
@@ -180,7 +192,7 @@
     },
     {
       "path": "engine/solo-expansion.js",
-      "sha256": "146b74c90c4ff8aeacda1902c139b725c2d099794f9cf125ec666040e431842f"
+      "sha256": "0bfaf6ca2807c9f81e911a718bbe90deba7567a9124909493ae369cf5a1f6cab"
     },
     {
       "path": "engine/state-model.js",
@@ -193,6 +205,10 @@
     {
       "path": "engine/systems.js",
       "sha256": "d8213f2c11d803c9cb8e286764db14a741e3d7e78079161cb95e36509cc95154"
+    },
+    {
+      "path": "engine/three-view.js",
+      "sha256": "e7de5464c6bf150aa1474108d2f0ed78cbe66f6deb784b39c30531aa74e7da38"
     },
     {
       "path": "engine/weight-trace.js",
@@ -212,7 +228,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "bc5252abbb0e550f5d556383b9f1bfc6befba98e369780fa160d2d8ae8b741e1"
+      "sha256": "1a0c6f62d26f54b523840101a6420ca7ef75e4d4970524025b7fbddc97e74ee9"
     },
     {
       "path": "js/emulation-engine.js",
@@ -245,6 +261,10 @@
     {
       "path": "scripts/build-agent.js",
       "sha256": "10536d5a44765cc8c164168dfd789201b5d390dffaa7d07606aead628c74b5fc"
+    },
+    {
+      "path": "scripts/build-level-tuning.js",
+      "sha256": "65f94828b1324346b3a8b4af18d0b99211bbb061f82212aacd181a57235d36de"
     },
     {
       "path": "scripts/hf-client.js",
@@ -284,7 +304,7 @@
     },
     {
       "path": "server/index.js",
-      "sha256": "1c950fdfad0229e96088c72cb7d8398366acb3815d0b7404085b4e938181c80e"
+      "sha256": "8fe6eeb143de400403a5e76660714ae43503dda0a0061d357708481d7599d189"
     },
     {
       "path": "server/request-clock.js",
@@ -328,11 +348,11 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "f33d78a6098f07cccf65fb4b52b19a94bd72d48494345342679b425de05b723a"
+      "sha256": "e9b5215eba3bae6a5a6cba77f17a5e294a799a6f31ea3a5704deee41ace4ea34"
     },
     {
       "path": "tests/fx.test.js",
-      "sha256": "818028a5a69449b1e72701f6cc0bec6869bb80b14f9f2c38297ceb0195134f3f"
+      "sha256": "c8ad28298b82fe3086d314e411faca86579c6e30f14de5c7a26194d5ceaed8e0"
     },
     {
       "path": "tests/harvest-policy.test.js",
@@ -364,7 +384,7 @@
     },
     {
       "path": "tests/solo-expansion.test.js",
-      "sha256": "7759544515675264dfde034ec4455af45bf906cf455986dfa0607dc4755e0ebf"
+      "sha256": "088d27d514071dcca55b11047fec6f6f1b1c1116d12258580ff544fbf6525989"
     },
     {
       "path": "tests/state-model.test.js",
@@ -597,6 +617,18 @@
     {
       "path": "vendor/jsnes/upstream-package.json",
       "sha256": "84884fb82a3e50290d69aab75184a26412a546c72b1db5b2500733685821aea6"
+    },
+    {
+      "path": "vendor/three/LICENSE",
+      "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    {
+      "path": "vendor/three/package.json",
+      "sha256": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de"
+    },
+    {
+      "path": "vendor/three/three.iife.min.js",
+      "sha256": "c9000d0e41eb0f9a4c6e4206680b7e5a82b39d1832f532bdc6a948a91aa7dc50"
     },
     {
       "path": "vendor/tsparticles/LICENSE",

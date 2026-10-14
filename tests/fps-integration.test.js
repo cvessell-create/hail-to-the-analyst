@@ -39,6 +39,7 @@ function game() {
     requestAnimationFrame() {},
     VessellEngine: require('../engine/core.js'),
     HailSoloExpansion: require('../engine/solo-expansion.js'),
+    HailCombat: require('../engine/combat-assist.js'),
     console
   });
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -50,7 +51,8 @@ function game() {
       enemies: () => enemies, keys: () => keys
       , update, fire, use, moveEntity, hasLOS, solid, engineClock, drawDoorStrip, drawEntrances, render,
       levels: () => levels, pickups: () => pickups,
-      checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine
+      checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine,
+      metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo
     };
   `;
   const at=source.lastIndexOf('title();');
@@ -58,7 +60,7 @@ function game() {
   return { fps: context.fps, nodes, events, drawing, approach: () => approach };
 }
 
-test('all five solo missions enter first-person play directly and victory follows the final map', () => {
+test('all seven solo missions enter first-person play directly and victory follows the final map', () => {
   const g = game();
   g.nodes.get('muteBtn').onclick();
   g.fps.briefing(0);
@@ -72,11 +74,11 @@ test('all five solo missions enter first-person play directly and victory follow
   assert.equal(g.approach(), undefined);
   assert.equal(g.fps.player().armor, 20);
   assert.ok(g.fps.enemies().some(e => e.type === 'FABRICATOR'));
-  for (let i=2;i<5;i++) {
+  for (let i=2;i<7;i++) {
     g.fps.finishLevel();
     assert.equal(g.fps.state(), 'brief');
     g.nodes.get('primary').onclick();
-    assert.ok(g.nodes.get('card').innerHTML.includes(`MISSION ${i+1} OF 5`));
+    assert.ok(g.nodes.get('card').innerHTML.includes(`MISSION ${i+1} OF 7`));
     g.nodes.get('primary').onclick();
     assert.equal(g.fps.state(), 'play');
     assert.equal(g.fps.checkpoint().missionIndex, i);
@@ -192,6 +194,21 @@ test('jetpack and fuel pickups drive flight, ground avoidance and bounded landin
   p.x=4.5;p.y=2.5;g.fps.update(1/60);assert.ok(Math.abs(p.fuel-fuel-35)<1e-8);
 });
 
+test('rooftops block walkers, carry hovering players, stop low shots and render as a low wall', () => {
+  const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(5);
+  const p=g.fps.player(),map=g.fps.levels()[5].map,y=5,x=map[y].indexOf('L');
+  assert.ok(x>0);
+  Object.assign(p,{x:x-1.5,y:y+.5,a:0,height:0,jetpack:true,fuel:100});
+  g.fps.moveEntity(p,3,0,.18);assert.ok(p.x<x,'ground player must not walk into a roof');
+  assert.equal(g.fps.solid(x+.5,y+.5),true,'enemies and the autopilot still see roofs as walls');
+  g.fps.keys().KeyJ=true;for(let i=0;i<40;i++)g.fps.update(1/60);g.fps.keys().KeyJ=false;
+  assert.ok(p.height>=.9);
+  g.fps.moveEntity(p,2,0,.18);assert.ok(p.x>x+.5,'airborne player flies over the roof edge');
+  for(let i=0;i<120;i++)g.fps.update(1/60);
+  assert.equal(p.height,.9,'player lands on the roof, not the street');
+  g.drawing.length=0;p.a=0;p.x=x-1.5;p.height=0;g.fps.render();
+  assert.ok(g.drawing.some(d=>d.color==='rgba(255,170,220,0.89)'||String(d.color).startsWith('rgba(255,170,220')),'roof cap line drawn');
+});
 test('jet fuel carries to the next mission and retries do not stack it; old checkpoints remain playable', () => {
   const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(0);
   Object.assign(g.fps.player(),{jetpack:true,fuel:22,height:1.2});
@@ -203,8 +220,8 @@ test('jet fuel carries to the next mission and retries do not stack it; old chec
 });
 
 test('final exit requires both clearance and a defeated controller through the real use handler', () => {
-  const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(4);
-  const p=g.fps.player(),map=g.fps.levels()[4].map,y=map.findIndex(row=>row.includes('X')),x=map[y].indexOf('X');
+  const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(6);
+  const p=g.fps.player(),map=g.fps.levels()[6].map,y=map.findIndex(row=>row.includes('X')),x=map[y].indexOf('X');
   Object.assign(p,{x:x-.5,y:y+.5,a:0});
   g.fps.use();assert.equal(g.fps.state(),'play');
   p.blue=true;g.fps.use();assert.equal(g.fps.state(),'play');
@@ -249,4 +266,43 @@ test('mission selection is explicitly practice and cannot award campaign victory
   g.fps.restore(g.fps.checkpoint());assert.equal(g.fps.checkpoint().practice,true);
   g.fps.finishLevel();assert.equal(g.fps.state(),'brief');
   assert.ok(g.nodes.get('card').innerHTML.includes('not a completed campaign'));
+});
+
+test('metro stations fast-travel for free, combat assists roll, raise and heal', () => {
+  const g = game(), sky = g.fps.levels().findIndex(l => l.name === 'SKYLINE DISTRICT'), down = code => g.events.keydown({ code, preventDefault() {} });
+  g.fps.loadLevel(sky);
+  const m = g.fps.metros();
+  assert.equal(m.length, 4);
+  const p = g.fps.player(), credits = g.fps.player().bullets;
+  p.x = m[0].x; p.y = m[0].y; g.fps.enemies().forEach(e => { e.alive = false; });
+  down('KeyE');
+  assert.equal(g.fps.trip().to, 1);
+  down('KeyE');
+  assert.equal(g.fps.trip().to, 2, 'E while waiting changes the destination');
+  for (let i = 0; i < 90; i++) g.fps.update(1 / 60);
+  assert.equal(g.fps.trip(), null);
+  assert.deepEqual([p.x, p.y], [m[2].x, m[2].y]);
+  assert.equal(p.bullets, credits, 'fast travel is free');
+  down('KeyE'); p.x -= 2; g.fps.update(1 / 60);
+  assert.equal(g.fps.trip(), null, 'leaving the platform cancels the train');
+  // Roll grants invulnerability and moves the player.
+  p.x = 13.5; p.y = 26.5; p.a = 0;
+  const hp = p.hp, x0 = p.x, y0 = p.y;
+  down('KeyQ');
+  g.fps.damage(30);
+  assert.equal(p.hp, hp);
+  for (let i = 0; i < 30; i++) g.fps.update(1 / 60);
+  assert.ok(Math.hypot(p.x - x0, p.y - y0) > 1, 'roll moved the player');
+  g.fps.damage(10); assert.ok(p.hp < hp);
+  // Raised weapon exposes the player above low cover.
+  g.fps.keys().KeyR = true; g.fps.update(1 / 60);
+  assert.equal(p.raised, true);
+  g.fps.keys().KeyR = false; g.fps.update(1 / 60);
+  assert.equal(p.raised, false);
+  // Healing vial pickup.
+  p.hp = 50; g.fps.pickups().push({ type: 'k', x: p.x, y: p.y, alive: true, bob: 0 });
+  g.fps.update(1 / 60);
+  assert.equal(p.hp, 62);
+  g.fps.render();
+  assert.ok(g.drawing.some(d => d.kind === 'text' && d.text === 'M'), 'radar marks metro stations');
 });
