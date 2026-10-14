@@ -228,7 +228,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "1a0c6f62d26f54b523840101a6420ca7ef75e4d4970524025b7fbddc97e74ee9"
+      "sha256": "5f75ae57824e183bb7290379f0bc2fca58b341806b852757dd7a66f2507f1fc6"
     },
     {
       "path": "js/emulation-engine.js",
@@ -348,7 +348,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "e9b5215eba3bae6a5a6cba77f17a5e294a799a6f31ea3a5704deee41ace4ea34"
+      "sha256": "9bddb86c554bcbfe0d66e2198470a56ae9a4d96b0847a720b65a1f500121a530"
     },
     {
       "path": "tests/fx.test.js",

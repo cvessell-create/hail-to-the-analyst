@@ -306,3 +306,12 @@ test('metro stations fast-travel for free, combat assists roll, raise and heal',
   g.fps.render();
   assert.ok(g.drawing.some(d => d.kind === 'text' && d.text === 'M'), 'radar marks metro stations');
 });
+test('player fire stops at walls: no hits behind them and tracers end at the wall',()=>{
+  const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(0);
+  const p=g.fps.player(),e=g.fps.enemies().find(x=>x.alive);
+  Object.assign(p,{x:5.5,y:1.5,a:0,cool:0,bullets:50,weapon:0});
+  Object.assign(e,{x:8.5,y:1.5,hp:1000,max:1000});
+  g.fps.fire();assert.equal(e.hp,1000,'wall at x=6 must block the shot');
+  Object.assign(p,{x:1.5,cool:0});Object.assign(e,{x:4.5});
+  g.fps.fire();assert.ok(e.hp<1000,'clear line still hits');
+});
