@@ -106,8 +106,9 @@
     if (ammoOf(p) < params.ammoThreshold && (c = pick(['b', 's']))) return go('ammo', c.q, c.d);
     if ((c = pick(['r', 'q']))) return go('clearance', c.q, c.d);
     if (!p.jetpack && (c = pick(['j']))) return go('jetpack', c.q, c.d);
+    if ((c = pick(['e']))) return go('footprint', c.q, c.d);
     if ((c = pick(['i'])) && c.d <= params.intelDetour) return go('intel', c.q, c.d);
-    const boss = state.enemies.find(e => e.alive && e.type === 'FABRICATOR');
+    const boss = state.enemies.find(e => e.alive && (e.type === 'FABRICATOR' || e.type === 'STALKER'));
     if (boss) { const d = reach(boss.x, boss.y); if (d !== undefined) return go('controller', boss, d); }
     const exit = findExit(state);
     if (exit) { const d = reach(exit.x + 0.5, exit.y + 0.5); if (d !== undefined) return go('exit', { x: exit.x + 0.5, y: exit.y + 0.5 }, d); }
@@ -146,7 +147,7 @@
       const weapon = wantShotgun ? 1 : (p.bullets > 0 ? 0 : (p.shells > 0 ? 1 : 0));
       if (p.weapon !== weapon) taps.push('Digit' + (weapon + 1));
       const diff = steerTo(p, target.e.x, target.e.y, keys, true);
-      const size = (target.e.type === 'FABRICATOR' ? 0.8 : 0.35) / Math.max(target.dist, 0.1);
+      const size = (target.e.type === 'FABRICATOR' || target.e.type === 'STALKER' ? 0.8 : 0.35) / Math.max(target.dist, 0.1);
       const hitWindow = Math.min(params.aimTolerance, size * 0.8);
       if (Math.abs(diff) < hitWindow) keys.add('Space');
       if (MELEE.has(target.e.type) && target.dist < params.retreatRange && !keys.has('KeyJ')) keys.add('KeyS');
@@ -262,6 +263,8 @@
     const nes = doc.querySelector('[aria-label*="NES"]');
     if (nes) nes.style.display = 'none';
 
+    // Steering assumes first-person key mapping; isometric view remaps movement.
+    if (typeof win.HailForceFirstPerson === 'function') win.HailForceFirstPerson();
     const si = win.HailSIDialogue && win.HailStoryCorpus
       ? win.HailSIDialogue.mount(win, win.HailStoryCorpus, { learner: () => learner, facts: () => facts }) : null;
     if (si) si.status(learner);
@@ -280,6 +283,7 @@
         hp: how === 'dead' ? 0 : s.player ? s.player.hp : 0, seconds: Math.round(((s.stats.elapsed || 0) - episode.startTime) * 10) / 10,
         stuck: memory.stuckCount || 0
       };
+      if (episode.footprints) Object.assign(ep, episode.footprints);
       const result = recordEpisode(learner, ep);
       if (si) si.onEpisode(learner, ep, result);
       try { store.setItem(opts.storageKey, serialize(learner)); } catch (e) { /* storage full */ }
@@ -294,6 +298,7 @@
     const timer = win.setInterval(() => {
       let s;
       try { s = win.HailCampaignState(); } catch (e) { return; }
+      if (episode && s.missionIndex === episode.mission && typeof win.HailFootprintEpisode === 'function') episode.footprints = win.HailFootprintEpisode();
       if (s.mode !== 'play') {
         release();
         // Pause keeps the episode open; only real exits from play are scored.
@@ -301,6 +306,7 @@
         if (s.mode !== 'pause') clickPrimary(); else send('keydown', 'Escape');
       } else {
         if (!episode || lastMission !== s.missionIndex) { if (episode) finish(s, 'complete'); begin(s); }
+        if (typeof win.HailFootprintEpisode === 'function') episode.footprints = win.HailFootprintEpisode();
         if (((s.stats.elapsed || 0) - episode.startTime) > opts.levelTimeout) { finish(s, 'timeout'); begin(s); }
         const out = act(s, memory, learner.candidate);
         for (const c of held) if (!out.keys.has(c)) send('keyup', c);

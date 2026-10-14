@@ -4,7 +4,7 @@
 
 ## Hosted continuation and first-person
 
-All seven solo missions enter play directly. Desktop browsers default to an
+All seven solo campaign missions enter play directly. Desktop browsers default to an
 isometric Three.js view (`V` toggles first person; `?view=fp` forces it); the
 autopilot always uses first person. The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
@@ -29,12 +29,33 @@ hosted movement prediction, live hex minimap fixes, and optional first-person
 tactical practice with a clearly fictional archive-routing Easter egg. All
 branch histories are retained; normal solo missions still enter FPS directly.
 
-The campaign continues through **THE ARCHIVE**, **FABRICATION PLANT**,
+**FOOTPRINT PURGE** is an optional side quest in Gateway Sprawl (also available in practice select), separate from the seven-mission campaign. Its eight fictional exposure nodes (`e`) represent simulated records. Hard nodes require standing still for 1.5 seconds; impossible nodes are LOCKED DOWN (containment, not deletion) and count as handled. Each node and category carries generic fix guidance, shown in the briefing and scrub message. Availability varies and real-world removal is not guaranteed. Two critical nodes gate the exit; optional scrubs also earn intel (critical/high/medium/low: 1000/750/500/250). Red/orange/yellow/grey nodes and the FOOTPRINTS HUD show progress. All invented service domains end in `.example`; no real accounts or services are modified. Existing SI autopilot episode events add only `footprints: [{id, category, severity, difficulty, t}]` in scrub order and `footprints_total: 8` for this mission; `difficulty` is `easy|medium|hard|impossible`; `t` is simulation seconds since level start. Other mission events are unchanged.
+
+Gateway Sprawl is a free-roam hub and side-quest setting; the seven-mission campaign runs through **THE ARCHIVE**, **FABRICATION PLANT**,
 **FROST YARD** (32 × 26), **STARLIGHT BOULEVARD** (40 × 30), and
 **GLACIER DOCK** (36 × 28). New outdoor maps have more than twice the original
-plant's grid area. Starlight is an original Hollywood-inspired city with neon
-theaters, palm-lined streets, sidewalk stars and a hillside sign, not licensed
-movie art or a recreation of a particular studio property.
+plant's grid area. Starlight is an original neon city district. The final
+mission, **SHADOW DOSSIER**, features the fictional mechanical Stalker boss and
+dormant ODNI artifact; defeating the guardian does not activate the system.
+
+The campaign adapts the publicly described intelligence workflow into fiction.
+The archived ODNI explainer lists direction, collection, processing,
+exploitation and dissemination; the game makes analysis visible alongside
+exploitation and treats evaluation/oversight as a continuing review layer.
+Briefings show how each mission touches the apparatus. Jack learns to question
+tasking, preserve source lineage, compare alternatives and disclose
+uncertainty. The fictional network advises settlement councils; it does not
+decide policy. The real IC, ODNI and their personnel are not characters or
+participants in this story.
+
+This adaptation is grounded in the public [ODNI explainer on intelligence and
+the intelligence cycle](https://archive.dni.gov/index.php/what-we-do/what-is-intelligence)
+and [ODNI's archived analytic-objectivity page](https://archive.dni.gov/index.php/how-we-work/objectivity),
+which describes the IC as a federation, ICD 203's analytic/tradecraft
+standards and the Analytic Ombuds role. These are archived public sources, not
+evidence about current classified operations or the effectiveness of any real
+institution; the game organization and events are fictional and do not imply
+real-world IC involvement.
 
 - Doors have bright frames, handles, clearance labels and nearby use prompts.
   Open entrances remain marked; exits have their own green signage.
@@ -53,7 +74,7 @@ movie art or a recreation of a particular studio property.
   Restart restores the mission's starting equipment rather than stacking it.
 - **MISSION SELECT // PRACTICE** lets you play any arena from its normal spawn.
   Practice is labeled on-screen and in state logs and never awards campaign
-  victory. The normal campaign still requires the five sequential objectives.
+  victory. The normal campaign requires all seven sequential mission objectives.
 
 These additions affect solo play; the multiplayer arena retains its separate
 authoritative rules and map.
@@ -79,7 +100,7 @@ A retro FPS and turn-based hex tactics game starring **Jack Slade**, a Strategic
 Open [the engine workbench](engine/workbench.html) for the map/asset editor,
 versioned save/load, ultra-boss control puzzle, editable payoff matrices,
 mixed strategies and backward-induction decision trees.
-The five-mission first-person campaign remains this page's game.
+The eight-mission first-person campaign remains this page's game.
 
 With Node.js 24+, run `npm test`, then `npm start` and visit
 `http://127.0.0.1:8787/engine/workbench.html`. Two local tabs can join the
@@ -142,7 +163,7 @@ for event bounds and thresholds.
 
 ### Tactical controls
 
-The optional legacy tactical practice arenas are separate from all five normal
+The optional legacy tactical practice arenas are separate from all seven normal
 solo starts. Choose **MISSION SELECT // PRACTICE**, then **TACTICAL ARCHIVE**
 or **TACTICAL PLANT**. The view stays with Jack while you command the squad;
 terrain, units and reachable destinations are shown in first person.
@@ -213,15 +234,46 @@ where you left. Dying in the city respawns you at the Safehouse.
 City runs are practice: they never complete the campaign. Free roam starts no gameplay
 attempt. Cleared districts are saved with the hero profile.
 
+### Gateway Sprawl (St. Louis sector sandbox)
+
+The orange **GATEWAY SPRAWL** gate on Vessell City's west edge opens a 44×32 free-roam
+sector (`engine/gateway-sprawl.js`). It is an original cyberpunk sector inspired by public facts
+about St. Louis, Missouri, not a street-accurate map. It contains:
+
+- a stainless catenary arch on the riverfront;
+- a flood wall with gates;
+- a walkable Eads Bridge deck over the river;
+- Laclede's Landing warehouses and the safehouse;
+- a numbered downtown grid;
+- I-70, I-64 and I-44 viaducts with underpasses;
+- North City brick ruins;
+- a quiet Pruitt-Igoe memorial field with no patrols;
+- Delmar Loop, Forest Park, Union Station, City Museum and an old brewhouse;
+- The Hill, Cherokee Street, and Soulard rowhouses around a market hall.
+
+Five light-rail stops link the sector. Entering a district shows short flavour text. The cyan
+gate at the bridge end returns you to Vessell City. Sandbox travel never clears missions. The
+search record and sources are listed in the module header:
+
+- gatewayarch.com fact sheet
+- lacledeslanding.com history
+- STLPR (2010) on brick theft
+- Wikipedia: Eads Bridge, Numbered Streets, Union Station, City Museum, Soulard Farmers
+  Market, The Hill, Cherokee Street, Delmar Loop, Forest Park, MetroLink, Pruitt–Igoe,
+  Anheuser-Busch Brewery, and I-64/I-70/I-44
+
+Flood-wall statistics were not verified and are not used.
+
 ### FPS mobile controls
 
 Left-side virtual joystick to move, drag right side of screen to look. Dedicated **FIRE**, **WEAPON**, **USE**, and hold-to-fly **JET** buttons.
 
 ## The game
 
-Seven missions, an optional legacy Analyst squad, and three weapons:
+Seven campaign missions, an optional Footprint Purge side quest, an optional
+legacy Analyst squad, and three weapons:
 
-- **Missions** — archive clearance, the plant controller, the frost yard, the Starlight city district and the glacier dock, the Skyline rooftop district and **SHADOW DOSSIER**, a fictional surveillance vault whose evidence files teach sourcing rules (no real accounts, people or agencies).
+- **Missions** — seven connected districts in the fictional Municipal Darwinism campaign, from Laclede's Landing and North City to the Mississippi freight yards and downtown grid. The final **SHADOW DOSSIER** has the mechanical Stalker boss and dormant fictional ODNI artifact. Gateway Sprawl is an optional St. Louis-inspired free-roam district with the separate Footprint Purge side quest; neither the game nor its training records contact real accounts, people or agencies.
 - **Weapons** — Sidearm, Breacher shotgun (pellet spread), Redactor (rapid-fire).
 - **Enemies** — Mole, Disinfo Drone, Troll, Ice Pig Droid, and **THE FABRICATOR** controller.
 - **Tactical faction** — original grimdark sci-fi Fabricators expand with Null Wardens, Ash Auditors and Signal Reavers; no Games Workshop content.
@@ -267,7 +319,7 @@ Tests cover engine algorithms, scenes/saves, collision/LOS, payoff/tree solvers,
 power indices, exact fair division, local HTTP and authoritative co-op, as well
 as hex geometry, first-person tactical rendering and native controls, terrain
 hit chance, d20 versus AC, conditions, tactical checkpoint replay, breach
-modifiers, live minimap markers and all five solo missions. The offline game
+modifiers, live minimap markers and all seven solo campaign missions. The offline game
 needs no build; the separate hosted app has TypeScript and production builds.
 
 ## Publish as a playable site

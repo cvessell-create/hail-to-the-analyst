@@ -10,7 +10,7 @@
 })(this, function () {
   'use strict';
   var MAX_UPGRADE = 3, START_CREDITS = 100, MISSION_CREDITS = 120;
-  var KILL_CREDITS = { MOLE: 15, DRONE: 20, ICE_PIG: 28, TROLL: 35, FABRICATOR: 200 };
+  var KILL_CREDITS = { MOLE: 15, DRONE: 20, ICE_PIG: 28, TROLL: 35, FABRICATOR: 200, STALKER: 250 };
   // Upper bounds keep stacked modifiers readable and fair.
   var CLAMP = { resist: [0, 0.5], firewall: [0, 0.6], spread: [-0.5, 0], delay: [-0.4, 0], roll: [-0.5, 0], hackCd: [-0.5, 0], augCost: [-0.4, 0], speed: [-0.2, 0.2] };
   var SLOTS = [

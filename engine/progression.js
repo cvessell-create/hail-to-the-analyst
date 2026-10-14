@@ -22,7 +22,7 @@
   ];
   // Beginner order: survive first, then damage, then reload and accuracy.
   var RECOMMENDED = ['endurance', 'precision', 'endurance', 'handling', 'aim', 'precision'];
-  var KILL_XP = { MOLE: 30, DRONE: 40, ICE_PIG: 55, TROLL: 70, FABRICATOR: 400 };
+  var KILL_XP = { MOLE: 30, DRONE: 40, ICE_PIG: 55, TROLL: 70, FABRICATOR: 400, STALKER: 500 };
   var MISSION_XP = 150;
 
   // Damage types; multiplier < .9 reads grey (ineffective), > 1.2 reads red (very effective).
@@ -32,9 +32,10 @@
     DRONE: { ballistic: 0.7, energy: 1.5, digital: 1.4, fire: 0.8 },
     ICE_PIG: { ballistic: 0.8, energy: 1.3, digital: 1.0, fire: 1.6 },
     TROLL: { ballistic: 1.0, energy: 1.0, digital: 0.5, fire: 1.3 },
-    FABRICATOR: { ballistic: 0.9, energy: 1.3, digital: 0.7, fire: 1.0 }
+    FABRICATOR: { ballistic: 0.9, energy: 1.3, digital: 0.7, fire: 1.0 },
+    STALKER: { ballistic: 0.8, energy: 1.2, digital: 1.5, fire: 0.9 }
   };
-  var ROBOTS = { DRONE: true, ICE_PIG: true, FABRICATOR: true };
+  var ROBOTS = { DRONE: true, ICE_PIG: true, FABRICATOR: true, STALKER: true };
 
   var TACTICAL = { max: 100, grenadeCost: 100, perDamage: 0.35, vial: 35 };
   var GRENADE = { range: 4.2, fuse: 0.6, radius: 2.1, damage: 75, type: 'fire' };

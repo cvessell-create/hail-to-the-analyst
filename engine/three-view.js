@@ -13,10 +13,12 @@
     M: [77, 91, 93], S: [18, 29, 28], H: [235, 170, 20], R: [190, 35, 30], B: [30, 100, 210], D: [42, 110, 100],
     X: [35, 150, 48], L: [104, 78, 96],
     // Vessell City tiles: brick, concrete/glass towers, archive paper, safehouse, archive, plant, skyline entrances.
-    K: [138, 75, 58], G: [154, 160, 166], W: [232, 224, 200], Y: [255, 199, 106], A: [53, 208, 208], Z: [90, 107, 122], V: [16, 24, 38] };
-  var GLOW = { N: 0.35, S: 0.25, R: 0.2, B: 0.2, D: 0.15, X: 0.6, Y: 0.35, A: 0.45, Z: 0.25, V: 0.3 };
+    K: [138, 75, 58], G: [154, 160, 166], W: [232, 224, 200], Y: [255, 199, 106], A: [53, 208, 208], Z: [90, 107, 122], V: [16, 24, 38],
+    // Gateway Sprawl tiles: stainless arch, river, district gates.
+    J: [196, 206, 214], E: [24, 52, 78], O: [224, 121, 79], Q: [53, 208, 208] };
+  var GLOW = { N: 0.35, S: 0.25, R: 0.2, B: 0.2, D: 0.15, X: 0.6, Y: 0.35, A: 0.45, Z: 0.25, V: 0.3, J: 0.2, E: 0.1, O: 0.4, Q: 0.45 };
   // Isometric-only block heights so the city skyline reads; the first-person view stays uniform.
-  var ISO_HEIGHT = { L: 0.5, G: 2.2, W: 1.3, M: 1.2, K: 1.1 };
+  var ISO_HEIGHT = { L: 0.5, G: 2.2, W: 1.3, M: 1.2, K: 1.1, J: 2.6, E: 0.1 };
 
   function layout(map) {
     var walls = {}, doors = [], exits = [];
@@ -41,7 +43,7 @@
   }
 
   function theme(level) {
-    var city = level && level.theme === 'city', outdoor = Boolean(level && level.outdoor);
+    var city = level && (level.theme === 'city' || level.theme === 'gateway'), outdoor = Boolean(level && level.outdoor);
     return { outdoor: outdoor, fog: outdoor ? (city ? 0xc78391 : 0xb9d8ed) : 0x0b1210,
       floor: outdoor ? (city ? 0x4a3a4c : 0x5b7387) : 0x2b2c24, ceiling: 0x141a17,
       sky: city ? 0x8d7cff : outdoor ? 0xcfe6ff : 0x6e7d6a, ground: outdoor ? 0x3a3140 : 0x1a1c16 };
@@ -161,8 +163,8 @@
   // pooled near the player, floor rings, enemy aim lasers and a shield dome.
   var ISO_OFFSET = [-10, 15, -10], ISO_VIEW = 6.2, SQ = Math.SQRT1_2;
   var RING = { player: 0x3dff7a, ally: 0x3d9bff, enemy: 0xff3030, boss: 0xffb020 };
-  var NEON = { N: 0xff3cc8, S: 0x30ff9a, R: 0xff3020, B: 0x3080ff, D: 0x30ffd8, X: 0x5dff7a, I: 0x9fe8ff, Y: 0xffc76a, A: 0x35d0d0, Z: 0x6fa8ff, V: 0xffc76a };
-  var BODY = { DRONE: 0x8fa6b8, TROLL: 0xb04a3a, MOLE: 0x7a5a3a, ICE_PIG: 0xbfe6ff, FABRICATOR: 0xd08a20 };
+  var NEON = { N: 0xff3cc8, S: 0x30ff9a, R: 0xff3020, B: 0x3080ff, D: 0x30ffd8, X: 0x5dff7a, I: 0x9fe8ff, Y: 0xffc76a, A: 0xffb85c, Z: 0x6fa8ff, V: 0xffc76a };
+  var BODY = { DRONE: 0x8fa6b8, TROLL: 0xb04a3a, MOLE: 0x7a5a3a, ICE_PIG: 0xbfe6ff, FABRICATOR: 0xd08a20, STALKER: 0x91a7ad };
   var PICK = { h: 0xff3a3a, k: 0xff4a4a, a: 0x6fb8ff, b: 0xffd27a, s: 0xffb04a, y: 0xffe030, n: 0x30a0ff, u: 0x40ff90,
     i: 0x71ff4e, r: 0xff3b30, q: 0x3489f0, j: 0xc0c0c0, v: 0xffa040 };
   // Screen-relative movement: up = +x+y, right = -x+y in game coordinates.
@@ -223,7 +225,7 @@
         pad.rotation.x = -Math.PI / 2; pad.position.set(e[0] + 0.5, 0.02, e[1] + 0.5); world.add(pad);
         neon.push({ x: e[0] + 0.5, y: e[1] + 0.5, color: NEON.X });
       });
-      var tint = th.outdoor ? (level && level.theme === 'city' ? '#2a1c2c' : '#1e2a34') : '#2a1416';
+      var tint = th.outdoor ? (level && (level.theme === 'city' || level.theme === 'gateway') ? '#2a1c2c' : '#1e2a34') : '#2a1416';
       var ftex = floorTexture(THREE, doc, tint);
       if (ftex) ftex.repeat.set(plan.w / 2, plan.h / 2);
       var floor = new THREE.Mesh(new THREE.PlaneGeometry(plan.w, plan.h), new THREE.MeshStandardMaterial({ color: ftex ? 0xffffff : 0x2a1416, map: ftex, roughness: 0.55, metalness: 0.3 }));
@@ -291,14 +293,14 @@
       unit({ x: p.x, y: p.y, z: (p.height || 0) * 0.6 }, 0x2ecf6a, RING.player, p.a, 1);
       (state.enemies || []).forEach(function (e) {
         if (!e.alive) return;
-        var boss = e.type === 'FABRICATOR';
+        var boss = e.type === 'FABRICATOR' || e.type === 'STALKER';
         unit(e, BODY[e.type] || 0x999999, boss ? RING.boss : RING.enemy, Math.atan2(p.y - e.y, p.x - e.x), boss ? 1.8 : e.type === 'TROLL' ? 1.3 : 1);
         if (e.aiming) { var lz = take('laser'); beam(lz, e.x, e.y, p.x, p.y, 0.38); lz.material.opacity = 0.5 + 0.4 * Math.sin(t * 30); }
       });
       (state.allies || []).forEach(function (a) { unit({ x: a.x, y: a.y, z: 0.35 + Math.sin(t * 5) * 0.05 }, 0x5aa8ff, RING.ally, t * 2, 0.6); });
       (state.pickups || []).forEach(function (q) {
         if (!q.alive) return; var m = take('pick'); m.position.set(q.x, 0.18 + Math.sin(q.bob || 0) * 0.05, q.y); m.rotation.y = t * 1.5;
-        var c = PICK[q.type] || 0xffffff; m.material.color.setHex(c); m.material.emissive.setHex(c);
+        var c = q.type === 'e' ? ({ critical: 0xff3b30, high: 0xff922b, medium: 0xffe14a, low: 0x999999 }[q.severity] || 0x999999) : (PICK[q.type] || 0xffffff); m.material.color.setHex(c); m.material.emissive.setHex(c);
       });
       (state.shots || []).forEach(function (s) { var o = take('orb'); o.position.set(s.x, 0.38 + (s.height || 0) * 0.6, s.y); });
       (state.tracers || []).forEach(function (r) { var tr = take('tracer'); beam(tr, r.x0, r.y0, r.x1, r.y1, 0.38); tr.material.opacity = Math.max(0, r.t / 0.12); });

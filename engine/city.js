@@ -13,9 +13,12 @@
     Y: { kind: 'safehouse', label: 'SAFEHOUSE' },
     A: { kind: 'mission', target: 'THE ARCHIVE', label: 'THE ARCHIVE' },
     Z: { kind: 'mission', target: 'FABRICATION PLANT', label: 'FABRICATION PLANT', needs: 'THE ARCHIVE' },
-    V: { kind: 'mission', target: 'SKYLINE DISTRICT', label: 'SKYLINE DISTRICT', needs: 'FABRICATION PLANT' }
+    V: { kind: 'mission', target: 'SKYLINE DISTRICT', label: 'SKYLINE DISTRICT', needs: 'FABRICATION PLANT' },
+    // District gates are free-roam links between sandbox maps; they never count as cleared missions.
+    O: { kind: 'district', target: 'GATEWAY SPRAWL', label: 'GATEWAY SPRAWL' },
+    Q: { kind: 'district', target: NAME, label: NAME, home: 'GATEWAY SPRAWL' }
   };
-  var PALETTE = { K: '#8A4B3A', G: '#9AA0A6', W: '#E8E0C8', M: '#5A6B7A', Y: '#FFC76A', A: '#35D0D0', Z: '#5A6B7A', V: '#101826', U: '#F5A623' };
+  var PALETTE = { K: '#8A4B3A', G: '#9AA0A6', W: '#E8E0C8', M: '#5A6B7A', Y: '#FFC76A', A: '#35D0D0', Z: '#5A6B7A', V: '#101826', U: '#F5A623', O: '#E0794F', Q: '#35D0D0' };
   var STOPS = ['CENTRAL', 'ARCHIVE'];
 
   function build() {
@@ -28,7 +31,7 @@
     rect(20, 1, 28, 6, 'G');          // Skyline towers
     rect(2, 14, 11, 20, 'W');         // The Archive
     rect(18, 14, 28, 20, 'M');        // Fabrication Plant
-    put([[4, 5, 'Y'], [24, 6, 'V'], [6, 14, 'A'], [23, 14, 'Z']]);
+    put([[4, 5, 'Y'], [24, 6, 'V'], [6, 14, 'A'], [23, 14, 'Z'], [0, 11, 'O']]); // O: west gate to Gateway Sprawl
     put([[8, 7, 'U'], [13, 16, 'U']]); // Metro Central -> Archive stop (row-major order matches STOPS)
     put([[4, 7, 'P']]);
     put([[11, 9, 'L'], [16, 9, 'L'], [19, 11, 'L'], [9, 12, 'L'], [26, 10, 'L']]); // planters / parked cars
@@ -39,11 +42,11 @@
 
   function level() {
     return {
-      name: NAME, district: 'DOWNTOWN', city: true, outdoor: true, theme: 'city', fx: 'neon-city', stops: STOPS.slice(),
+      name: NAME, district: 'DOWNTOWN GRID', city: true, outdoor: true, theme: 'gateway', fx: 'neon-city', stops: STOPS.slice(),
       objective: 'Free roam. Walk to a district entrance and press E to enter.',
       brief: 'Vessell City links the operations through one walkable hub. The <b>SAFEHOUSE</b> door restores health and saves your hero. ' +
         '<b>METRO CENTRAL</b> rides to the Archive stop for free. Face a district entrance and press <b>E</b>: The Archive is open; ' +
-        'clearing it opens the Fabrication Plant, and clearing the Plant opens the Skyline District. City runs are free roam: they never complete the campaign.',
+        'clearing it opens the Fabrication Plant, and clearing the Plant opens the Skyline District. The west-edge <b>GATEWAY SPRAWL</b> gate leads to the riverfront sandbox and its optional footprint side quest. City runs are free roam: they never complete the campaign.',
       map: build()
     };
   }
@@ -59,7 +62,7 @@
   }
 
   function sanitizeCleared(raw) {
-    var known = Object.keys(ENTRANCES).map(function (k) { return ENTRANCES[k].target; }).filter(Boolean), out = [];
+    var known = Object.keys(ENTRANCES).filter(function (k) { return ENTRANCES[k].kind === 'mission'; }).map(function (k) { return ENTRANCES[k].target; }), out = [];
     (Array.isArray(raw) ? raw : []).forEach(function (n) { if (known.indexOf(n) >= 0 && out.indexOf(n) < 0) out.push(n); });
     return out;
   }

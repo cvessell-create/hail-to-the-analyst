@@ -64,7 +64,7 @@
       var wall=(r+c)%2?'N':'I';
       for(var i=0;i<7;i++){grid[y0][x0+i]=wall;grid[y0+6][x0+i]=wall;grid[y0+i][x0]=wall;grid[y0+i][x0+6]=wall;}
       grid[y0][x0+3]='D';grid[y0+6][x0+3]='D';grid[y0+3][x0]='D';grid[y0+3][x0+6]='D';
-      grid[y0+3][x0+3]=fill[r][c];
+      grid[y0+3][x0+3]=r===1&&c===1?'z':fill[r][c];
     });});
     [[2,2,'P'],[3,1,'j'],[10,10,'d'],[28,10,'d'],[19,20,'d'],[37,20,'m'],[10,20,'t'],[28,1,'i'],
      [19,11,'h'],[37,11,'a'],[2,20,'b'],[19,30,'v'],[37,30,'X'],[35,30,'h'],[11,30,'d'],[29,21,'m'],[24,11,'p'],[6,21,'p'],
@@ -74,23 +74,23 @@
   }
   function levels(){
     return [
-      {name:'FROST YARD',outdoor:true,fx:'frost-snow',requires:'red',objective:'Recover red clearance and cross the ice-droid yard.',
-        brief:'A larger, open-air training yard is guarded by <b>ICE PIG DROIDS</b>: original robotic opponents with armored snouts and icy plating. Collect a <b>JETPACK</b>, hold <b>J / JET</b> to hover, and search for fuel canisters. Fuel never regenerates. Hovering avoids ground melee, not walls or aimed projectiles. Recover red clearance and reach extraction.',
+      {name:'FROST YARD',district:'NORTH CITY TRANSFER',theme:'gateway',outdoor:true,fx:'frost-snow',requires:'red',objective:'Cross the frozen transfer yard and recover the settlement route.',
+        brief:'North City’s winter transfer yard is full of rail-cut brick, iced-over service lanes and moving-city salvage. ICE PIG DROIDS guard the fuel stores. A jetpack can evade their ground charge, but fuel never regenerates and walls still block flight. Recover RED CLEARANCE and reach extraction.',
         map:arena(32,26,false)},
-      {name:'STARLIGHT BOULEVARD',outdoor:true,theme:'city',fx:'neon-city',requires:'red',objective:'Recover theater clearance and extract through the city district.',
-        brief:'An original Hollywood-inspired district: neon theaters, palm-lined streets, star-patterned sidewalks and a <b>STARLIGHT</b> hillside sign. Ice pig droids patrol the boulevard. Search the side streets for red clearance, ammunition and jet fuel before reaching extraction. All scenery is original; no movie characters, celebrity likenesses or studio logos are used.',
+      {name:'STARLIGHT BOULEVARD',district:'DELMAR LOOP',outdoor:true,theme:'gateway',fx:'neon-city',requires:'red',objective:'Check the competing broadcasts and cross the Delmar street grid.',
+        brief:'A fictional cyberpunk Delmar Loop: neon storefronts, brick facades and a rail line cut through the boulevard. Ice pig droids and watcher drones patrol the side streets. Treat every broadcast as a lead, use the buildings for cover and recover RED CLEARANCE.',
         map:city()},
-      {name:'GLACIER DOCK',outdoor:true,fx:'glacier-blizzard',requires:'blue-boss',objective:'Recover blue clearance, disable the dock controller and extract.',
-        brief:'The final 36-by-28 dock has wider patrol lanes, fuel caches and another automated controller. Ice pig droids rush on the ground; drones and controllers can aim at your flight altitude. Recover <b>BLUE CLEARANCE</b>, disable the controller and use the marked exit. These machines are fictional training opponents, not real people or institutions.',
+      {name:'GLACIER DOCK',district:'MISSISSIPPI FREIGHT',outdoor:true,theme:'gateway',fx:'glacier-blizzard',requires:'blue-boss',objective:'Recover BLUE CLEARANCE, disable the dock controller and open an evacuation lane.',
+        brief:'The frozen Mississippi freight dock is contested by rival mobile-city patrols. ICE PIG DROIDS rush the ground lanes while drones cover the exposed riverfront. Use the freight walls as cover, preserve fuel and disable the controller before extraction.',
         map:arena(36,28,true)},
-      {name:'SKYLINE DISTRICT',outdoor:true,theme:'city',fx:'neon-city',requires:'blue-boss',
-        objective:'Search the buildings for blue clearance, disable the plaza controller and extract.',
-        brief:'An original night cityscape built from the training loop data. Streets run between <b>enterable buildings</b> (use the doors) and flat <b>ROOFTOPS</b>. Climb to altitude 0.9 on the <b>JETPACK</b> to fly over a roof, land on it, and shoot down into the streets; walled rooftop courtyards hide supplies that can only be reached from the air. Recover <b>BLUE CLEARANCE</b>, disable the plaza controller and extract at the far corner.',
+      {name:'SKYLINE DISTRICT',district:'DOWNTOWN GRID',outdoor:true,theme:'gateway',fx:'neon-city',requires:'blue-boss',
+        objective:'Trace the relay records, recover BLUE CLEARANCE and disable the plaza controller.',
+        brief:'A numbered downtown grid climbs toward a steel-arch skyline. Streets run between <b>enterable buildings</b> and flat <b>ROOFTOPS</b>. Use the jetpack to reach rooftop courtyards, but drones can aim upward and fuel does not regenerate. Compare relay records before choosing a route.',
         tuning:tuning?{enemies:tuning.enemies,fuelCaches:tuning.fuelCaches,healthKits:tuning.healthKits,source:tuning.source}:null,
         map:skyline(tuning)},
-      {name:'SHADOW DOSSIER',theme:'dossier',fx:'neon-city',requires:'blue-boss',dossier:true,
-        objective:'Recover blue clearance, shut down the aggregator and extract.',
-        brief:'A fictional surveillance vault where an automated <b>AGGREGATOR</b> stitches scraps into dossiers. Glass cells hold <b>EVIDENCE FILES</b>; each one teaches a sourcing rule. Watcher drones patrol the halls. Recover <b>BLUE CLEARANCE</b>, shut down the aggregator in the central vault and extract. No real accounts, people or agencies are depicted.',
+      {name:'SHADOW DOSSIER',district:'BURIED RIVERFRONT VAULT',theme:'gateway',fx:'neon-city',requires:'blue-boss',dossier:true,
+        objective:'Face the STALKER, secure the ODNI artifact and leave the system dormant.',
+        brief: 'Under the riverfront, an evidence vault stores conflicting records about the cities’ harvests. A mechanical <b>STALKER</b> guards an artifact holding access codes to <b>ODNI</b>, a fictional weapons system in this story. The codes are not a firing order. Recover BLUE CLEARANCE, disable the guardian and leave the system dormant. No real accounts, people or agencies are involved.',
         map:dossier()}
     ];
   }
@@ -175,7 +175,7 @@
     ctx.fillStyle='#ffffff';ctx.fillRect(-s*.3,s*.27,s*.18,s*.035);ctx.fillRect(s*.12,s*.27,s*.18,s*.035);
   }
   function backdrop(ctx,w,h,angle,theme){
-    if(theme!=='city')return;
+    if(theme!=='gateway')return;
     var offset=angle*110,period=w*2;
     ctx.fillStyle='#574066';
     for(var i=-1;i<4;i++){
@@ -183,7 +183,7 @@
       ctx.beginPath();ctx.moveTo(x,h*.5);ctx.lineTo(x+w*.25,h*.18);ctx.lineTo(x+w*.65,h*.3);ctx.lineTo(x+w,h*.5);ctx.fill();
     }
     var sign=((w*.7-offset)%period+period)%period-w*.5;
-    ctx.fillStyle='#fff2cb';ctx.font='900 28px Courier New';ctx.textAlign='center';ctx.fillText('STARLIGHT',sign,h*.24);
+    ctx.fillStyle='#fff2cb';ctx.font='900 24px Courier New';ctx.textAlign='center';ctx.fillText('GATEWAY DISTRICT',sign,h*.24);
     ctx.fillStyle='#151b35';
     for(var n=-1;n<14;n++){var bx=((n*95-offset*.6)%period+period)%period-95;ctx.fillRect(bx,h*.42-(n%4+4)%4*13,66,h*.13);}
   }
@@ -193,7 +193,7 @@
       ctx.strokeStyle='#60a977';ctx.lineWidth=Math.max(2,s*.045);
       for(var i=0;i<7;i++){var a=i*Math.PI/3.5+Math.sin(phase)*.015;ctx.beginPath();ctx.moveTo(0,s*.32);ctx.lineTo(Math.cos(a)*s*.35,s*.3+Math.sin(a)*s*.2);ctx.stroke();}
     }else{
-      var label=tile==='N'?'NEON THEATER':'STAR CINEMA';
+        var label=tile==='N'?'LOOP LINE':'RIVER CITY';
       ctx.fillStyle='#180f29';ctx.fillRect(-s*.5,s*.25,s,s*.22);
       ctx.strokeStyle=tile==='N'?'#ff66c4':'#ffd27b';ctx.lineWidth=2;ctx.strokeRect(-s*.5,s*.25,s,s*.22);
       ctx.fillStyle='#fff2da';ctx.font='900 '+Math.max(9,s*.07)+'px Courier New';ctx.textAlign='center';ctx.fillText(label,0,s*.4);

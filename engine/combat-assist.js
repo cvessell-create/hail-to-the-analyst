@@ -120,8 +120,8 @@
     });
     (o.enemies || []).forEach(function (e) {
       if (!e.alive) return; var q = at(e.x, e.y); if (q[2] > range) return;
-      ctx.fillStyle = e.type === 'FABRICATOR' ? '#ffb020' : '#ff2d2d';
-      ctx.beginPath(); ctx.arc(q[0], q[1], e.type === 'FABRICATOR' ? 4 : 2.5, 0, 6.29); ctx.fill();
+      ctx.fillStyle = e.type === 'FABRICATOR' || e.type === 'STALKER' ? '#ffb020' : '#ff2d2d';
+      ctx.beginPath(); ctx.arc(q[0], q[1], e.type === 'FABRICATOR' || e.type === 'STALKER' ? 4 : 2.5, 0, 6.29); ctx.fill();
     });
     if (o.round) {
       ctx.fillStyle = '#7dffb0'; ctx.beginPath(); ctx.moveTo(cx, cy - 6); ctx.lineTo(cx + 5, cy); ctx.lineTo(cx, cy + 6); ctx.lineTo(cx - 5, cy); ctx.fill();

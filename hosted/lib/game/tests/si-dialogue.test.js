@@ -101,3 +101,24 @@ test('game falls back to verbatim owner lines when the framework link is down', 
   assert.ok(rows(win).some(r => /link down/.test(r.text)));
   assert.equal(ch.records[0].kind, 'owner');
 });
+
+test('SI footprint episode payload adds only structured scrub records and leaves other missions unchanged', async () => {
+  const calls = [], ops = require('../engine/footprint-ops.js');
+  const win = fakeWindow(async (url, init) => {
+    if (init && init.body) calls.push(JSON.parse(init.body));
+    return { ok: true, json: async () => ({ text: '', loop: { episodes: 0 } }) };
+  });
+  const ch = SI.mount(win, corpus, {});
+  let state = ops.scrub({ ...ops.createState(), time: 1.75 }, 'F2');
+  state = ops.scrub({ ...state, time: 3 }, 'F1');
+  const learner = { generation: 2, history: [] }, result = { score: 100, improved: false };
+  ch.onEpisode(learner, { mission: 7, outcome: 'complete', kills: 0, died: false, seconds: 4,
+    footprints: ops.episode(state).map(n => ({ ...n, name: 'never transmit', domain: 'never.example' })), footprints_total: 8 }, result);
+  ch.onEpisode(learner, { mission: 0, outcome: 'dead', kills: 0, died: true, seconds: 2 }, result);
+  await tick();
+  const events = calls.filter(c => c.event).map(c => c.event);
+  assert.deepEqual(events[0].footprints, ops.episode(state));
+  assert.equal(events[0].footprints_total, 8);
+  assert.equal(Object.hasOwn(events[1], 'footprints'), false);
+  assert.equal(Object.hasOwn(events[1], 'footprints_total'), false);
+});

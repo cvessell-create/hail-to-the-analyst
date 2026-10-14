@@ -98,6 +98,9 @@
     let floor = 0;
     try { floor = JSON.parse(win.localStorage.getItem(opts.storageKey)).stage | 0; } catch (e) { floor = 0; }
 
+    // One channel per page: a later mount (e.g. autopilot) replaces the earlier panel.
+    const prior = doc.getElementById ? doc.getElementById('siChannel') : null;
+    if (prior && prior.parentNode) prior.parentNode.removeChild(prior);
     const panel = doc.createElement('div');
     panel.id = 'siChannel';
     // Docked under the game view when the page provides #dock; otherwise a floating panel.
@@ -114,8 +117,9 @@
       doc.body.appendChild(panel);
     }
     const log = panel.querySelector('#siLog'), head = panel.querySelector('#siHead'), ask = panel.querySelector('#siAsk');
-    if (dock && head.addEventListener) head.addEventListener('click', () => {
-      const narrow = win.matchMedia && win.matchMedia('(max-aspect-ratio:1/1)').matches;
+    if (dock && head.addEventListener) head.addEventListener('click', (e) => {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const narrow = win.matchMedia && win.matchMedia('(pointer:coarse),(max-width:760px),(max-aspect-ratio:1/1)').matches;
       panel.classList.toggle(narrow ? 'expanded' : 'collapsed');
     });
 
@@ -189,6 +193,10 @@
         const event = { generation: learner.generation - 1, mission: episode.mission, outcome: episode.outcome,
           kills: episode.kills, fitness: Math.round(result.score), improved: result.improved, died: episode.died,
           seconds: episode.seconds, stage: p.complete ? 'correction' : p.current.id };
+        if (Array.isArray(episode.footprints)) {
+          event.footprints = episode.footprints.map(({ id, category, severity, difficulty, t }) => ({ id, category, severity, difficulty, t }));
+          event.footprints_total = episode.footprints_total;
+        }
         remote('/chat', { message: '', view: 'game', event, game: opts.facts ? opts.facts() : null }).then(rr => {
           if (rr && rr.text) return postReply(rr);
           if (p.stage === before && (result.improved || episode.died)) {

@@ -65,7 +65,9 @@ function game() {
   }
   tactics.createBattle = (...args) => { battle = T.createBattle(...args); return battle; };
   const context = vm.createContext({ window, document, Tactics: tactics,
-    VessellEngine: require('../engine/core.js'),HailSoloExpansion: require('../engine/solo-expansion.js'),
+    VessellEngine: require('../engine/core.js'),HailSoloExpansion: require('../engine/solo-expansion.js'),HailFootprintOps: require('../engine/footprint-ops.js'),
+    HailCity: require('../engine/city.js'),HailGatewaySprawl: require('../engine/gateway-sprawl.js'),
+    HailCampaignStory: require('../engine/campaign-story.js'),HailStalker: require('../engine/stalker.js'),
     HailTacticalRenderer: require('../engine/tactical-renderer.js'),
     HailGameplayData: require('../engine/gameplay-data.js'),
     performance: { now: () => 1000 }, requestAnimationFrame() {} });

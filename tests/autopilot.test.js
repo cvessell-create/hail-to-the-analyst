@@ -121,3 +121,38 @@ test('exitOutcome scores only real level clears as complete', () => {
   assert.equal(A.exitOutcome('title'), 'interrupted');
   assert.equal(A.exitOutcome('tactical'), 'interrupted');
 });
+
+test('autopilot seeks footprint nodes before the mission exit', () => {
+  const ops = require('../engine/footprint-ops.js'), level = ops.level();
+  const s = makeState({ map: level.map.map(r => r.replace(/[Pehb]/g, '.').split('')), doors: {},
+    pickups: ops.catalogue.map(q => ({ type: ops.TILE, id: q.id, x: q.x + .5, y: q.y + .5, alive: true })) });
+  assert.equal(A.chooseGoal(s, A.DEFAULT_PARAMS).kind, 'footprint');
+  s.pickups.forEach(q => { q.alive = false; });
+  assert.equal(A.chooseGoal(s, A.DEFAULT_PARAMS).kind, 'exit');
+});
+
+test('browser driver carries ordered footprint telemetry through completion and resets on other missions', () => {
+  const ops = require('../engine/footprint-ops.js'), events = [];
+  let interval, s = makeState({ mode: 'play', missionIndex: 7 }), footprint = ops.createState();
+  const el = () => ({ style: {}, remove() {}, appendChild() {} });
+  const win = {
+    document: { createElement: el, body: el(), getElementById: () => null, querySelector: () => null, querySelectorAll: () => [] },
+    localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    HailCampaignState: () => s,
+    HailFootprintEpisode: () => s.missionIndex === 7 ? { footprints: ops.episode(footprint), footprints_total: 8 } : null,
+    HailStoryCorpus: {}, HailSIDialogue: { mount: () => ({ status() {}, onEpisode(_learner, episode) { events.push(episode); } }) },
+    setInterval(fn) { interval = fn; return 1; }, clearInterval() {},
+    dispatchEvent() {}, KeyboardEvent: class { constructor(type, fields) { Object.assign(this, { type }, fields); } }
+  };
+  const run = A.start(win);
+  interval();
+  footprint = ops.scrub({ ...footprint, time: 1.5 }, 'F2'); interval();
+  footprint = ops.scrub({ ...footprint, time: 3 }, 'F1'); s.mode = 'victory'; interval();
+  assert.deepEqual(events[0].footprints, ops.episode(footprint));
+  assert.equal(events[0].footprints_total, 8);
+  s = makeState({ mode: 'play', missionIndex: 0 }); interval();
+  s.mode = 'dead'; interval();
+  assert.equal(Object.hasOwn(events[1], 'footprints'), false);
+  assert.equal(Object.hasOwn(events[1], 'footprints_total'), false);
+  run.stop();
+});

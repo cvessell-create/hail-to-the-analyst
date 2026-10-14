@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "3834b511af6bedd2fcdbafe5dd3a4ebb53a01d76d17990898286de8be05734c2"
+      "sha256": "7860e6bc63cf4cfa9452a44b71b3fafe0450f3a41f5c8618edcd2357f35387ab"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -124,19 +124,23 @@
     },
     {
       "path": "engine/autopilot.js",
-      "sha256": "52afd2de0870e77b6b97280c0fc117ff2a1b453ca0b1fb957a8ab3f242e3c3d9"
+      "sha256": "fb198054afe89c33812cd766e3c9e2799837e88000fe02565ab924435387ea03"
     },
     {
       "path": "engine/boss.js",
       "sha256": "ddc8f28f6ffd8ecb3a4e4084c48cccefc60e0057ceb8345b70cf71609d4b62f5"
     },
     {
+      "path": "engine/campaign-story.js",
+      "sha256": "1c6c374cfcba257b96c287a9754c0a21de4e19538c45dc7add18f10b7eac70ec"
+    },
+    {
       "path": "engine/city.js",
-      "sha256": "b0dd070276030fbc9601e143176927000c372105d2e0ab74fd48e42826901950"
+      "sha256": "46bf339bb3e072fe525a23df218b39f2201850c7827a5252be20f3dd2d0826ef"
     },
     {
       "path": "engine/combat-assist.js",
-      "sha256": "a73baf6e108017a5162313b46a5f48636fb2bd24be3907e5323dfdda5e0e8541"
+      "sha256": "c8af9b636d49991379e42e0acd90646e937977ecb30e05d86efc66f699acd67d"
     },
     {
       "path": "engine/controls.js",
@@ -159,6 +163,10 @@
       "sha256": "8d3f7850da966029c68e9b1995608f873c2f1bd640e7b30dffed1e204cbff2fa"
     },
     {
+      "path": "engine/footprint-ops.js",
+      "sha256": "17ee9b593275c802fe165c3fb082fe6ea27fd6c50792cf064931cf83c6434622"
+    },
+    {
       "path": "engine/fx.js",
       "sha256": "787064ee18901688f8fdbe666b3a36a5d6d70ced2321d77bc02a4256c4aba23b"
     },
@@ -171,6 +179,10 @@
       "sha256": "a85358e606be38108738317f2ff627ab3dc6b07fde89ee757344f9b02565f5d2"
     },
     {
+      "path": "engine/gateway-sprawl.js",
+      "sha256": "8e042e13c759dd8969b6c865285b48730fdd5a3dcb36c39a0a23da8faf03ddf6"
+    },
+    {
       "path": "engine/harvest-policy.js",
       "sha256": "70cb9f77fd52589f624089e48f163e091425632cdee5ce1b7980e8271116bf41"
     },
@@ -180,7 +192,7 @@
     },
     {
       "path": "engine/loadout.js",
-      "sha256": "06e935d40435946cc9f89612462e082a29ac0532f1d1f4db09b9b26b694e5bff"
+      "sha256": "11473cc7e20d55b48865a7f8e7fc8ca54a63986cedf4b44bf9a7eec119560984"
     },
     {
       "path": "engine/math.js",
@@ -192,7 +204,7 @@
     },
     {
       "path": "engine/progression.js",
-      "sha256": "6ec66f8cca765bb280bf05900a98d137d8b14681c813d7fc964b5847fe3dd8b4"
+      "sha256": "bf8f36f92b7108fe066aa2d81996ac783185bf5eec869200b56e39102fe2eaf2"
     },
     {
       "path": "engine/seeded-rng.js",
@@ -200,7 +212,7 @@
     },
     {
       "path": "engine/si-dialogue.js",
-      "sha256": "84148d716a66cb648bcafbe642c29039110d42c19087d059d2111824b27fdef2"
+      "sha256": "8103f52c28f5652af34c4b83d5bc31be94886e5548ab55e836c89d27cb0b698a"
     },
     {
       "path": "engine/si-story-corpus.js",
@@ -208,7 +220,11 @@
     },
     {
       "path": "engine/solo-expansion.js",
-      "sha256": "0bfaf6ca2807c9f81e911a718bbe90deba7567a9124909493ae369cf5a1f6cab"
+      "sha256": "e8e894c9527db3c50148157e2edd7ccbd68dbc3a158d26de7e33f1b73d689645"
+    },
+    {
+      "path": "engine/stalker.js",
+      "sha256": "70899d9a8bce1f5200bf78a4b4f771882d00ef37ae8ecd34925dc41ba06a29ff"
     },
     {
       "path": "engine/state-model.js",
@@ -228,7 +244,7 @@
     },
     {
       "path": "engine/three-view.js",
-      "sha256": "436eadfad260ca478619ab6d69eede83a741767ac73fc12627cfa14d78c99d53"
+      "sha256": "f1c709b9d1ff6bbeaef71c0b02a82e02c277d1b7f70cf630b453ab57d4d85aca"
     },
     {
       "path": "engine/weight-trace.js",
@@ -248,7 +264,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "177d423381b6fc21424465dd85cfbb4ead139fde8de1b6792b738700cd2581eb"
+      "sha256": "163b0e8071ef10476f5d371752b0a2cdb217b64d2ef0be7c08f4e0cfa5111e3a"
     },
     {
       "path": "js/emulation-engine.js",
@@ -348,11 +364,15 @@
     },
     {
       "path": "tests/autopilot.test.js",
-      "sha256": "9edb6bd0c256f07c2539f700d7d9072d34a8212e78a6bd966947271d33d50515"
+      "sha256": "ac797808bb3601965658113d38053768d46ac20c4f8dc74d75806ea82bda6a36"
+    },
+    {
+      "path": "tests/campaign-story.test.js",
+      "sha256": "45cfad65a3a2f8e7cd13d24a34ff8b9eca9a40eefe8a14d2deb437e8ca829f51"
     },
     {
       "path": "tests/city.test.js",
-      "sha256": "560a5d3697e61c9a25f365013db51f523c02e4a1d4fef4182ac0c88cf7069bd2"
+      "sha256": "2cb530aec54360f591a9c7e0c8be515ebe0b4e43a39e21e714fcb65707b78f63"
     },
     {
       "path": "tests/deception-ops.test.js",
@@ -375,8 +395,12 @@
       "sha256": "42258b7121ad2fffd8c34a3c500fa07764344459bdde068f5f0657ef8b81f4bf"
     },
     {
+      "path": "tests/footprint-ops.test.js",
+      "sha256": "288f4fbbb2138d5b7dc3d11d5e9298038577b6ae2d9f296f4292ca72ebcaf2bf"
+    },
+    {
       "path": "tests/fps-integration.test.js",
-      "sha256": "a5f47577869b852dbf6477a7e433650d06564e2f29e882c5fcabb66f505039ae"
+      "sha256": "091e809cce17547b0bfb825d07bc81a4edd500e05e0e698911fd586276e2ee0c"
     },
     {
       "path": "tests/fx.test.js",
@@ -385,6 +409,10 @@
     {
       "path": "tests/gameplay-data.test.js",
       "sha256": "fda585273a918d27f512d9e35900f7d93646b3eb270e7c9f6713609c27b56234"
+    },
+    {
+      "path": "tests/gateway-sprawl.test.js",
+      "sha256": "2a135b7e224172e4c5c0eb59149a72e9adf1d6c7c3b484aee252e3422b23f9f3"
     },
     {
       "path": "tests/harvest-policy.test.js",
@@ -416,11 +444,15 @@
     },
     {
       "path": "tests/si-dialogue.test.js",
-      "sha256": "a820c5f40142aa058498f163279df3afa43bc1e1ce269cd81e10a94c89fb1f67"
+      "sha256": "6a122ab311adb18e6bfae6a0247ace480fa007259340c6609a897c07eeb7d20a"
     },
     {
       "path": "tests/solo-expansion.test.js",
-      "sha256": "088d27d514071dcca55b11047fec6f6f1b1c1116d12258580ff544fbf6525989"
+      "sha256": "3b108f66a63b0fa6787aaf3a0c1c4639aa768a5a749e05b2c8e3a3f55976776f"
+    },
+    {
+      "path": "tests/stalker.test.js",
+      "sha256": "77d84865288932968e4429ece08298ef0278be3ccbd9d3c6910712a1d17d3295"
     },
     {
       "path": "tests/state-model.test.js",
@@ -432,7 +464,7 @@
     },
     {
       "path": "tests/tactical-view.test.js",
-      "sha256": "8b4e275750d969675507d98f10179566d3320b03f09ec4b127611d4ab020caba"
+      "sha256": "175cbd119005dccde7e04cd56346faea7d105f335d4818ff484485834d599bec"
     },
     {
       "path": "tests/tactics.test.js",

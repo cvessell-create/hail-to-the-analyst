@@ -55,8 +55,12 @@ function game(opts = {}) {
     requestAnimationFrame() {},
     VessellEngine: require('../engine/core.js'),
     HailSoloExpansion: require('../engine/solo-expansion.js'),
+    HailFootprintOps: require('../engine/footprint-ops.js'),
     HailCombat: require('../engine/combat-assist.js'),
     HailCity: require('../engine/city.js'),
+    HailGatewaySprawl: require('../engine/gateway-sprawl.js'),
+    HailCampaignStory: require('../engine/campaign-story.js'),
+    HailStalker: require('../engine/stalker.js'),
     ...(opts.progression ? { HailProgression: require('../engine/progression.js'), HailLoadout: require('../engine/loadout.js') } : {}),
     console
   });
@@ -72,7 +76,8 @@ function game(opts = {}) {
       telemetry: gameplayData,
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine,
       metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo, hero: () => hero, saveHero, maxHp,
-      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice
+      sideQuestReturn: () => sideQuestReturn,
+      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice, message: () => message
     };
   `;
   const at=source.lastIndexOf('title();');
@@ -80,11 +85,12 @@ function game(opts = {}) {
   return { fps: context.fps, nodes, events, drawing, stored, approach: () => approach };
 }
 
-test('all seven solo missions enter first-person play directly and victory follows the final map', () => {
+test('all seven campaign missions enter first-person play directly and victory follows the final map', () => {
   const g = game();
   g.nodes.get('muteBtn').onclick();
   g.fps.briefing(0);
   assert.ok(g.nodes.get('card').innerHTML.includes('ENTER MISSION'));
+  assert.match(g.nodes.get('card').innerHTML, /APPARATUS LAYER \/\/ DIRECTION/);
   g.nodes.get('primary').onclick();
   assert.equal(g.fps.state(), 'play');
   assert.equal(g.approach(), undefined);
@@ -94,16 +100,57 @@ test('all seven solo missions enter first-person play directly and victory follo
   assert.equal(g.approach(), undefined);
   assert.equal(g.fps.player().armor, 20);
   assert.ok(g.fps.enemies().some(e => e.type === 'FABRICATOR'));
-  for (let i=2;i<7;i++) {
+  for (let i=2;i<g.fps.city().campaign;i++) {
     g.fps.finishLevel();
     assert.equal(g.fps.state(), 'brief');
     g.nodes.get('primary').onclick();
-    assert.ok(g.nodes.get('card').innerHTML.includes(`MISSION ${i+1} OF 7`));
+    assert.ok(g.nodes.get('card').innerHTML.includes(`MISSION ${i+1} OF ${g.fps.city().campaign}`));
     g.nodes.get('primary').onclick();
     assert.equal(g.fps.state(), 'play');
     assert.equal(g.fps.checkpoint().missionIndex, i);
   }
   g.fps.finishLevel(); assert.equal(g.fps.state(), 'victory');
+});
+test('the final campaign map spawns the Stalker and keeps ODNI dormant after its defeat', () => {
+  const g = game(), f = g.fps;
+  f.briefing(6);
+  g.nodes.get('primary').onclick();
+  const stalker = f.enemies().find(e => e.type === 'STALKER');
+  assert.ok(stalker);
+  assert.equal(stalker.hp, require('../engine/stalker.js').HEALTH);
+  const exit = f.levels()[6].map.findIndex(row => row.includes('X'));
+  const exitX = f.levels()[6].map[exit].indexOf('X');
+  Object.assign(f.player(), { x: exitX - 0.5, y: exit + 0.5, a: 0, blue: true });
+  f.use();
+  assert.equal(f.state(), 'play', 'clearance alone cannot open the final exit');
+  f.killEnemy(stalker);
+  assert.match(f.message(), /ODNI ARTIFACT SECURED — SYSTEM DORMANT/);
+  assert.equal(f.checkpoint().bossDead, true);
+  f.use();
+  assert.equal(f.state(), 'victory');
+});
+test('Gateway Sprawl opens Footprint Purge as an optional quest and returns to the same signal exchange', () => {
+  const g = game(), f = g.fps, gateway = f.levels().findIndex(l => l.name === 'GATEWAY SPRAWL');
+  assert.equal(f.levels()[7].name, 'FOOTPRINT PURGE');
+  f.loadLevel(gateway);
+  const p = f.player();
+  p.x = 27.5; p.y = 10.5; p.a = 0;
+  g.drawing.length = 0; f.drawEntrances();
+  assert.ok(g.drawing.some(d => d.text === 'FOOTPRINT PURGE'));
+  assert.ok(g.drawing.some(d => d.text === 'E: ENTER'));
+  f.use();
+  assert.equal(f.state(), 'brief');
+  assert.equal(f.checkpoint().missionIndex, 7, JSON.stringify({ gateway, sideQuestReturn: f.sideQuestReturn(), name: f.levels()[7].name }));
+  assert.equal(f.sideQuestReturn().levelIndex, gateway);
+  g.nodes.get('primary').onclick();
+  f.finishLevel();
+  assert.match(g.nodes.get('card').innerHTML, /OPTIONAL SIDE QUEST COMPLETE/);
+  g.nodes.get('primary').onclick();
+  assert.equal(f.state(), 'play');
+  assert.equal(f.checkpoint().missionIndex, gateway);
+  assert.equal(f.player().x, 27.5);
+  assert.equal(f.player().y, 10.5);
+  assert.equal(f.city().campaign, 7);
 });
 test('visible privacy controls default off and consented telemetry follows real mission starts, deaths and completions', () => {
   const g = game();
@@ -277,14 +324,14 @@ test('jet fuel carries to the next mission and retries do not stack it; old chec
   g.fps.restore(saved);assert.doesNotThrow(()=>g.fps.update(1/60));assert.equal(g.fps.player().height,0);
 });
 
-test('final exit requires both clearance and a defeated controller through the real use handler', () => {
-  const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(6);
-  const p=g.fps.player(),map=g.fps.levels()[6].map,y=map.findIndex(row=>row.includes('X')),x=map[y].indexOf('X');
+test('controller exit requires both clearance and a defeated controller through the real use handler', () => {
+  const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(1);
+  const p=g.fps.player(),map=g.fps.levels()[1].map,y=map.findIndex(row=>row.includes('X')),x=map[y].indexOf('X');
   Object.assign(p,{x:x-.5,y:y+.5,a:0});
   g.fps.use();assert.equal(g.fps.state(),'play');
   p.blue=true;g.fps.use();assert.equal(g.fps.state(),'play');
   const saved=g.fps.checkpoint();saved.bossDead=true;g.fps.restore(saved);
-  g.fps.use();assert.equal(g.fps.state(),'victory');assert.equal(g.fps.mission().exportLog().state.approved,true);
+  g.fps.use();assert.equal(g.fps.state(),'brief');assert.equal(g.fps.mission().exportLog().state.approved,true);
 });
 
 test('doors have luminous frames, handles and labels, including an open entrance marker', () => {
@@ -493,12 +540,12 @@ test('a corrupt saved profile falls back to a fresh hero',()=>{
 test('Vessell City is a free-roam hub after the campaign: entrances, gating, metro and return trips', () => {
   const g = game(), f = g.fps, down = code => g.events.keydown({ code, preventDefault() {} });
   const c = f.city();
-  assert.equal(c.campaign, 7); assert.equal(c.index, 7); assert.equal(f.levels()[7].name, 'VESSELL CITY');
+  assert.equal(c.campaign, 7); assert.equal(c.index, c.campaign + 1); assert.equal(f.levels()[c.index].name, 'VESSELL CITY');
   assert.ok(g.nodes.get('card').innerHTML.includes('VESSELL CITY // FREE ROAM'), 'title offers the city without replacing DEPLOY');
   f.telemetry.setConsent(true);
   f.cityCard(); assert.ok(g.nodes.get('card').innerHTML.includes('— VESSELL CITY —'));
   g.nodes.get('primary').onclick();
-  assert.equal(f.state(), 'play'); assert.equal(f.checkpoint().missionIndex, 7); assert.equal(f.practice(), true);
+  assert.equal(f.state(), 'play'); assert.equal(f.checkpoint().missionIndex, f.city().index); assert.equal(f.practice(), true);
   assert.equal(f.telemetry.events().filter(e => e.kind === 'attempt-start').length, 0, 'free roam starts no gameplay attempt');
   f.enemies().forEach(e => { e.alive = false; });
   const p = f.player();
@@ -523,12 +570,32 @@ test('Vessell City is a free-roam hub after the campaign: entrances, gating, met
   assert.notEqual(f.state(), 'victory'); assert.deepEqual([...f.city().cleared], ['THE ARCHIVE']);
   assert.ok(g.nodes.get('card').innerHTML.includes('RETURN TO VESSELL CITY'));
   g.nodes.get('primary').onclick();
-  assert.equal(f.checkpoint().missionIndex, 7);
+  assert.equal(f.checkpoint().missionIndex, f.city().index);
   assert.deepEqual([f.player().x, f.player().y], [6.5, 13.5], 'returns to the entrance it left from');
   // Plant now opens.
   f.enemies().forEach(e => { e.alive = false; });
   Object.assign(f.player(), { x: 23.5, y: 13.5, a: Math.PI / 2 }); f.use();
   assert.equal(f.state(), 'brief'); assert.ok(g.nodes.get('card').innerHTML.includes('FABRICATION PLANT'));
+});
+
+test('the west gate links Vessell City to the Gateway Sprawl sandbox and back', () => {
+  const g = game(), f = g.fps;
+  f.enterCity(); f.enemies().forEach(e => { e.alive = false; });
+  Object.assign(f.player(), { x: 1.5, y: 11.5, a: Math.PI }); f.use();
+  const L = f.levels()[f.checkpoint().missionIndex];
+  assert.equal(L.name, 'GATEWAY SPRAWL'); assert.equal(f.state(), 'play');
+  assert.ok(f.checkpoint().missionIndex > f.city().index, 'district sits after the city, outside the campaign');
+  assert.equal(f.message(), '— GATEWAY SPRAWL — RIVERFRONT');
+  assert.equal(f.metros().length, L.stops.length);
+  f.render(); f.drawMap(); f.update(1 / 60);
+  f.enemies().forEach(e => { e.alive = false; });
+  for (let i = 0; i < 240; i++) f.update(1 / 60);
+  Object.assign(f.player(), { x: 26.5, y: 27.5 }); f.update(1 / 60);
+  assert.ok(f.message().startsWith('SOULARD: '), 'entering a district shows its flavour text');
+  Object.assign(f.player(), { x: 42.5, y: 4.5, a: 0 }); f.use();
+  assert.equal(f.checkpoint().missionIndex, f.city().index);
+  assert.deepEqual([f.player().x, f.player().y], [1.5, 11.5], 'returns to the west gate');
+  assert.deepEqual([...f.city().cleared], [], 'sandbox travel never clears missions');
 });
 
 test('city progress persists in the local hero profile and is sanitized', () => {
@@ -546,11 +613,11 @@ test('dying in the city respawns at the safehouse; dying in a city mission offer
   const g = game(), f = g.fps;
   f.enterCity(); f.die();
   assert.ok(g.nodes.get('card').innerHTML.includes('RESPAWN AT SAFEHOUSE'));
-  g.nodes.get('primary').onclick(); assert.equal(f.checkpoint().missionIndex, 7);
+  g.nodes.get('primary').onclick(); assert.equal(f.checkpoint().missionIndex, f.city().index);
   f.enemies().forEach(e => { e.alive = false; });
   Object.assign(f.player(), { x: 6.5, y: 13.5, a: Math.PI / 2 }); f.use(); g.nodes.get('primary').onclick();
   f.die(); assert.ok(g.nodes.get('card').innerHTML.includes('RETURN TO VESSELL CITY'));
-  g.nodes.get('cityBack').onclick(); assert.equal(f.checkpoint().missionIndex, 7);
+  g.nodes.get('cityBack').onclick(); assert.equal(f.checkpoint().missionIndex, f.city().index);
 });
 
 test('autopilot runs in the isometric view with the same tank steering it uses in first person', () => {
@@ -565,4 +632,56 @@ test('autopilot runs in the isometric view with the same tank steering it uses i
   assert.ok(fp.dx > 0 && Math.abs(fp.dy) < 1e-9);
   assert.deepEqual([auto.dx, auto.dy, auto.a], [fp.dx, fp.dy, fp.a], 'W walks along the facing in both views');
   assert.ok(human.iso && Math.abs(human.dy) > 1e-6, 'a human in isometric still moves screen-relative');
+});
+
+test('footprint mission scrubs nodes, gates exit, preserves checkpoints and resets on retry', () => {
+  const ops = require('../engine/footprint-ops.js'), g = game();
+  const index = g.fps.levels().findIndex(l => l.name === 'FOOTPRINT PURGE');
+  assert.equal(g.fps.city().campaign, 7);
+  g.fps.loadLevel(index);
+  const p = g.fps.player(), exit = () => { p.x = 13.5; p.y = 9.5; p.a = 0; g.fps.use(); };
+  assert.equal(g.fps.pickups().filter(q => q.type === ops.TILE).length, 8);
+  exit(); assert.equal(g.fps.state(), 'play');
+  assert.equal(g.fps.checkpoint().presentation.message, 'CRITICAL EXPOSURES REMAIN: 2');
+  for (const id of ['F3', 'F2', 'F1']) {
+    const q = g.fps.pickups().find(q => q.id === id);
+    p.x = q.x; p.y = q.y;
+    for(let frame=0;frame<(q.difficulty==='hard'?30:1);frame++)g.fps.update(.05);
+    assert.equal(q.alive, false);
+    assert.match(g.fps.checkpoint().presentation.message, q.difficulty==='impossible'?/^LOCKED DOWN: /:/^SCRUBBED: /);
+    assert.ok(g.fps.checkpoint().presentation.message.endsWith(' — '+ops.exposure(id).fix));
+  }
+  const checkpoint = g.fps.checkpoint();
+  assert.equal(checkpoint.stats.intel, 2750);
+  assert.deepEqual(Array.from(checkpoint.footprintState.scrubbed, q => q.id), ['F3','F2','F1']);
+  g.fps.render();
+  assert.ok(g.drawing.some(d => d.text === 'FOOTPRINTS 3/8'));
+  g.fps.loadLevel(index);
+  assert.equal(g.fps.checkpoint().footprintState.scrubbed.length, 0);
+  g.fps.restore(checkpoint);
+  assert.equal(g.fps.checkpoint().footprintState.scrubbed.length, 3);
+  const restored = g.fps.player(); restored.x = 13.5; restored.y = 9.5; restored.a = 0;
+  g.fps.use(); assert.equal(g.fps.state(), 'victory');
+  g.fps.loadLevel(0);
+  assert.equal(Object.hasOwn(g.fps.checkpoint(), 'footprintState'), false);
+});
+
+test('hard footprint nodes require an uninterrupted stationary 1.5s hold and impossible nodes are contained', () => {
+  const ops=require('../engine/footprint-ops.js'),g=game();
+  g.fps.loadLevel(g.fps.levels().findIndex(l=>l.name==='FOOTPRINT PURGE'));
+  const advance=seconds=>{while(seconds>1e-9){const dt=Math.min(.05,seconds);g.fps.update(dt);seconds-=dt;}};
+  const node=g.fps.pickups().find(q=>q.id==='F1'),p=g.fps.player();
+  p.x=node.x;p.y=node.y;advance(1);
+  assert.equal(node.alive,true);assert.equal(g.fps.checkpoint().stats.intel,0);
+  p.x=1.5;p.y=1.5;advance(.1);assert.equal(node.hold,0);
+  p.x=node.x;p.y=node.y;advance(1.49);assert.equal(node.alive,true);
+  g.fps.keys().KeyW=true;advance(.01);assert.equal(node.hold,0);
+  g.fps.keys().KeyW=false;advance(1.49);assert.equal(node.alive,true);
+  advance(.01);assert.equal(node.alive,false);
+  assert.equal(g.fps.checkpoint().presentation.message,'SCRUBBED: '+ops.exposure('F1').name+' [CRITICAL · DATA BROKER] — '+ops.FIXES.data_broker);
+  const impossible=g.fps.pickups().find(q=>q.id==='F2');p.x=impossible.x;p.y=impossible.y;
+  advance(.05);assert.equal(impossible.alive,false);
+  assert.match(g.fps.checkpoint().presentation.message,/^LOCKED DOWN: SHADOWMART PASTE/);
+  assert.equal(ops.exitOpen(g.fps.checkpoint().footprintState),true);
+  g.fps.render();assert.ok(g.drawing.filter(d=>d.kind==='text').some(d=>/rotate|password/.test(d.text)));
 });

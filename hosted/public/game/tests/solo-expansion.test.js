@@ -73,9 +73,9 @@ test('original icy pig and city scenery render distinct features without importe
   const draws=[],ctx={fillRect(...a){draws.push([this.fillStyle,...a]);},strokeRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fill(){},fillText(t){draws.push(t);}};
   expansion.pig(ctx,100,0);
   assert.ok(draws.some(d=>d[0]==='#c3f4ff'));assert.ok(draws.some(d=>d[0]==='#ff6587'));
-  expansion.backdrop(ctx,960,540,0,'city');assert.ok(draws.includes('STARLIGHT'));
-  expansion.scenery(ctx,120,'N',0);assert.ok(draws.includes('NEON THEATER'));
-  expansion.scenery(ctx,120,'C',0);assert.ok(draws.includes('STAR CINEMA'));
+  expansion.backdrop(ctx,960,540,0,'gateway');assert.ok(draws.includes('GATEWAY DISTRICT'));
+  expansion.scenery(ctx,120,'N',0);assert.ok(draws.includes('LOOP LINE'));
+  expansion.scenery(ctx,120,'C',0);assert.ok(draws.includes('RIVER CITY'));
   assert.doesNotThrow(()=>expansion.scenery(ctx,120,'T',0));
 });
 
@@ -116,7 +116,7 @@ test('shadow dossier level is fictional, gated and teaches evidence rules withou
   const d=expansion.levels().find(l=>l.name==='SHADOW DOSSIER');
   assert.ok(d&&d.dossier);assert.equal(d.requires,'blue-boss');
   const all=d.map.join('');
-  for(const c of ['F','q','P','X'])assert.equal(all.split(c).length-1,1,c);
+  for(const c of ['z','q','P','X'])assert.equal(all.split(c).length-1,1,c);
   assert.ok(all.split('i').length-1>=4,'evidence files');assert.ok(all.split('d').length-1>=5,'watcher drones');
   assert.match(d.brief,/No real accounts, people or agencies/);
   assert.equal(expansion.DOSSIER_FILES.length,6);
