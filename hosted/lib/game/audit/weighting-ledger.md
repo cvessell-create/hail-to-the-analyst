@@ -55,7 +55,7 @@ A proposed adapter must log `rawOutput`, `measure`, `units`, `direction`, `norma
 
 The chair/agenda example motivates a governance experiment: fix player preferences, vary agenda, observe the winner, then compare declared utility outcomes. A weak-dominance test compares supplied action payoffs. May analyzes a two-alternative decision rule under its assumptions. Gibbard–Satterthwaite limits a different class of rules with at least three outcomes. Their scopes do not cancel each other.
 
-The broader Vessell pillars PARADOX, BOTTLENECK, DUAL LAYER and XFACTOR provide an organizing interpretation. They are not numerical coefficients imported into this source. Each proposed connection must pass WHAT, WHY, WHERE, DEPENDENCIES, FAILURE, EVIDENCE and DECISION. Teacher/course-facing theory and the Mother's cross-domain framework remain separate in this audit. No framework production package was imported or its thresholds asserted.
+The broader Vessell pillars PARADOX, BOTTLENECK, DUAL LAYER and XFACTOR provide an organizing interpretation. They are not numerical coefficients imported into this source. Each proposed connection must pass WHAT, WHY, WHERE, DEPENDENCIES, FAILURE, EVIDENCE and DECISION. 
 
 ## Reciprocal feedback schema
 

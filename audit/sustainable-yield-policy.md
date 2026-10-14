@@ -19,7 +19,7 @@ K_{k+1}=K_k+D_k-H_k,\quad U_{k+1}=U_k+A_k-D_k+H_k,
 Y_{k+1}=Y_k+D_k-H_k,\quad E_{k+1}=E_k+A_k.
 \]
 
-h is a nonnegative integer requested harvest. Awards and harvests are discrete events; these balances do not grow between events. No interest, biological replenishment or income is invented from R. The same module runs co-op and tactical influence awards. Ordinary combat XP remains progression XP; the savings/available split is a bookkeeping partition of influence XP, not an additional XP award or a credit conversion. No purchase/consumption mechanic for the available ledger is supplied.
+h is a nonnegative integer requested harvest. Awards and harvests are discrete events; these balances do not grow between events. No interest, biological replenishment or income is invented from R. The same module runs co-op and tactical influence awards. Ordinary combat XP remains progression XP; the savings/available split is a bookkeeping partition of influence XP, not an additional XP award or a credit conversion. 
 
 ## Proof and sustainable-yield meaning
 

@@ -39,6 +39,21 @@ manifests in the game audit remain historical records, not current hashes.
 
 ## Deployment
 
+The recovered gameplay-metadata branch adds an optional local data/feedback
+panel. Collection is off by default, requires consent, and sends no telemetry
+over the network. It retains bounded summaries and category-only feedback;
+export/import/delete/revoke remain explicit owner actions. Suggestions require
+declared sample thresholds and human review, never automatic game changes.
+The panel suspends gameplay and controls while open.
+
+The 0.3.1 consolidation retains all branch histories and mirrors the live hex
+minimap, optional first-person tactical practice, fictional archive terminal,
+README Play image and hosted collision-aware movement prediction. New solo
+starts remain direct FPS; tactical practice is opt-in and never campaign victory.
+The isolated tactical renderer shares original art without changing FPS state.
+Tactical checkpoints retain the battle, selected unit, weapon, view and archive
+state; combat continues using the campaign's seeded RNG.
+
 Restore dependencies with `npm ci`, then `npm run build`.
 The D1 binding and supplied `rooms` migration are required for `/api/arena`.
 `npm start` runs the built Worker locally, not on the ChatGPT-hosted site.

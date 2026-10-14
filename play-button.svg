@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 220 64" role="img" aria-labelledby="title">
+  <title id="title">PLAY</title>
+  <rect x="2" y="2" width="216" height="60" rx="10" fill="#b7f34a" stroke="#14231a" stroke-width="4"/>
+  <path d="M26 20v24l20-12z" fill="#14231a"/>
+  <text x="122" y="42" fill="#14231a" font-family="Arial, sans-serif" font-size="26" font-weight="700" text-anchor="middle">PLAY</text>
+</svg>

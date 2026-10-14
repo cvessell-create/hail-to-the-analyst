@@ -1,17 +1,23 @@
 /* Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: GPL-2.0-or-later */
-#overlay:has(.tactical-card) { padding: 8px; overflow-y: auto; touch-action: pan-y; align-items: flex-start; }
-.tactical-card { max-width: 680px; margin: auto; padding: 8px; }
-.tactical-sheet, .tactical-help, .tactical-hud { font-size: clamp(11px, 1.5vw, 14px); line-height: 1.4; margin: 6px 0; }
+#overlay:has(.tactical-card) { padding: 0; background: none; pointer-events: none; align-items: flex-end; }
+body:has(.tactical-card), html:has(.tactical-card) { touch-action: pan-y; }
+#shell:has(.tactical-card) #game { touch-action: none; }
+#card.tactical-card { width: 100%; height: 46%; padding: 8px 12px; overflow-y: auto; touch-action: pan-y; background: rgba(5,9,7,.93); pointer-events: auto; border-top: 2px solid var(--edge); text-align: left; }
+.tactical-card .kicker { margin: 0; font-size: 12px; }
+.tactical-sheet, .tactical-help, .tactical-hud { font-size: 11px; line-height: 1.4; margin: 4px 0; }
 .tactical-hud { color: var(--acid); }
-.hex-board { position: relative; width: min(100%, 430px); margin: 8px auto; }
-.hex { position: absolute; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); border: 0; padding: 0; color: #fff; font: bold clamp(12px, 3vw, 20px) monospace; cursor: pointer; text-shadow: 1px 1px #000; }
-.hex.analyst { color: #baff8c; }
-.hex.fabricator { color: #ffb6ad; }
-.hex.objective { box-shadow: inset 0 0 0 5px #ffd020; }
-.hex.reachable { box-shadow: inset 0 0 0 3px #78bf89; }
-.hex.selected, .hex:focus-visible { box-shadow: inset 0 0 0 6px #fff; outline: none; }
-.hex:hover { filter: brightness(1.3); }
-.tactical-controls { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; }
-.tactical-controls select { background: #10150f; color: #fff; padding: 6px; border: 1px solid var(--edge); }
+.tactical-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; }
+.tactical-controls label { display: flex; align-items: center; gap: 4px; }
+.tactical-controls select { max-width: 230px; background: #10150f; color: #fff; padding: 6px; border: 1px solid var(--edge); min-height: 36px; }
 .tactical-controls .chip { min-height: 36px; }
-.tactical-log { text-align: left; padding-left: 22px; margin: 8px auto; max-width: 540px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.tactical-controls button:disabled { opacity: .45; cursor: default; }
+.tactical-card :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.tactical-card details { font-size: 11px; margin-top: 4px; }
+.tactical-log { padding-left: 22px; margin: 4px 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+@media (max-width: 600px) {
+  #card.tactical-card { padding: 6px; }
+  .tactical-sheet { display: none; }
+  .tactical-controls { gap: 4px; }
+  .tactical-controls label { flex-direction: column; align-items: flex-start; }
+  .tactical-controls select { max-width: 180px; }
+}

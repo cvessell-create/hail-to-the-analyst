@@ -1,6 +1,6 @@
 {
   "name": "hail-to-the-analyst",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Five-mission offline FPS campaign and original math-driven engine workbench",
   "license": "GPL-3.0-or-later",

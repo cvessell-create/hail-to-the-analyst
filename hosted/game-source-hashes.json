@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "210b7d852615221a21c105f113ee776964ba6e11589f0ab014903bf4618008c9"
+      "sha256": "1c895d29611d9dc27d4ed5b547daa326748232703c29cc474e769b572b850c63"
     },
     {
       "path": "COPYING-GPL-3",
@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "17c28d5ad20bbb9e838bc1e19035b9b90b47d67ff37898bb44273990e9086667"
+      "sha256": "786c2695b739d287f645ba1185bcbeeba74712c6e6393d92edb2267fa66a7192"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -92,7 +92,7 @@
     },
     {
       "path": "audit/sustainable-yield-policy.md",
-      "sha256": "f62f52344cfd037bd4f71829d704fa5af7193213f19e9907a9ceee5f147ec567"
+      "sha256": "4fd56bb2eb83be99b624e92c4ed361bc6b1d0e3bb8c946269d36f0a11082396f"
     },
     {
       "path": "audit/test-results.txt",
@@ -100,11 +100,11 @@
     },
     {
       "path": "audit/weighting-ledger.md",
-      "sha256": "48185521e18e027942844d1503595b19a3b3b9eec5475c3c840564463fb68249"
+      "sha256": "de24355ed4f9e44054341f5a08aba09d2cf4bf254ab14c3c493fc4ffe9b68468"
     },
     {
       "path": "css/tactics.css",
-      "sha256": "6d6f6496af130b6379c42af7727f569f39733f878e962fe7c18508a747f9110d"
+      "sha256": "69edb9d1ac2c399b78c4732f244cd5b1f17fcbccca248d2fc16552072de8a9e1"
     },
     {
       "path": "engine/LICENSE",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "ab20734a478ed1d9ca3ca6993c45ddf34bfb490f32b3522a9232c0c85b536c7d"
+      "sha256": "11e5d6435d9bf06ad48a62cd1a4fa769c6fc7647941dcfb534fb8a1f482f5c8a"
     },
     {
       "path": "engine/autopilot.js",
@@ -157,6 +157,10 @@
     {
       "path": "engine/game-theory.js",
       "sha256": "41747b0fed73975b478578f793e5b57bbc4ad0d20efec55291caa82b37257a61"
+    },
+    {
+      "path": "engine/gameplay-data.js",
+      "sha256": "a85358e606be38108738317f2ff627ab3dc6b07fde89ee757344f9b02565f5d2"
     },
     {
       "path": "engine/harvest-policy.js",
@@ -207,6 +211,10 @@
       "sha256": "d8213f2c11d803c9cb8e286764db14a741e3d7e78079161cb95e36509cc95154"
     },
     {
+      "path": "engine/tactical-renderer.js",
+      "sha256": "ef65a92850ad258777f70dde9465a47d7398e3a729ae289206d0af5a5d856c0c"
+    },
+    {
       "path": "engine/three-view.js",
       "sha256": "e7de5464c6bf150aa1474108d2f0ed78cbe66f6deb784b39c30531aa74e7da38"
     },
@@ -228,7 +236,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "5f75ae57824e183bb7290379f0bc2fca58b341806b852757dd7a66f2507f1fc6"
+      "sha256": "59b2458e6f0eb25d9ae4c46f0d0f6d4a736cd33227951e5f8a1f8e7ccf541598"
     },
     {
       "path": "js/emulation-engine.js",
@@ -244,11 +252,15 @@
     },
     {
       "path": "js/tactical-ui.js",
-      "sha256": "e03870f69f2c7fce52c86d88d9d09c19e5fd4a1241f45c4f54a271b34496e5f6"
+      "sha256": "3cf80ade07bb688cfd068b85967dacb08d68723dc84098af0b4361e4b77b526e"
     },
     {
       "path": "js/tactics.js",
       "sha256": "909699c63717601140aae2a8f85fc721a56609d1c330f1a33af15e570de38dd9"
+    },
+    {
+      "path": "play-button.svg",
+      "sha256": "b8a5480f5ab55ac58872eec42c122a529e337c7796f7d9eac53fb4c27d391361"
     },
     {
       "path": "scripts/audit-math.js",
@@ -288,7 +300,7 @@
     },
     {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "1bd7874b4794ae073aba078885fb7553bdc3da03beb2e914b8a0fbe3aa6d99ab"
+      "sha256": "3099bbb15f5c7b8dd5a23966e893782c4277beb02aeb28d48f315426fb51ccac"
     },
     {
       "path": "server/arena.js",
@@ -348,11 +360,15 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "9bddb86c554bcbfe0d66e2198470a56ae9a4d96b0847a720b65a1f500121a530"
+      "sha256": "b162b4c1daaac67edd791b517b02c083370c5c1154532b1e34a5a78c85cf5bd2"
     },
     {
       "path": "tests/fx.test.js",
       "sha256": "c8ad28298b82fe3086d314e411faca86579c6e30f14de5c7a26194d5ceaed8e0"
+    },
+    {
+      "path": "tests/gameplay-data.test.js",
+      "sha256": "fda585273a918d27f512d9e35900f7d93646b3eb270e7c9f6713609c27b56234"
     },
     {
       "path": "tests/harvest-policy.test.js",
@@ -393,6 +409,10 @@
     {
       "path": "tests/static-reserve.test.js",
       "sha256": "357955a5f55ba74213f23a32ba79f57714193cb70f0b7dc8b09bc8a6367121c6"
+    },
+    {
+      "path": "tests/tactical-view.test.js",
+      "sha256": "8b4e275750d969675507d98f10179566d3320b03f09ec4b127611d4ab020caba"
     },
     {
       "path": "tests/tactics.test.js",
