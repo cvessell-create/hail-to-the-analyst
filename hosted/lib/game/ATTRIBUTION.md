@@ -122,3 +122,12 @@ Gregg Tavares) and `vendor/tsparticles/` holds @tsparticles/slim 4.4.0
 (`tsparticles.slim.bundle.min.js`, MIT, Copyright (c) Matteo Bruni). Both are
 unmodified npm package files with their licence and package metadata retained.
 `engine/fx.js` is original Apache-2.0 presentation code; `?fx=0` disables it.
+
+## Three.js isometric view, October 13, 2026
+
+`vendor/three/three.iife.min.js` is a browser IIFE bundle of three.js 0.186.1
+(npm `three`, MIT, Copyright © 2010-2026 three.js authors); `LICENSE` and
+`package.json` are retained. It is lazy-loaded only for the isometric view.
+`engine/three-view.js` is original presentation code. Visual direction follows
+generic isometric twin-stick conventions; no assets, names or UI from other games
+are used.

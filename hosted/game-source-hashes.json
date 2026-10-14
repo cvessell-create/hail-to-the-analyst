@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "2adebcef5466a49188155256453150a496a54946cff7a8939d537db913c44613"
+      "sha256": "210b7d852615221a21c105f113ee776964ba6e11589f0ab014903bf4618008c9"
     },
     {
       "path": "COPYING-GPL-3",
@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "4e792e534d3dda39af82c1b5a73dfda30456a61f231b866a41314843297f85ed"
+      "sha256": "17c28d5ad20bbb9e838bc1e19035b9b90b47d67ff37898bb44273990e9086667"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -397,6 +397,10 @@
     {
       "path": "tests/tactics.test.js",
       "sha256": "f82511fddcdf5674c58f0edc46232da9cf09c714f43ac7b172bbdb4322f730ae"
+    },
+    {
+      "path": "tests/three-view.test.js",
+      "sha256": "91b4f13607c64a27e0ec00519501f4f9d57d6d59a9dd7a9cedabafe3b66a54af"
     },
     {
       "path": "tests/upgrades.test.js",

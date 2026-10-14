@@ -2,10 +2,12 @@
 
 ## Hosted continuation and first-person repair
 
-All five solo missions enter first-person play directly. The original hex-grid
+All seven solo missions enter play directly. Desktop browsers default to an
+isometric Three.js view (`V` toggles first person; `?view=fp` forces it); the
+autopilot always uses first person. The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
 The story is a civilian training simulation, not a political attribution.
-The browser first-person renderer is the only gameplay view; the NES companion
+Both renderers are presentation only; gameplay stays in `index.html`; the NES companion
 display was removed from the UI (`engine/nes-visual.js` remains as a tested module).
 
 ### Expanded solo campaign
@@ -111,7 +113,7 @@ with Enter or Space. Hex labels/tooltips show terrain defence and movement costs
 | Key | Action |
 |-----|--------|
 | W A S D / Arrows | Move / strafe |
-| Mouse | Look |
+| Mouse | Look (first person) / aim at cursor (isometric) |
 | Click | Fire |
 | E | Use (doors, pickups, metro: call train / press again to change stop) |
 | Q | Dodge roll (brief invulnerability, 1.1 s cooldown) |
@@ -119,6 +121,11 @@ with Enter or Space. Hex labels/tooltips show terrain defence and movement costs
 | G | Mark the route to the current objective on the radar (8 s) |
 | J (hold) | Jetpack lift/hover, after collecting JET equipment |
 | 1 / 2 / 3 | Sidearm / Breacher / Redactor |
+| T | Throw grenade (spends tactical charge) |
+| F / C / B | Augments: shockwave / drone / barrier dome (spend energy) |
+| H | Hack nearby terminals, turrets and machines |
+| K | Skills panel (spend skill points) |
+| V | Toggle isometric / first-person view |
 | M | Minimap |
 | P / Esc | Pause |
 
@@ -128,9 +135,9 @@ Left-side virtual joystick to move, drag right side of screen to look. Dedicated
 
 ## The game
 
-Five first-person missions, an optional legacy Analyst squad, and three weapons:
+Seven missions, an optional legacy Analyst squad, and three weapons:
 
-- **Missions** — archive clearance, the plant controller, the frost yard, the Starlight city district and a final glacier dock requiring both blue clearance and its controller defeat.
+- **Missions** — archive clearance, the plant controller, the frost yard, the Starlight city district and the glacier dock, the Skyline rooftop district and **SHADOW DOSSIER**, a fictional surveillance vault whose evidence files teach sourcing rules (no real accounts, people or agencies).
 - **Weapons** — Sidearm, Breacher shotgun (pellet spread), Redactor (rapid-fire).
 - **Enemies** — Mole, Disinfo Drone, Troll, Ice Pig Droid, and **THE FABRICATOR** controller.
 - **Tactical faction** — original grimdark sci-fi Fabricators expand with Null Wardens, Ash Auditors and Signal Reavers; no Games Workshop content.
