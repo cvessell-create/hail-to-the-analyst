@@ -73,7 +73,9 @@
   }
 
   function mount(win, corpus, options) {
-    const opts = { storageKey: 'hail-si-level1/v1', chatUrl: 'http://127.0.0.1:8790', hideSources: true, ...options };
+    // Served by the game server (local or tunnelled): use its same-origin /si proxy so remote players reach the host's SI.
+    const loc = win.location || {}, viaServer = /^https?:$/.test(loc.protocol || '') && !/github\.io$/.test(loc.hostname || '');
+    const opts = { storageKey: 'hail-si-level1/v1', chatUrl: viaServer ? '/si' : 'http://127.0.0.1:8790', hideSources: true, ...options };
     const doc = win.document, dlg = createDialogue(corpus);
     // Provenance for every line shown in game; citations stay out of game play when hideSources is set.
     const records = [];

@@ -7,22 +7,54 @@ const { createArena } = require('./arena.js');
 const { createHuggingFaceClient } = require('./huggingface.js');
 const Engine = require('../engine/core.js');
 const root = path.resolve(__dirname, '..');
-function createServer({ manual = false, hfClient = null } = {}) {
-  const arena = createArena(), rates = new Map();
+const PUBLIC_HOST = /^[a-z0-9-]+\.trycloudflare\.com$/;
+// Public mode (HAIL_PUBLIC=1) serves a Cloudflare quick tunnel: Hugging Face routes are closed and
+// the host's SI is reachable only through the rate-limited /si/chat and /si/status proxy.
+function createServer({ manual = false, hfClient = null, publicMode = process.env.HAIL_PUBLIC === '1',
+  siUrl = process.env.HAIL_SI_URL || 'http://127.0.0.1:8790', fetchImpl = globalThis.fetch } = {}) {
+  const arena = createArena(), rates = new Map(), siRates = new Map();
   const hf = hfClient || createHuggingFaceClient();
   const server = http.createServer(async (req, res) => {
     const json = (status, body) => {
       res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body));
     };
     try {
-      const host = req.headers.host;
-      if (!/^(127\.0\.0\.1|localhost|\[::1\]):\d+$/.test(host || '')) return json(403, { error: 'Local host required.' });
-      if (req.headers.origin && req.headers.origin !== `http://${host}`) return json(403, { error: 'Same-origin requests required.' });
-      const url = new URL(req.url, `http://${host}`), address = req.socket.remoteAddress;
+      const host = req.headers.host, remote = publicMode && PUBLIC_HOST.test(host || '');
+      if (!remote && !/^(127\.0\.0\.1|localhost|\[::1\]):\d+$/.test(host || '')) return json(403, { error: 'Local host required.' });
+      if (req.headers.origin && req.headers.origin !== `${remote ? 'https' : 'http'}://${host}`) return json(403, { error: 'Same-origin requests required.' });
+      const url = new URL(req.url, `http://${host}`);
+      const address = remote ? String(req.headers['cf-connecting-ip'] || 'tunnel') : req.socket.remoteAddress;
+      if (remote && url.pathname.startsWith('/api/hf/')) return json(403, { error: 'Hugging Face routes are local only.' });
       const rate = rates.get(address) || { start: Date.now(), count: 0 };
       if (Date.now() - rate.start > 1000) { rate.start = Date.now(); rate.count = 0; }
       rates.set(address, rate);
       if (++rate.count > 300) return json(429, { error: 'Local request budget exceeded.' });
+      if (url.pathname === '/si/status' || url.pathname === '/si/chat') {
+        const post = url.pathname === '/si/chat';
+        if (req.method !== (post ? 'POST' : 'GET')) return json(405, { error: 'Unsupported SI method.' });
+        let body;
+        if (post) {
+          const si = siRates.get(address) || { start: Date.now(), count: 0 };
+          if (Date.now() - si.start > 60000) { si.start = Date.now(); si.count = 0; }
+          siRates.set(address, si);
+          if (++si.count > 20) return json(429, { error: 'SI budget is 20 messages per minute.' });
+          if (!req.headers['content-type']?.startsWith('application/json')) return json(415, { error: 'JSON required.' });
+          body = '';
+          for await (const chunk of req) { body += chunk.toString('utf8'); if (body.length > 4096) return json(413, { error: 'Body exceeds 4096 bytes.' }); }
+          if (remote) {
+            // Remote testers' gameplay events stay out of the host's SI memory; only the chat text is forwarded.
+            let data; try { data = JSON.parse(body); } catch { return json(400, { error: 'Malformed JSON.' }); }
+            if (!data || typeof data.message !== 'string' || !data.message.trim()) return json(422, { error: 'A message is required.' });
+            body = JSON.stringify({ message: data.message.slice(0, 500), view: 'game' });
+          }
+        }
+        try {
+          const upstream = await fetchImpl(siUrl + (post ? '/chat' : '/status'), post ?
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(30000) } :
+            { signal: AbortSignal.timeout(5000) });
+          return json(upstream.status, await upstream.json());
+        } catch { return json(502, { error: 'SI service unavailable.' }); }
+      }
       if (url.pathname.startsWith('/api/')) {
         const token = (req.headers.authorization || '').replace(/^Bearer /, '');
         if (req.method === 'GET' && url.pathname === '/api/state') return json(200, arena.snapshot(token));

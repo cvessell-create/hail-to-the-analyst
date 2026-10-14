@@ -92,3 +92,37 @@ test('HTTP service serves only local assets and rejects unauthenticated, cross-o
   assert.equal(state.status, 200);
   assert.equal(JSON.stringify(await state.json()).includes(player.token), false);
 });
+test('public tunnel mode admits trycloudflare hosts, closes Hugging Face routes and proxies SI with a budget', async t => {
+  const http = require('node:http'), sent = [];
+  const fetchImpl = async (url, init = {}) => { sent.push([url, init.body]); return { status: 200, json: async () => ({ text: 'ok', url }) }; };
+  const { server } = createServer({ manual: true, publicMode: true, siUrl: 'http://si.test', fetchImpl });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const call = (path, { method = 'GET', host = 'beta-run.trycloudflare.com', body, origin, ip = '1.2.3.4' } = {}) => new Promise((resolve, reject) => {
+    const headers = { Host: host, 'cf-connecting-ip': ip };
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    if (origin) headers.Origin = origin;
+    const req = http.request({ port: server.address().port, path, method, headers }, res => {
+      let data = ''; res.on('data', c => { data += c; }); res.on('end', () => resolve({ status: res.statusCode, data }));
+    });
+    req.on('error', reject); if (body !== undefined) req.write(body); req.end();
+  });
+  assert.equal((await call('/index.html')).status, 200);
+  assert.equal((await call('/index.html', { host: 'evil.example.com' })).status, 403);
+  assert.equal((await call('/api/hf/status')).status, 403);
+  assert.equal((await call('/api/join', { method: 'POST', body: '{"name":"x"}', origin: 'https://evil.example.com' })).status, 403);
+  assert.equal((await call('/api/join', { method: 'POST', body: '{"name":"Remote analyst"}', origin: 'https://beta-run.trycloudflare.com' })).status, 201);
+  const status = await call('/si/status'); assert.equal(status.status, 200); assert.equal(JSON.parse(status.data).url, 'http://si.test/status');
+  for (let i = 0; i < 20; i++) assert.equal((await call('/si/chat', { method: 'POST', body: '{"message":"hi"}' })).status, 200);
+  assert.equal((await call('/si/chat', { method: 'POST', body: '{"message":"hi"}' })).status, 429);
+  assert.equal((await call('/si/chat', { method: 'POST', body: '{"message":"hi"}', ip: '5.6.7.8' })).status, 200);
+  assert.equal(sent.filter(([url]) => url === 'http://si.test/chat').length, 21);
+  assert.equal((await call('/si/chat', { method: 'POST', body: '{"event":{"kills":1}}', ip: '9.9.9.9' })).status, 422);
+  assert.equal((await call('/si/chat', { method: 'POST', body: '{"message":"yo","event":{"kills":1},"game":{"hp":1}}', ip: '9.9.9.9' })).status, 200);
+  assert.deepEqual(JSON.parse(sent.at(-1)[1]), { message: 'yo', view: 'game' });
+  const { server: local } = createServer({ manual: true });
+  await new Promise(resolve => local.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => local.close(resolve)));
+  const blocked = await new Promise(resolve => http.get({ port: local.address().port, path: '/', headers: { Host: 'beta-run.trycloudflare.com' } }, res => { res.resume(); resolve(res.statusCode); }));
+  assert.equal(blocked, 403);
+});

@@ -89,6 +89,19 @@ All currency is game-only and has no real-money value; no wallets, purchases or 
 GitHub Pages runs offline tools, not the Node multiplayer server.
 See the [engine contracts, math and limitations](engine/README.md).
 
+### Online beta (host's Mac, temporary link)
+
+Invited testers can play and join co-op through a Cloudflare quick tunnel to
+the host's machine. Run `HAIL_PUBLIC=1 npm start`, the SI chat service
+(`python -m vessell.si_chat serve` in VessellFramework) and Ollama, then
+`cloudflared tunnel --url http://127.0.0.1:8787` and share the printed
+`*.trycloudflare.com` link. Anyone with the link can connect; it stops when
+any of these processes stops. Public mode closes Hugging Face routes, limits
+SI chat to 20 messages per minute per visitor and forwards only chat text, so
+remote gameplay events stay out of the host's SI memory. Chat text itself is
+still logged locally by the SI service. Arena state is in memory and resets
+when the server restarts.
+
 **No build, no dependencies.** `index.html` is the entry point; keep its local `js/` and `css/` folders beside it. No network calls, remote assets or real LLM API. Open it in any modern browser:
 
 ```bash

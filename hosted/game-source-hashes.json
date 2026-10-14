@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "afe8c204b7a10aa05d2fed5fd036ef08975093fd8212b4dbc7ae161ab942f630"
+      "sha256": "3834b511af6bedd2fcdbafe5dd3a4ebb53a01d76d17990898286de8be05734c2"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -200,7 +200,7 @@
     },
     {
       "path": "engine/si-dialogue.js",
-      "sha256": "2795cc8f54790b1e06c065e59697790d54076879684e6715428b8b68e75b8985"
+      "sha256": "84148d716a66cb648bcafbe642c29039110d42c19087d059d2111824b27fdef2"
     },
     {
       "path": "engine/si-story-corpus.js",
@@ -328,7 +328,7 @@
     },
     {
       "path": "server/index.js",
-      "sha256": "e33a9bb22c435ae90af2f16988053f50d6c291302fb4dfac28f86c83b6f80985"
+      "sha256": "6ab4959fab964081ee963325974a644963fe709eeeba32f5c0207acb4b4d184d"
     },
     {
       "path": "server/request-clock.js",
@@ -340,7 +340,7 @@
     },
     {
       "path": "tests/arena.test.js",
-      "sha256": "0563d8d7ee230b27e6478e6d0d06678885c7380ad9b22cf3e8aecf81f9f9d536"
+      "sha256": "71d8b060735d58ac22017efa47279291d1cbb134f2efbcdbc705b7bb51575adf"
     },
     {
       "path": "tests/autonomous-agent.test.js",
