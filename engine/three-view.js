@@ -11,8 +11,12 @@
   var EYE = 0.5, LIFT = 0.25, ROOF_FRAC = 0.7, DOORS = 'DRB';
   var COLORS = { '#': [90, 93, 76], I: [135, 195, 230], N: [115, 36, 127], C: [188, 145, 101], T: [65, 114, 72],
     M: [77, 91, 93], S: [18, 29, 28], H: [235, 170, 20], R: [190, 35, 30], B: [30, 100, 210], D: [42, 110, 100],
-    X: [35, 150, 48], L: [104, 78, 96] };
-  var GLOW = { N: 0.35, S: 0.25, R: 0.2, B: 0.2, D: 0.15, X: 0.6 };
+    X: [35, 150, 48], L: [104, 78, 96],
+    // Vessell City tiles: brick, concrete/glass towers, archive paper, safehouse, archive, plant, skyline entrances.
+    K: [138, 75, 58], G: [154, 160, 166], W: [232, 224, 200], Y: [255, 199, 106], A: [53, 208, 208], Z: [90, 107, 122], V: [16, 24, 38] };
+  var GLOW = { N: 0.35, S: 0.25, R: 0.2, B: 0.2, D: 0.15, X: 0.6, Y: 0.35, A: 0.45, Z: 0.25, V: 0.3 };
+  // Isometric-only block heights so the city skyline reads; the first-person view stays uniform.
+  var ISO_HEIGHT = { L: 0.5, G: 2.2, W: 1.3, M: 1.2, K: 1.1 };
 
   function layout(map) {
     var walls = {}, doors = [], exits = [];
@@ -60,6 +64,10 @@
     else if (tile === 'N') { g.fillStyle = '#ff55c4'; g.fillRect(0, 0, 3, 32); g.fillRect(29, 0, 3, 32); }
     else if (tile === 'I') { g.fillStyle = '#dcf4ff'; g.fillRect(0, 0, 2, 32); g.fillRect(30, 0, 2, 32); }
     else if (tile === 'L') { g.fillStyle = css(1.45); g.fillRect(0, 0, 32, 2); g.fillRect(0, 16, 32, 1); }
+    else if (tile === 'K') { g.fillStyle = css(0.7); for (var br = 0; br < 32; br += 6) { g.fillRect(0, br, 32, 1); g.fillRect((br / 6) % 2 ? 6 : 20, br, 1, 6); } }
+    else if (tile === 'G' || tile === 'V') { g.fillStyle = '#ffc76a'; for (var wy = 4; wy < 30; wy += 8) for (var wx = 4; wx < 30; wx += 8) if ((wx * 3 + wy) % 5) g.fillRect(wx, wy, 4, 4); }
+    else if (tile === 'W') { g.fillStyle = '#35d0d0'; g.fillRect(0, 12, 32, 3); g.fillStyle = css(0.8); g.fillRect(4, 18, 4, 10); g.fillRect(14, 18, 4, 10); g.fillRect(24, 18, 4, 10); }
+    else if (tile === 'Y' || tile === 'A' || tile === 'Z') { g.fillStyle = css(0.45); g.fillRect(8, 6, 16, 26); g.fillStyle = css(1.6); g.fillRect(8, 2, 16, 3); }
     else if (DOORS.indexOf(tile) >= 0) { g.fillStyle = tile === 'R' ? '#ff7666' : tile === 'B' ? '#66baff' : '#7bffe0'; g.fillRect(0, 0, 3, 32); g.fillRect(29, 0, 3, 32); g.fillRect(0, 2, 32, 2); g.fillRect(22, 14, 4, 5); }
     var t = new THREE.CanvasTexture(cv);
     t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter;
@@ -153,7 +161,7 @@
   // pooled near the player, floor rings, enemy aim lasers and a shield dome.
   var ISO_OFFSET = [-10, 15, -10], ISO_VIEW = 6.2, SQ = Math.SQRT1_2;
   var RING = { player: 0x3dff7a, ally: 0x3d9bff, enemy: 0xff3030, boss: 0xffb020 };
-  var NEON = { N: 0xff3cc8, S: 0x30ff9a, R: 0xff3020, B: 0x3080ff, D: 0x30ffd8, X: 0x5dff7a, I: 0x9fe8ff };
+  var NEON = { N: 0xff3cc8, S: 0x30ff9a, R: 0xff3020, B: 0x3080ff, D: 0x30ffd8, X: 0x5dff7a, I: 0x9fe8ff, Y: 0xffc76a, A: 0x35d0d0, Z: 0x6fa8ff, V: 0xffc76a };
   var BODY = { DRONE: 0x8fa6b8, TROLL: 0xb04a3a, MOLE: 0x7a5a3a, ICE_PIG: 0xbfe6ff, FABRICATOR: 0xd08a20 };
   var PICK = { h: 0xff3a3a, k: 0xff4a4a, a: 0x6fb8ff, b: 0xffd27a, s: 0xffb04a, y: 0xffe030, n: 0x30a0ff, u: 0x40ff90,
     i: 0x71ff4e, r: 0xff3b30, q: 0x3489f0, j: 0xc0c0c0, v: 0xffa040 };
@@ -199,7 +207,7 @@
       world = new THREE.Group(); doorMeshes = []; neon = [];
       var plan = layout(map), th = theme(level), m4 = new THREE.Matrix4();
       Object.keys(plan.walls).forEach(function (tile) {
-        var cells = plan.walls[tile], h = tile === 'L' ? 0.5 : 1, geo = new THREE.BoxGeometry(1, h, 1);
+        var cells = plan.walls[tile], h = ISO_HEIGHT[tile] || 1, geo = new THREE.BoxGeometry(1, h, 1);
         var mat = material(THREE, doc, tile);
         var mesh = new THREE.InstancedMesh(geo, mat, cells.length);
         cells.forEach(function (c, i) { mesh.setMatrixAt(i, m4.makeTranslation(c[0] + 0.5, h / 2, c[1] + 0.5)); if (NEON[tile]) neon.push({ x: c[0] + 0.5, y: c[1] + 0.5, color: NEON[tile] }); });
@@ -321,5 +329,5 @@
 
   return { create: create, layout: layout, camera: camera, theme: theme, heightOf: heightOf,
     EYE: EYE, LIFT: LIFT, ROOF_FRAC: ROOF_FRAC, createIso: createIso, isoMove: isoMove, isoAngle: isoAngle,
-    ISO_OFFSET: ISO_OFFSET, ISO_HEADING: ISO_HEADING, scope: 'Presentation only; gameplay authority stays in index.html' };
+    ISO_OFFSET: ISO_OFFSET, ISO_HEADING: ISO_HEADING, ISO_HEIGHT: ISO_HEIGHT, scope: 'Presentation only; gameplay authority stays in index.html' };
 });

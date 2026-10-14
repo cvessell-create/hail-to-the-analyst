@@ -55,6 +55,22 @@
     SKILLS.forEach(function (s) { skills[s.id] = 0; });
     return { level: 1, xp: 0, points: 0, skills: skills, tactical: 0, energy: 100, augCd: { shockwave: 0, drone: 0, barrier: 0 }, hackCd: 0, caches: 0 };
   }
+  // Rebuild a hero from saved data, keeping only known fields within their limits.
+  function restore(raw) {
+    var h = create();
+    if (!raw || typeof raw !== 'object') return h;
+    var int = function (v, lo, hi, d) { return Number.isFinite(v) ? Math.max(lo, Math.min(hi, Math.floor(v))) : d; };
+    var num = function (v, lo, hi, d) { return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d; };
+    h.level = int(raw.level, 1, MAX_LEVEL, 1);
+    h.xp = num(raw.xp, 0, xpToNext(h.level), 0);
+    h.points = int(raw.points, 0, MAX_LEVEL * POINTS_PER_LEVEL + 999, 0);
+    h.caches = int(raw.caches, 0, 999, 0);
+    if (raw.skills && typeof raw.skills === 'object') SKILLS.forEach(function (s) { h.skills[s.id] = int(raw.skills[s.id], 0, SKILL_CAP, 0); });
+    h.tactical = num(raw.tactical, 0, TACTICAL.max, 0);
+    h.energy = num(raw.energy, 0, 10000, h.energy);
+    if (raw.gear && typeof raw.gear === 'object') h.gear = raw.gear;
+    return h;
+  }
   function xpToNext(level) { return 100 * level; }
   function gainXp(hero, amount) {
     var ups = 0;
@@ -153,7 +169,7 @@
   return {
     POINTS_PER_LEVEL: POINTS_PER_LEVEL, SKILL_CAP: SKILL_CAP, SKILLS: SKILLS, RECOMMENDED: RECOMMENDED, KILL_XP: KILL_XP, MISSION_XP: MISSION_XP,
     TYPES: TYPES, WEAK: WEAK, ROBOTS: ROBOTS, TACTICAL: TACTICAL, GRENADE: GRENADE, AUGMENTS: AUGMENTS, AIM_TELL: AIM_TELL, insideDome: insideDome, ENERGY_VIAL: ENERGY_VIAL, HACK: HACK, STRIKE: STRIKE,
-    create: create, xpToNext: xpToNext, gainXp: gainXp, spend: spend, autoSpend: autoSpend, attribute: attribute,
+    create: create, restore: restore, xpToNext: xpToNext, gainXp: gainXp, spend: spend, autoSpend: autoSpend, attribute: attribute,
     maxHp: maxHp, maxEnergy: maxEnergy, critChance: critChance, delayScale: delayScale, spreadScale: spreadScale,
     burdenSpeed: burdenSpeed, rollCooldownScale: rollCooldownScale, chargeGain: chargeGain,
     multiplier: multiplier, effectiveness: effectiveness, hit: hit, addCharge: addCharge, canGrenade: canGrenade,

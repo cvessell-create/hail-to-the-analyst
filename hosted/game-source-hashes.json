@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "77a8b7b70ccf71ebeb60035fca68b91914182038e24b7fd7d32337dbb544562b"
+      "sha256": "afe8c204b7a10aa05d2fed5fd036ef08975093fd8212b4dbc7ae161ab942f630"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -127,6 +127,10 @@
       "sha256": "ddc8f28f6ffd8ecb3a4e4084c48cccefc60e0057ceb8345b70cf71609d4b62f5"
     },
     {
+      "path": "engine/city.js",
+      "sha256": "b0dd070276030fbc9601e143176927000c372105d2e0ab74fd48e42826901950"
+    },
+    {
       "path": "engine/combat-assist.js",
       "sha256": "a73baf6e108017a5162313b46a5f48636fb2bd24be3907e5323dfdda5e0e8541"
     },
@@ -172,7 +176,7 @@
     },
     {
       "path": "engine/loadout.js",
-      "sha256": "dbcd03c77c1f1f1facf170f1309768eb56e0b88ccd59f4956f1cc632646dc0f8"
+      "sha256": "06e935d40435946cc9f89612462e082a29ac0532f1d1f4db09b9b26b694e5bff"
     },
     {
       "path": "engine/math.js",
@@ -184,7 +188,7 @@
     },
     {
       "path": "engine/progression.js",
-      "sha256": "19746d5cacef5b76ad356d8bf34c42bdb3a1e49b7e1cd36f1b8d63c9ca7ce780"
+      "sha256": "6ec66f8cca765bb280bf05900a98d137d8b14681c813d7fc964b5847fe3dd8b4"
     },
     {
       "path": "engine/seeded-rng.js",
@@ -220,7 +224,7 @@
     },
     {
       "path": "engine/three-view.js",
-      "sha256": "e7de5464c6bf150aa1474108d2f0ed78cbe66f6deb784b39c30531aa74e7da38"
+      "sha256": "436eadfad260ca478619ab6d69eede83a741767ac73fc12627cfa14d78c99d53"
     },
     {
       "path": "engine/weight-trace.js",
@@ -240,7 +244,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "3c73e64353aed644507eb8d101efb3881da24bd9b3d0eae6a2956d47a416fca4"
+      "sha256": "d178b259f80e93d429b8d02433d0cfbc2578be5639a6a004edb9a3e5e77e602f"
     },
     {
       "path": "js/emulation-engine.js",
@@ -343,6 +347,10 @@
       "sha256": "9edb6bd0c256f07c2539f700d7d9072d34a8212e78a6bd966947271d33d50515"
     },
     {
+      "path": "tests/city.test.js",
+      "sha256": "560a5d3697e61c9a25f365013db51f523c02e4a1d4fef4182ac0c88cf7069bd2"
+    },
+    {
       "path": "tests/deception-ops.test.js",
       "sha256": "de3fcb8e96d73e4a51be963eb28682639e1fb27697165b1ffe7e4c9d0f8e31bd"
     },
@@ -364,7 +372,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "b162b4c1daaac67edd791b517b02c083370c5c1154532b1e34a5a78c85cf5bd2"
+      "sha256": "b3a8b01820defc212fad1861df147c4de78d00f1a4a06181198723de2db33dec"
     },
     {
       "path": "tests/fx.test.js",

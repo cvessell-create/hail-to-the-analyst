@@ -8,10 +8,10 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 
-function game() {
+function game(opts = {}) {
   const nodes = new Map();
   const drawing = [];
-  const stored = new Map();
+  const stored = new Map(Object.entries(opts.stored || {}));
   const localStorage = {
     getItem(key) { return stored.has(key) ? stored.get(key) : null; },
     setItem(key, value) { stored.set(key, String(value)); },
@@ -55,6 +55,8 @@ function game() {
     VessellEngine: require('../engine/core.js'),
     HailSoloExpansion: require('../engine/solo-expansion.js'),
     HailCombat: require('../engine/combat-assist.js'),
+    HailCity: require('../engine/city.js'),
+    ...(opts.progression ? { HailProgression: require('../engine/progression.js'), HailLoadout: require('../engine/loadout.js') } : {}),
     console
   });
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -68,7 +70,8 @@ function game() {
       levels: () => levels, pickups: () => pickups,
       telemetry: gameplayData,
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine,
-      metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo
+      metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo, hero: () => hero, saveHero, maxHp,
+      enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice
     };
   `;
   const at=source.lastIndexOf('title();');
@@ -458,4 +461,93 @@ test('data and feedback dialog suspends gameplay and ignores gameplay shortcuts 
   g.nodes.get('gameDataClose').onclick();
   g.fps.update(1/60);
   assert.notEqual(JSON.stringify(g.fps.checkpoint()),before);
+});
+
+test('hero XP, skills and loadout persist locally and travel with campaign checkpoints',()=>{
+  const g=game({progression:true}),h=g.fps.hero();
+  h.level=4;h.skills.endurance=3;h.gear.credits=900;
+  const L=require('../engine/loadout.js');assert.ok(L.buy(h,'armor','shell').ok);assert.ok(L.upgrade(h,'armor').ok);
+  g.fps.saveHero();
+  const saved=g.stored.get('hail-analyst-profile/v1');assert.ok(saved);
+  const g2=game({progression:true,stored:{'hail-analyst-profile/v1':saved}}),h2=g2.fps.hero();
+  assert.equal(h2.level,4);assert.equal(h2.skills.endurance,3);assert.equal(h2.gear.equipped.armor,'shell');assert.equal(h2.gear.owned.armor.shell,1);
+  assert.equal(g2.fps.maxHp(),100+8*3+30);
+  g2.fps.loadLevel(0);const cp=g2.fps.checkpoint();assert.equal(cp.hero.gear.equipped.armor,'shell');
+  const g3=game({progression:true});g3.fps.restore(cp);assert.equal(g3.fps.hero().gear.equipped.armor,'shell');assert.equal(g3.fps.hero().level,4);
+});
+
+test('tampered profiles are clamped and unknown gear is dropped',()=>{
+  const bad=JSON.stringify({level:999,xp:-5,skills:{endurance:99,bogus:5},gear:{credits:-50,owned:{armor:{weave:42,fake:1}},equipped:{armor:'fake',deck:'lattice'}}});
+  const h=game({progression:true,stored:{'hail-analyst-profile/v1':bad}}).fps.hero();
+  assert.equal(h.level,30);assert.equal(h.xp,0);assert.equal(h.skills.endurance,10);assert.equal(h.skills.bogus,undefined);
+  assert.equal(h.gear.credits,0);assert.equal(h.gear.owned.armor.weave,3);assert.equal(h.gear.owned.armor.fake,undefined);
+  assert.equal(h.gear.equipped.armor,'jacket');assert.equal(h.gear.equipped.deck,'pocket');
+});
+
+test('a corrupt saved profile falls back to a fresh hero',()=>{
+  const h=game({progression:true,stored:{'hail-analyst-profile/v1':'{not json'}}).fps.hero();
+  assert.equal(h.level,1);assert.equal(h.gear.credits,100);
+});
+
+test('Vessell City is a free-roam hub after the campaign: entrances, gating, metro and return trips', () => {
+  const g = game(), f = g.fps, down = code => g.events.keydown({ code, preventDefault() {} });
+  const c = f.city();
+  assert.equal(c.campaign, 7); assert.equal(c.index, 7); assert.equal(f.levels()[7].name, 'VESSELL CITY');
+  assert.ok(g.nodes.get('card').innerHTML.includes('VESSELL CITY // FREE ROAM'), 'title offers the city without replacing DEPLOY');
+  f.telemetry.setConsent(true);
+  f.cityCard(); assert.ok(g.nodes.get('card').innerHTML.includes('— VESSELL CITY —'));
+  g.nodes.get('primary').onclick();
+  assert.equal(f.state(), 'play'); assert.equal(f.checkpoint().missionIndex, 7); assert.equal(f.practice(), true);
+  assert.equal(f.telemetry.events().filter(e => e.kind === 'attempt-start').length, 0, 'free roam starts no gameplay attempt');
+  f.enemies().forEach(e => { e.alive = false; });
+  const p = f.player();
+  // Metro Central -> Archive stop.
+  const m = f.metros(); assert.equal(m.length, 2);
+  p.x = m[0].x; p.y = m[0].y; down('KeyE'); assert.equal(f.trip().to, 1);
+  for (let i = 0; i < 90; i++) f.update(1 / 60);
+  assert.deepEqual([p.x, p.y], [m[1].x, m[1].y]);
+  // Plant is locked until the Archive is cleared.
+  Object.assign(p, { x: 23.5, y: 13.5, a: Math.PI / 2 }); f.use();
+  assert.equal(f.state(), 'play');
+  // Safehouse heals and saves.
+  Object.assign(p, { x: 4.5, y: 6.5, a: -Math.PI / 2, hp: 10 }); f.use();
+  assert.equal(p.hp, f.maxHp());
+  // Archive entrance opens the real mission briefing, then the mission.
+  Object.assign(p, { x: 6.5, y: 13.5, a: Math.PI / 2 }); f.use();
+  assert.equal(f.state(), 'brief'); assert.ok(g.nodes.get('card').innerHTML.includes('THE ARCHIVE'));
+  assert.ok(g.nodes.get('card').innerHTML.includes('BACK TO VESSELL CITY'));
+  g.nodes.get('primary').onclick(); assert.equal(f.state(), 'play'); assert.equal(f.checkpoint().missionIndex, 0);
+  assert.equal(f.telemetry.events().filter(e => e.kind === 'attempt-start').length, 1, 'district missions are normal practice attempts');
+  f.finishLevel();
+  assert.notEqual(f.state(), 'victory'); assert.deepEqual([...f.city().cleared], ['THE ARCHIVE']);
+  assert.ok(g.nodes.get('card').innerHTML.includes('RETURN TO VESSELL CITY'));
+  g.nodes.get('primary').onclick();
+  assert.equal(f.checkpoint().missionIndex, 7);
+  assert.deepEqual([f.player().x, f.player().y], [6.5, 13.5], 'returns to the entrance it left from');
+  // Plant now opens.
+  f.enemies().forEach(e => { e.alive = false; });
+  Object.assign(f.player(), { x: 23.5, y: 13.5, a: Math.PI / 2 }); f.use();
+  assert.equal(f.state(), 'brief'); assert.ok(g.nodes.get('card').innerHTML.includes('FABRICATION PLANT'));
+});
+
+test('city progress persists in the local hero profile and is sanitized', () => {
+  const g = game({ progression: true }), f = g.fps;
+  f.enterCity(); f.enemies().forEach(e => { e.alive = false; });
+  Object.assign(f.player(), { x: 6.5, y: 13.5, a: Math.PI / 2 }); f.use(); g.nodes.get('primary').onclick(); f.finishLevel();
+  const saved = JSON.parse(g.stored.get('hail-analyst-profile/v1'));
+  assert.deepEqual(saved.city, ['THE ARCHIVE']);
+  saved.city.push('NOWHERE', 'THE ARCHIVE', 7);
+  const g2 = game({ progression: true, stored: { 'hail-analyst-profile/v1': JSON.stringify(saved) } });
+  assert.deepEqual(g2.fps.city().cleared, ['THE ARCHIVE']);
+});
+
+test('dying in the city respawns at the safehouse; dying in a city mission offers the way back', () => {
+  const g = game(), f = g.fps;
+  f.enterCity(); f.die();
+  assert.ok(g.nodes.get('card').innerHTML.includes('RESPAWN AT SAFEHOUSE'));
+  g.nodes.get('primary').onclick(); assert.equal(f.checkpoint().missionIndex, 7);
+  f.enemies().forEach(e => { e.alive = false; });
+  Object.assign(f.player(), { x: 6.5, y: 13.5, a: Math.PI / 2 }); f.use(); g.nodes.get('primary').onclick();
+  f.die(); assert.ok(g.nodes.get('card').innerHTML.includes('RETURN TO VESSELL CITY'));
+  g.nodes.get('cityBack').onclick(); assert.equal(f.checkpoint().missionIndex, 7);
 });

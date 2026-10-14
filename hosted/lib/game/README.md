@@ -179,6 +179,27 @@ terrain, units and reachable destinations are shown in first person.
 | M | Minimap |
 | P / Esc | Pause |
 
+Your hero (level, XP, skills, credits and gear) is saved in this browser only, under the
+localStorage key `hail-analyst-profile/v1`. It is a game save, not telemetry: it has no
+player ID and is never sent anywhere. Campaign checkpoints carry the same hero snapshot.
+Autopilot runs never write it. To start fresh, clear that key from your browser's site data.
+
+### Vessell City (free roam, slice 1)
+
+**VESSELL CITY // FREE ROAM** on the title screen opens a walkable hub (`engine/city.js`).
+It works best in the isometric view (V). Face a district entrance and press **E**:
+
+- **Safehouse**: restores health and saves your hero.
+- **The Archive**: always open.
+- **Fabrication Plant**: opens once the Archive is cleared.
+- **Skyline District**: opens once the Plant is cleared.
+
+Metro Central rides to the Archive stop. Clearing a district from the city returns you to
+where you left. Dying in the city respawns you at the Safehouse.
+
+City runs are practice: they never complete the campaign. Free roam starts no gameplay
+attempt. Cleared districts are saved with the hero profile.
+
 ### FPS mobile controls
 
 Left-side virtual joystick to move, drag right side of screen to look. Dedicated **FIRE**, **WEAPON**, **USE**, and hold-to-fly **JET** buttons.

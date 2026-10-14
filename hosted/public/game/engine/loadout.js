@@ -61,6 +61,23 @@
     hero.gear = { credits: START_CREDITS, owned: owned, equipped: equipped, ui: { slot: 0, cursor: cursor } };
     return hero.gear;
   }
+  // Replace hero.gear with a validated copy: unknown items dropped, free items always owned.
+  function sanitize(hero) {
+    var raw = hero.gear; hero.gear = null;
+    var g = attach(hero);
+    if (!raw || typeof raw !== 'object') return g;
+    if (Number.isFinite(raw.credits)) g.credits = Math.max(0, Math.min(1e7, Math.floor(raw.credits)));
+    SLOTS.forEach(function (s) {
+      var own = raw.owned && raw.owned[s.id];
+      if (own && typeof own === 'object') Object.keys(own).forEach(function (id) {
+        if (find(s.id, id)) g.owned[s.id][id] = Number.isFinite(own[id]) ? Math.max(0, Math.min(MAX_UPGRADE, Math.floor(own[id]))) : 0;
+      });
+      var eq = raw.equipped && raw.equipped[s.id];
+      if (typeof eq === 'string' && eq in g.owned[s.id]) g.equipped[s.id] = eq;
+    });
+    return g;
+  }
+  function snapshot(hero) { var g = attach(hero); return { credits: g.credits, owned: JSON.parse(JSON.stringify(g.owned)), equipped: JSON.parse(JSON.stringify(g.equipped)) }; }
   function stat(hero, key) {
     if (!hero) return 0;
     var g = attach(hero), total = 0;
@@ -187,7 +204,7 @@
   return {
     MAX_UPGRADE: MAX_UPGRADE, START_CREDITS: START_CREDITS, MISSION_CREDITS: MISSION_CREDITS, KILL_CREDITS: KILL_CREDITS,
     SLOTS: SLOTS, ITEMS: ITEMS, CLAMP: CLAMP,
-    find: find, attach: attach, stat: stat, earn: earn, upgradeCost: upgradeCost, canUpgrade: canUpgrade,
+    find: find, attach: attach, sanitize: sanitize, snapshot: snapshot, stat: stat, earn: earn, upgradeCost: upgradeCost, canUpgrade: canUpgrade,
     buy: buy, equip: equip, upgrade: upgrade, activate: activate, key: key, layout: layout, click: click, panel: panel
   };
 });
