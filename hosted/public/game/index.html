@@ -419,7 +419,8 @@ refreshGameplayData('');title();
 card.insertAdjacentHTML('beforeend','<div class="small"><a href="engine/workbench.html">ENGINE WORKBENCH // EDITOR + CO-OP</a><br>Copyright 2026 Christopher R. Vessell. Combined engine/game distribution: GPL-3.0-or-later; no warranty. See <a href="COPYING-GPL-3">combined licence</a> and <a href="ATTRIBUTION.md">upstream and SRD credits</a>.</div>');
 requestAnimationFrame(loop);
 })();
-if(window.HailAutopilot&&window.location&&/[?&]autopilot=1\b/.test(window.location.search))window.HailAutopilot.start(window);
+if(window.HailAutopilot&&window.location&&/[?&]autopilot=1\b/.test(window.location.search))window.HailAutopilot.start(window)
+else if(window.HailSIDialogue&&window.HailStoryCorpus&&!/[?&]chat=0\b/.test(window.location.search||''))window.HailSIDialogue.mount(window,window.HailStoryCorpus,{});
 if(window.HailFX)window.HailFX.mount(window);
 </script>
 </body>
