@@ -124,7 +124,7 @@
     },
     {
       "path": "engine/autopilot.js",
-      "sha256": "fb198054afe89c33812cd766e3c9e2799837e88000fe02565ab924435387ea03"
+      "sha256": "05d257dd39d8bc885f0012de61c07c39d70b89539a17c517a29232ab92626567"
     },
     {
       "path": "engine/boss.js",
@@ -264,7 +264,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "163b0e8071ef10476f5d371752b0a2cdb217b64d2ef0be7c08f4e0cfa5111e3a"
+      "sha256": "722890a763878bdf2ad4c0394972a3824a76085c51fff7a8c1c759dd4b4ac330"
     },
     {
       "path": "js/emulation-engine.js",

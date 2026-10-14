@@ -263,8 +263,6 @@
     const nes = doc.querySelector('[aria-label*="NES"]');
     if (nes) nes.style.display = 'none';
 
-    // Steering assumes first-person key mapping; isometric view remaps movement.
-    if (typeof win.HailForceFirstPerson === 'function') win.HailForceFirstPerson();
     const si = win.HailSIDialogue && win.HailStoryCorpus
       ? win.HailSIDialogue.mount(win, win.HailStoryCorpus, { learner: () => learner, facts: () => facts }) : null;
     if (si) si.status(learner);

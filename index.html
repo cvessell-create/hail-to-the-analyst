@@ -123,10 +123,9 @@ var City=typeof HailCity!=='undefined'?HailCity:null,cityCleared=[],cityRun=fals
 var Combat=typeof HailCombat!=='undefined'?HailCombat:null,metros=[],metroTrip=null,hintPath=null,surroundInfo=null;
 var Prog=typeof HailProgression!=='undefined'?HailProgression:null,hero=Prog?Prog.create():null,Gear=typeof HailLoadout!=='undefined'?HailLoadout:null,gearOpen=false,skillsOpen=false,strikes=[],strikeT=3,grenades=[],allies=[],floaters=[],autoSkills=false;
 try{autoSkills=/[?&]autopilot=1\b/.test(window.location.search)}catch(_){}
-var viewMode='fp',iso=null,isoAim=null,tracers=[],barrier=null,lockFp=false;
-window.HailForceFirstPerson=function(){lockFp=true;viewMode='fp'};
+var viewMode='fp',iso=null,isoAim=null,tracers=[],barrier=null;
 function isoOn(){return viewMode==='iso'&&Boolean(iso)}
-function loadIso(){if(lockFp)return;if(iso){viewMode='iso';return}if(typeof HailThreeView==='undefined'||!HailThreeView.createIso||typeof document.createElement!=='function')return;function go(){try{iso=HailThreeView.createIso(THREE,{W:W,H:H,canvas:document.createElement('canvas')});if(lockFp)return;viewMode='iso';setMessage('ISOMETRIC VIEW. MOUSE AIMS. [V] SWITCHES VIEW.',3)}catch(err){iso=null;viewMode='fp'}}if(typeof THREE!=='undefined')return go();var sc=document.createElement('script');sc.src='vendor/three/three.iife.min.js';sc.onload=go;document.head.appendChild(sc)}
+function loadIso(){if(iso){viewMode='iso';return}if(typeof HailThreeView==='undefined'||!HailThreeView.createIso||typeof document.createElement!=='function')return;function go(){try{iso=HailThreeView.createIso(THREE,{W:W,H:H,canvas:document.createElement('canvas')});viewMode='iso';setMessage('ISOMETRIC VIEW. MOUSE AIMS. [V] SWITCHES VIEW.',3)}catch(err){iso=null;viewMode='fp'}}if(typeof THREE!=='undefined')return go();var sc=document.createElement('script');sc.src='vendor/three/three.iife.min.js';sc.onload=go;document.head.appendChild(sc)}
 try{if(!/[?&]view=fp\b/.test(window.location.search))loadIso()}catch(_){}
 function gs(k){return Gear&&hero?Gear.stat(hero,k):0}
 var PROFILE_KEY='hail-analyst-profile/v1',profileT=0;
