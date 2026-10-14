@@ -174,6 +174,7 @@ terrain, units and reachable destinations are shown in first person.
 | F / C / B | Augments: shockwave / drone / barrier dome (spend energy) |
 | H | Hack nearby terminals, turrets and machines |
 | K | Skills panel (spend skill points) |
+| I | Loadout panel: buy, equip and upgrade weapon mods, armor, tech, augmentations and cyberdecks with in-game credits (1–5 slot, ←→ browse, Enter buy/equip, U upgrade, or click) |
 | V | Toggle isometric / first-person view |
 | M | Minimap |
 | P / Esc | Pause |

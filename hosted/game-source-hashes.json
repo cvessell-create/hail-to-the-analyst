@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "786c2695b739d287f645ba1185bcbeeba74712c6e6393d92edb2267fa66a7192"
+      "sha256": "77a8b7b70ccf71ebeb60035fca68b91914182038e24b7fd7d32337dbb544562b"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -171,6 +171,10 @@
       "sha256": "bdfbff46417137cb62433a75e57d96753b6137dde03b2f14e1fa85ea1d499831"
     },
     {
+      "path": "engine/loadout.js",
+      "sha256": "dbcd03c77c1f1f1facf170f1309768eb56e0b88ccd59f4956f1cc632646dc0f8"
+    },
+    {
       "path": "engine/math.js",
       "sha256": "ab50286d55082a5504e2c176c48e61f05a9cc57976092a5f2b2cb079c971ac70"
     },
@@ -236,7 +240,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "85bd2c8eb1bfdb508d918edef89276d5821fcd0032f4931db56b5f6dc51bcb8e"
+      "sha256": "3c73e64353aed644507eb8d101efb3881da24bd9b3d0eae6a2956d47a416fca4"
     },
     {
       "path": "js/emulation-engine.js",
@@ -381,6 +385,10 @@
     {
       "path": "tests/huggingface.test.js",
       "sha256": "b7ce982c1e94ab6ea369a06dc7ea3ed46dc98987df18dc82f3b7129a306ba485"
+    },
+    {
+      "path": "tests/loadout.test.js",
+      "sha256": "1777db9180b6b8fc9c5add54855de5dcc069ac546f4dd2a1dbcac9f334ce0687"
     },
     {
       "path": "tests/nes-visual.test.js",
