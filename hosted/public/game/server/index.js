@@ -95,7 +95,9 @@ function createServer({ manual = false, hfClient = null, publicMode = process.en
       }
       if (req.method !== 'GET') return json(405, { error: 'GET required.' });
       let name;
-      try { name = decodeURIComponent(url.pathname === '/' ? '/engine/workbench.html' : url.pathname); }
+      // Playtesters on the public link land straight in the game; the workbench stays local-only.
+      const home = remote ? '/index.html' : '/engine/workbench.html';
+      try { name = decodeURIComponent(url.pathname === '/' ? home : url.pathname); }
       catch { return json(400, { error: 'Invalid URL encoding.' }); }
       if (!/^\/(index\.html|README\.md|LICENSE|COPYING-GPL-3|ATTRIBUTION\.md|engine\/[\w.-]+|js\/[\w.-]+|css\/[\w.-]+|vendor\/(jsnes|twgl|tsparticles|three|nova|augmented-ui)\/[\w.-]+|vendor\/fonts\/share-tech-mono\/[\w.-]+)$/.test(name)) {
         return json(404, { error: 'Unknown static file.' });

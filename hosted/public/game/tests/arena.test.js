@@ -108,6 +108,8 @@ test('public tunnel mode admits trycloudflare hosts, closes Hugging Face routes 
     req.on('error', reject); if (body !== undefined) req.write(body); req.end();
   });
   assert.equal((await call('/index.html')).status, 200);
+  const home = await call('/');
+  assert.equal(home.status, 200); assert.match(home.data, /<title>Hail to the Analyst<\/title>/);
   assert.equal((await call('/index.html', { host: 'evil.example.com' })).status, 403);
   assert.equal((await call('/api/hf/status')).status, 403);
   assert.equal((await call('/api/join', { method: 'POST', body: '{"name":"x"}', origin: 'https://evil.example.com' })).status, 403);

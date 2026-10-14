@@ -248,7 +248,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "998247e2a3c428ca9d98e64bece557c8e50a4dc90c00172609a6f9fb2caed1f6"
+      "sha256": "177d423381b6fc21424465dd85cfbb4ead139fde8de1b6792b738700cd2581eb"
     },
     {
       "path": "js/emulation-engine.js",
@@ -328,7 +328,7 @@
     },
     {
       "path": "server/index.js",
-      "sha256": "6ab4959fab964081ee963325974a644963fe709eeeba32f5c0207acb4b4d184d"
+      "sha256": "f374e8951bd49abf131acea36a5caba4e81675de1587767df953950b8708c9c0"
     },
     {
       "path": "server/request-clock.js",
@@ -340,7 +340,7 @@
     },
     {
       "path": "tests/arena.test.js",
-      "sha256": "71d8b060735d58ac22017efa47279291d1cbb134f2efbcdbc705b7bb51575adf"
+      "sha256": "b3893ef1f5e6d9815fe6cfbef4858328f9acdbc199848e8eea4a32040e5aee0f"
     },
     {
       "path": "tests/autonomous-agent.test.js",
