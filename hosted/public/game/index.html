@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
-<meta name="description" content="A self-contained retro first-person game about tracing sources and verifying information.">
+<meta name="description" content="A self-contained third-person isometric game about tracing sources and verifying information.">
 <link rel="icon" href="data:,">
 <title>Hail to the Analyst</title>
 <link rel="stylesheet" href="css/tactics.css">
@@ -52,7 +52,7 @@ body:has(#dock>#siChannel,#dock>#autopilotHud) #dock{display:flex}
 </head>
 <body>
 <div id="shell">
-<canvas id="game" width="960" height="540" tabindex="0" aria-label="Jack's first-person view. Tactical: arrows look, WASD step, Space attacks chosen target, E ends turn. Drag to look."></canvas>
+<canvas id="game" width="960" height="540" tabindex="0" aria-label="Jack's third-person isometric view. WASD moves, mouse aims, E interacts."></canvas>
 <div id="crt"></div><div id="vignette"></div>
 <div id="topbar"><button class="chip" id="mapBtn" aria-pressed="false" aria-label="Toggle live hex tactical minimap">HEX MAP [M]</button><button class="chip" id="muteBtn" aria-pressed="false">SOUND ON</button><button class="chip" id="pauseBtn">PAUSE</button></div>
 <div id="touch"><div id="look"></div><div id="joy" class="touchzone"><div class="nub"></div></div><button id="weapon" class="touchbtn">WEAPON</button><button id="use" class="touchbtn">USE</button><button id="fire" class="touchbtn">FIRE</button><button id="jet" class="touchbtn" aria-label="Hold to fly jetpack">JET</button></div>
@@ -124,10 +124,11 @@ var City=typeof HailCity!=='undefined'?HailCity:null,cityCleared=[],cityRun=fals
 var Combat=typeof HailCombat!=='undefined'?HailCombat:null,metros=[],metroTrip=null,hintPath=null,surroundInfo=null;
 var Prog=typeof HailProgression!=='undefined'?HailProgression:null,hero=Prog?Prog.create():null,Gear=typeof HailLoadout!=='undefined'?HailLoadout:null,gearOpen=false,skillsOpen=false,strikes=[],strikeT=3,grenades=[],allies=[],floaters=[],autoSkills=false;
 try{autoSkills=/[?&]autopilot=1\b/.test(window.location.search)}catch(_){}
-var viewMode='fp',iso=null,isoAim=null,tracers=[],barrier=null;
+var viewMode='iso',iso=null,isoAim=null,tracers=[],barrier=null,cameraError='';
 function isoOn(){return viewMode==='iso'&&Boolean(iso)}
-function loadIso(){if(iso){viewMode='iso';return}if(typeof HailThreeView==='undefined'||!HailThreeView.createIso||typeof document.createElement!=='function')return;function go(){try{iso=HailThreeView.createIso(THREE,{W:W,H:H,canvas:document.createElement('canvas')});viewMode='iso';setMessage('ISOMETRIC VIEW. MOUSE AIMS. [V] SWITCHES VIEW.',3)}catch(err){iso=null;viewMode='fp'}}if(typeof THREE!=='undefined')return go();var sc=document.createElement('script');sc.src='vendor/three/three.iife.min.js';sc.onload=go;document.head.appendChild(sc)}
-try{if(!/[?&]view=fp\b/.test(window.location.search))loadIso()}catch(_){}
+function cameraFailed(err){iso=null;cameraError='THIRD-PERSON CAMERA UNAVAILABLE: '+err.message;console.error(cameraError)}
+function loadIso(){if(iso)return;if(typeof HailThreeView==='undefined'||!HailThreeView.createIso||typeof document.createElement!=='function'){cameraFailed(new Error('renderer module missing'));return}function go(){try{iso=HailThreeView.createIso(THREE,{W:W,H:H,canvas:document.createElement('canvas')});cameraError='';setMessage('THIRD-PERSON VIEW LOCKED. MOUSE AIMS.',3)}catch(err){cameraFailed(err)}}if(typeof THREE!=='undefined')return go();var sc=document.createElement('script');sc.src='vendor/three/three.iife.min.js';sc.onload=go;sc.onerror=function(){cameraFailed(new Error('renderer script failed to load'))};document.head.appendChild(sc)}
+loadIso();
 function gs(k){return Gear&&hero?Gear.stat(hero,k):0}
 var PROFILE_KEY='hail-analyst-profile/v1',profileT=0;
 function heroSnapshot(){return hero?{level:hero.level,xp:hero.xp,points:hero.points,caches:hero.caches,skills:Object.assign({},hero.skills),tactical:hero.tactical,energy:hero.energy,gear:Gear?Gear.snapshot(hero):null,city:cityCleared.slice()}:null}
@@ -382,7 +383,8 @@ function renderIso(){ctx.save();var sx=shake?Math.sin(levelTime*97)*5:0,sy=shake
 function render(scene){
 var desiredHeight=scene&&cv.clientWidth&&cv.clientHeight?Math.round(W*cv.clientHeight/cv.clientWidth):540;
 if(H!==desiredHeight){H=desiredHeight;cv.height=H;ctx.imageSmoothingEnabled=false;}
-if(scene){HailTacticalRenderer.draw(ctx,cv,scene,W,H,FOV,NUM,zbuf,{wallColor:wallColor,drawEnemy:drawEnemy,drawPickup:drawPickup,drawWeapon:drawWeapon});return;}
+if(!isoOn()){ctx.fillStyle='#080d0d';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='16px Courier New';ctx.fillText(cameraError||'LOADING THIRD-PERSON CAMERA...',W/2,H/2);return;}
+if(scene){ctx.fillStyle='#080d0d';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='16px Courier New';ctx.fillText('LEGACY FIRST-PERSON TACTICAL VIEW DISABLED. USE TACTICAL ORDERS.',W/2,H/2);return;}
 if(isoOn())return renderIso();ctx.save();var sx=shake?Math.sin(levelTime*97)*5:0,sy=shake?Math.cos(levelTime*113)*3.5:0;ctx.translate(sx,sy);var L=levels[levelIndex],sky=ctx.createLinearGradient(0,0,0,H/2);sky.addColorStop(0,L.sky?L.sky[0]:L.outdoor?(L.theme==='city'?'#24234a':'#314568'):'#080d0d');sky.addColorStop(1,L.sky?L.sky[1]:L.outdoor?(L.theme==='city'?'#c78391':'#b9d8ed'):'#344039');ctx.fillStyle=sky;ctx.fillRect(-10,-10,W+20,H/2+10);HailSoloExpansion.backdrop(ctx,W,H,player.a,L.theme);if(typeof HailGatewaySprawl!=='undefined')HailGatewaySprawl.backdrop(ctx,W,H,player.a,L.theme);var floor=ctx.createLinearGradient(0,H/2,0,H);floor.addColorStop(0,L.floor?L.floor[0]:L.outdoor?(L.theme==='city'?'#6b5166':'#718fa5'):'#25261f');floor.addColorStop(1,L.floor?L.floor[1]:L.outdoor?(L.theme==='city'?'#211b2d':'#293e57'):'#060705');ctx.fillStyle=floor;ctx.fillRect(-10,H/2,W+20,H/2+10);
 if(L.theme==='city'){ctx.fillStyle='#d6a76d';ctx.font='900 24px Courier New';ctx.textAlign='center';for(var star=0;star<7;star++)ctx.fillText('*',star*150+((player.x*30)%150),H-90);}
 for(var col=0;col<NUM;col++){var cam=2*col/NUM-1,rayA=player.a+Math.atan(cam*Math.tan(FOV/2)),rdx=Math.cos(rayA),rdy=Math.sin(rayA),ray=VessellEngine.castRay(map,player.x,player.y,rayA,64,solid),low=null;if(ray.tile==='L'){low=ray;ray=VessellEngine.castRay(map,player.x,player.y,rayA,64,noRoof)}var side=ray.side,c=ray.tile||'#';var dist=Math.max(.03,ray.distance*Math.cos(rayA-player.a));zbuf[col]=dist;var line=Math.min(H*2,H/dist),top=(H-line)/2+(player.height||0)*.25*H/dist,hit=side===0?player.y+ray.distance*rdy:player.x+ray.distance*rdx,tx=hit-Math.floor(hit);ctx.fillStyle=wallColor(c,side,tx,top,dist);ctx.fillRect(col*2,top,2,line);if('DRB'.indexOf(c)>=0)drawDoorStrip(c,tx,col*2,top,line);if(c==='S'&&((col+(performance.now()/150|0))%17===0)){ctx.fillStyle='#65ff61';ctx.fillRect(col*2,top+line*.38,2,3)}if(low)drawRoofStrip(low,col,rayA,rdx,rdy)}
@@ -486,7 +488,7 @@ window.addEventListener('keydown',function(e){
   if(state==='play'&&hero&&Gear&&e.code==='KeyI'&&!e.repeat){gearOpen=!gearOpen;skillsOpen=false;return}
   if(state==='play'&&gearOpen){var gr=Gear.key(hero,e.code);if(gr){e.preventDefault();keys[e.code]=false;gearAct(gr);return}if(e.code==='Escape'){gearOpen=false;return}}
   if(state==='play'&&hero&&!skillsOpen&&!gearOpen){if(e.code==='KeyT')throwGrenade();if(e.code==='KeyF')augment('shockwave');if(e.code==='KeyC')augment('drone');if(e.code==='KeyB')augment('barrier');if(e.code==='KeyH')hack()}
-  if(state==='play'&&e.code==='KeyV'){if(isoOn())viewMode='fp';else loadIso()}
+  if(state==='play'&&e.code==='KeyV'){setMessage('THIRD-PERSON VIEW LOCKED.',3)}
   if(e.code==='KeyE')use();
   if(state==='play'&&Combat&&e.code==='KeyQ'){var rf=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),rs=(keys.KeyD?1:0)-(keys.KeyA?1:0);var im=isoOn()&&!autoSkills&&(rf||rs)?HailThreeView.isoMove(rf,rs):null;if(Combat.startRoll(player,im?Math.atan2(im.y,im.x):rf||rs?player.a+Math.atan2(rs,rf):player.a)){if(hero)player.rollCd*=Prog.rollCooldownScale(hero)*(1+gs('roll'));tone('pick')}}
   if(state==='play'&&Combat&&e.code==='KeyG'){hintPath=Combat.hint(window.HailCampaignState&&window.HailCampaignState(),window.HailAutopilot);setMessage(hintPath?'ROUTE TO '+hintPath.kind.toUpperCase()+' MARKED ON RADAR.':'NO ROUTE AVAILABLE.',2)}

@@ -110,7 +110,7 @@ test('hex scene preserves neighbour parity, equal spacing and shared polygon edg
   }
 });
 
-test('shared renderer accepts tactical scene before FPS exists and never mutates either rules or FPS state', () => {
+test('legacy tactical scenes cannot restore first-person camera or mutate rules and campaign state', () => {
   const g = game();
   g.fps.startTactics(0);
   assert.equal(g.fps.player(), undefined);
@@ -118,9 +118,8 @@ test('shared renderer accepts tactical scene before FPS exists and never mutates
   g.fps.loop(1000);
   assert.equal(JSON.stringify(battle), before);
   assert.equal(g.fps.player(), undefined);
-  assert.ok(g.drawing.some(c => c.name === 'fillText' && c.args[0].includes('JACK’S VIEW')));
-  assert.ok(g.drawing.some(c => c.name === 'fillText' && c.args[0] === 'BREACH OBJECTIVE'));
-  assert.ok(g.drawing.some(c => c.name === 'lineTo'));
+  assert.ok(g.drawing.some(c => c.name === 'fillText' && c.args[0].startsWith('THIRD-PERSON CAMERA UNAVAILABLE:')));
+  assert.ok(!g.drawing.some(c => c.name === 'fillText' && c.args[0].includes('JACK’S VIEW')));
   const scene = g.ui.scene();
   assert.equal(scene.tiles.length, battle.width * battle.height);
   assert.ok(scene.sprites.some(s => s.o.side === 'analyst'));
@@ -134,7 +133,7 @@ test('shared renderer accepts tactical scene before FPS exists and never mutates
   canvas.clientWidth = 390; canvas.clientHeight = 844;
   g.fps.render(scene);
   assert.equal(canvas.height, Math.round(960 * 844 / 390));
-  g.fps.render(); // Original renderer still accepts no adapter.
+  g.fps.render();
   assert.equal(canvas.height, 540);
 });
 

@@ -2,14 +2,18 @@
 
 [![PLAY](play-button.svg)](https://cvessell-create.github.io/hail-to-the-analyst/)
 
-## Hosted continuation and first-person
+## Hosted continuation and locked third-person camera
 
 All seven solo campaign missions enter play directly. Desktop browsers default to an
-isometric Three.js view (`V` toggles first person; `?view=fp` forces it); the
-autopilot always uses first person. The original hex-grid
+third-person isometric Three.js view, including autopilot. `V` cannot change
+the camera and legacy `?view=fp` URLs no longer override it. Camera loading or
+WebGL failures show an explicit error instead of a first-person fallback.
+Legacy tactical checkpoints retain their orders/tools, but their first-person
+canvas presentation is disabled rather than overriding the camera lock.
+The original hex-grid
 prototype remains only for legacy checkpoint compatibility and optional tools.
 The story is a civilian training simulation, not a political attribution.
-Both renderers are presentation only; gameplay stays in `index.html`; the NES companion
+The camera is presentation only; gameplay stays in `index.html`; the NES companion
 display was removed from the UI (`engine/nes-visual.js` remains as a tested module).
 
 Press **M** or tap **HEX MAP** during play for the live hex tactical minimap
@@ -27,7 +31,7 @@ source is also included, but is not needed to run the offline campaign.
 The consolidated update includes the prominent Play button, collision-aware
 hosted movement prediction, live hex minimap fixes, and optional first-person
 tactical practice with a clearly fictional archive-routing Easter egg. All
-branch histories are retained; normal solo missions still enter FPS directly.
+branch histories are retained; normal solo missions enter third-person play directly.
 
 **FOOTPRINT PURGE** is an optional side quest in Gateway Sprawl (also available in practice select), separate from the seven-mission campaign. Its eight fictional exposure nodes (`e`) represent simulated records. Hard nodes require standing still for 1.5 seconds; impossible nodes are LOCKED DOWN (containment, not deletion) and count as handled. Each node and category carries generic fix guidance, shown in the briefing and scrub message. Availability varies and real-world removal is not guaranteed. Two critical nodes gate the exit; optional scrubs also earn intel (critical/high/medium/low: 1000/750/500/250). Red/orange/yellow/grey nodes and the FOOTPRINTS HUD show progress. All invented service domains end in `.example`; no real accounts or services are modified. Existing SI autopilot episode events add only `footprints: [{id, category, severity, difficulty, t}]` in scrub order and `footprints_total: 8` for this mission; `difficulty` is `easy|medium|hard|impossible`; `t` is simulation seconds since level start. Other mission events are unchanged.
 

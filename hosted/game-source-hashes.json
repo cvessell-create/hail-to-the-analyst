@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d90ff87cd32bb1037879beaf8aca08f4c446f99be136729c3a37543557714b0e"
+      "sha256": "8b03cd12b0bc66a8a9dcfd4eb0896034d6b5fbb61cb849ba8f81240a09184f9f"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "11e5d6435d9bf06ad48a62cd1a4fa769c6fc7647941dcfb534fb8a1f482f5c8a"
+      "sha256": "0e5bbf29932337706ce207147d55bca6716150412ebe615329474725d16ea677"
     },
     {
       "path": "engine/aug-frames.js",
@@ -268,7 +268,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "3b5ca3b842032281a52c37c98492ac3b89228b94922bb0ab1ebf05af7fa6b6d9"
+      "sha256": "e0892ae3ff0dbd09f1d60e09b6ad9cb04f26cba745c4ac94e10fbf443f4cdd0f"
     },
     {
       "path": "js/emulation-engine.js",
@@ -404,7 +404,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "091e809cce17547b0bfb825d07bc81a4edd500e05e0e698911fd586276e2ee0c"
+      "sha256": "93ab835068a471518daf620d86af40a3b9614383527eb1fb8cb5373b688ad329"
     },
     {
       "path": "tests/fx.test.js",
@@ -468,7 +468,7 @@
     },
     {
       "path": "tests/tactical-view.test.js",
-      "sha256": "175cbd119005dccde7e04cd56346faea7d105f335d4818ff484485834d599bec"
+      "sha256": "181d40e5e78d8ea8ffc6794fc44488631c92542ef9416d0b5492f0163203d1aa"
     },
     {
       "path": "tests/tactics.test.js",

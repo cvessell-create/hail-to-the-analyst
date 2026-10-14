@@ -2,8 +2,10 @@
 
 ## Current continuation
 
-Both solo missions are first-person; the former mandatory tactical grid is
-retained only for legacy checkpoint compatibility. The hosted app and mirror
+Solo campaign missions use a locked third-person isometric camera, including
+autopilot. Legacy first-person URLs and the V key cannot switch it; renderer
+failures show an error instead of falling back. Legacy tactical orders remain,
+but their first-person campaign-canvas presentation is disabled. The hosted app and mirror
 contract are documented in [the repair handoff](../hosted/GAME_REPAIR.md).
 Game credits have actual auction purchasing effects but no real-money value.
 Relay, armour and ammo inventory allocations equip on replay with proportional
@@ -214,5 +216,4 @@ Reviewed accessible descriptions, not full proofs of every original paper:
   reviewed geometric-mean priorities and initial-one allocation.
   Dean's harmonic threshold is the explicit formula above; no claim of reading
   Dean's original paper or validating political fairness is made.
-
 

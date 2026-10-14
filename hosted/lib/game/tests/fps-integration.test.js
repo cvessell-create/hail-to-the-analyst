@@ -18,7 +18,7 @@ function game(opts = {}) {
     removeItem(key) { stored.delete(key); }
   };
   const canvas = {
-    save() {}, restore() {}, translate() {}, rotate() {},
+    save() {}, restore() {}, translate() {}, rotate() {}, drawImage() {}, clip() {},
     beginPath() { drawing.push({kind:'beginPath'}); },
     closePath() { drawing.push({kind:'closePath'}); },
     moveTo(...args) { drawing.push({kind:'moveTo',args}); },
@@ -46,9 +46,13 @@ function game(opts = {}) {
   const events = {};
   let approach;
   const context = vm.createContext({
-    document: { getElementById: node, ...(opts.iso ? { createElement: () => ({}) } : {}) },
+    document: { getElementById: node, ...(opts.noCamera ? {} : { createElement: () => ({}) }) },
     window: { localStorage, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; }, ...(opts.search ? { location: { search: opts.search } } : {}) },
-    ...(opts.iso ? { THREE: {}, HailThreeView: { ...require('../engine/three-view.js'), createIso: () => ({ aimAt: () => null, project: () => ({ x: 0, y: 0 }) }) } } : {}),
+    ...(opts.noCamera ? {} : { THREE: {}, HailThreeView: { ...require('../engine/three-view.js'), createIso: () => {
+      if(opts.cameraFailure)throw new Error('WebGL unavailable');
+      return { canvas: {}, render: scene => drawing.push({kind:'iso',scene}),
+        aimAt: () => null, project: () => ({ x: 0, y: 0 }) };
+    } } }),
     HailGameplayData: require('../engine/gameplay-data.js'),
     TacticalUI: { start(card, mission, jack, callback) { approach = { mission, jack, callback }; } },
     performance: { now() { return 1000; } },
@@ -85,7 +89,7 @@ function game(opts = {}) {
   return { fps: context.fps, nodes, events, drawing, stored, approach: () => approach };
 }
 
-test('all seven campaign missions enter first-person play directly and victory follows the final map', () => {
+test('all seven campaign missions enter third-person play directly and victory follows the final map', () => {
   const g = game();
   g.nodes.get('muteBtn').onclick();
   g.fps.briefing(0);
@@ -93,6 +97,7 @@ test('all seven campaign missions enter first-person play directly and victory f
   assert.match(g.nodes.get('card').innerHTML, /APPARATUS LAYER \/\/ DIRECTION/);
   g.nodes.get('primary').onclick();
   assert.equal(g.fps.state(), 'play');
+  assert.equal(g.fps.isoOn(), true);
   assert.equal(g.approach(), undefined);
   g.fps.player().armor = 20;
   g.fps.finishLevel(); g.nodes.get('primary').onclick(); g.nodes.get('primary').onclick();
@@ -299,7 +304,7 @@ test('jetpack and fuel pickups drive flight, ground avoidance and bounded landin
   p.x=4.5;p.y=2.5;g.fps.update(1/60);assert.ok(Math.abs(p.fuel-fuel-35)<1e-8);
 });
 
-test('rooftops block walkers, carry hovering players, stop low shots and render as a low wall', () => {
+test('rooftops block walkers, carry hovering players and reach the third-person renderer', () => {
   const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(5);
   const p=g.fps.player(),map=g.fps.levels()[5].map,y=5,x=map[y].indexOf('L');
   assert.ok(x>0);
@@ -312,7 +317,30 @@ test('rooftops block walkers, carry hovering players, stop low shots and render 
   for(let i=0;i<120;i++)g.fps.update(1/60);
   assert.equal(p.height,.9,'player lands on the roof, not the street');
   g.drawing.length=0;p.a=0;p.x=x-1.5;p.height=0;g.fps.render();
-  assert.ok(g.drawing.some(d=>d.color==='rgba(255,170,220,0.89)'||String(d.color).startsWith('rgba(255,170,220')),'roof cap line drawn');
+  assert.ok(g.drawing.some(d=>d.kind==='iso'&&d.scene.map[y][x]==='L'),'roof tile supplied to isometric renderer');
+});
+
+test('third-person camera survives V, old first-person URLs and mission reloads', () => {
+  const g=game({search:'?autopilot=1&view=fp'});
+  g.fps.loadLevel(0);
+  assert.equal(g.fps.isoOn(),true);
+  g.events.keydown({code:'KeyV'});
+  assert.equal(g.fps.isoOn(),true);
+  g.fps.loadLevel(1);
+  assert.equal(g.fps.isoOn(),true);
+  g.fps.render();
+  assert.ok(g.drawing.some(d=>d.kind==='iso'));
+});
+
+test('missing or failed third-person renderer shows an error instead of first-person fallback', () => {
+  for(const options of [{noCamera:true},{cameraFailure:true}]){
+    const g=game(options);
+    g.fps.loadLevel(0);g.drawing.length=0;g.fps.render();
+    assert.equal(g.fps.isoOn(),false);
+    assert.ok(g.drawing.some(d=>d.kind==='text'&&d.text.startsWith('THIRD-PERSON CAMERA UNAVAILABLE:')));
+    assert.ok(!g.drawing.some(d=>d.kind==='iso'));
+    assert.ok(!g.drawing.some(d=>d.kind==='text'&&d.text.startsWith('JET')));
+  }
 });
 test('jet fuel carries to the next mission and retries do not stack it; old checkpoints remain playable', () => {
   const g=game();g.nodes.get('muteBtn').onclick();g.fps.loadLevel(0);
@@ -620,7 +648,7 @@ test('dying in the city respawns at the safehouse; dying in a city mission offer
   g.nodes.get('cityBack').onclick(); assert.equal(f.checkpoint().missionIndex, f.city().index);
 });
 
-test('autopilot runs in the isometric view with the same tank steering it uses in first person', () => {
+test('autopilot keeps tank steering in locked third-person even with a legacy URL', () => {
   const step = (opts) => {
     const g = game(opts), f = g.fps; f.loadLevel(0);
     Object.assign(f.player(), { a: 0 }); const x0 = f.player().x, y0 = f.player().y;
@@ -628,9 +656,9 @@ test('autopilot runs in the isometric view with the same tank steering it uses i
     return { iso: f.isoOn(), dx: f.player().x - x0, dy: f.player().y - y0, a: f.player().a };
   };
   const fp = step({ search: '?autopilot=1&view=fp' }), auto = step({ search: '?autopilot=1', iso: true }), human = step({ search: '?', iso: true });
-  assert.equal(fp.iso, false); assert.equal(auto.iso, true, 'autopilot no longer forces first person');
+  assert.equal(fp.iso, true); assert.equal(auto.iso, true, 'autopilot stays third-person');
   assert.ok(fp.dx > 0 && Math.abs(fp.dy) < 1e-9);
-  assert.deepEqual([auto.dx, auto.dy, auto.a], [fp.dx, fp.dy, fp.a], 'W walks along the facing in both views');
+  assert.deepEqual([auto.dx, auto.dy, auto.a], [fp.dx, fp.dy, fp.a], 'legacy URL does not change autopilot steering');
   assert.ok(human.iso && Math.abs(human.dy) > 1e-6, 'a human in isometric still moves screen-relative');
 });
 
