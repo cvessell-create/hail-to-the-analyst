@@ -65,13 +65,14 @@ function createServer({ manual = false, hfClient = null } = {}) {
       let name;
       try { name = decodeURIComponent(url.pathname === '/' ? '/engine/workbench.html' : url.pathname); }
       catch { return json(400, { error: 'Invalid URL encoding.' }); }
-      if (!/^\/(index\.html|README\.md|LICENSE|COPYING-GPL-3|ATTRIBUTION\.md|engine\/[\w.-]+|js\/[\w.-]+|css\/[\w.-]+|vendor\/(jsnes|twgl|tsparticles|three)\/[\w.-]+)$/.test(name)) {
+      if (!/^\/(index\.html|README\.md|LICENSE|COPYING-GPL-3|ATTRIBUTION\.md|engine\/[\w.-]+|js\/[\w.-]+|css\/[\w.-]+|vendor\/(jsnes|twgl|tsparticles|three|nova|augmented-ui)\/[\w.-]+|vendor\/fonts\/share-tech-mono\/[\w.-]+)$/.test(name)) {
         return json(404, { error: 'Unknown static file.' });
       }
       const file = path.join(root, name);
       if (!fs.existsSync(file) || !fs.statSync(file).isFile()) return json(404, { error: 'Static file not found.' });
       const extensions = { '.html': 'text/html', '.js': 'text/javascript', '.cjs': 'text/javascript', '.css': 'text/css' };
-      res.writeHead(200, { 'Content-Type': `${extensions[path.extname(file)] || 'text/plain'}; charset=utf-8`,
+      const ext = path.extname(file);
+      res.writeHead(200, { 'Content-Type': ext === '.woff2' ? 'font/woff2' : `${extensions[ext] || 'text/plain'}; charset=utf-8`,
         'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store' });
       const stream = fs.createReadStream(file);
       stream.on('error', error => { console.error('Static read failed:', error); res.destroy(); });

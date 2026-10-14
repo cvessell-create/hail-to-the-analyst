@@ -1,0 +1,62 @@
+/*
+ * Adapted from Nova - Cyberpunk AI Chatbot, static/style.css
+ * https://github.com/dragonpilee/Nova---Cyberpunk-AI-Chatbot
+ * commit 68b938ce656519fdd21c71ef7f6e56e38fb45473
+ * MIT License, Copyright (c) 2025 Alan Cyril. See vendor/nova/LICENSE.
+ *
+ * Font: Share Tech Mono (OFL-1.1, Carrois Type Design) is served locally from
+ * vendor/fonts/share-tech-mono/ instead of Google Fonts.
+ *
+ * Modified: selectors remapped from Nova's #chatbox / #chat-form / header to the
+ * SI chat panel (#siChannel, #siAsk, #siHead); the page
+ * background, Tailwind helper classes and button rules were dropped; animations
+ * are disabled under prefers-reduced-motion.
+ */
+@font-face {
+  font-family: 'Share Tech Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/share-tech-mono/share-tech-mono-latin-400-normal.woff2') format('woff2');
+}
+#siChannel {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  background: rgba(17, 17, 34, 0.95);
+  border: 2px solid #39ff14;
+  border-radius: 6px;
+  box-shadow: 0 0 24px #00ffff55, 0 0 64px #ff00ff22 inset;
+  animation: nova-flicker 2s infinite alternate;
+}
+@keyframes nova-flicker {
+  0%, 100% { box-shadow: 0 0 24px #00ffff55, 0 0 64px #ff00ff22 inset; }
+  50% { box-shadow: 0 0 32px #ff00ff99, 0 0 80px #39ff1444 inset; }
+}
+#siChannel #siHead {
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 0 16px #ff00ff, 0 0 32px #00ffff;
+  animation: nova-glitch 1.5s infinite linear alternate-reverse;
+}
+@keyframes nova-glitch {
+  0% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+  20% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
+  40% { text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff; }
+  60% { text-shadow: -2px -2px #ff00ff, 2px 2px #00ffff; }
+  80% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+  100% { text-shadow: 0 0 16px #ff00ff, 0 0 32px #00ffff; }
+}
+#siChannel #siAsk {
+  background: rgba(0, 0, 0, 0.8);
+  color: #39ff14;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 8px #00ffff;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+#siChannel #siAsk:focus {
+  border: 2px solid #ff00ff;
+  box-shadow: 0 0 16px #ff00ff;
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #siChannel, #siChannel #siHead { animation: none; }
+}

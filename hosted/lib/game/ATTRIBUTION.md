@@ -134,3 +134,21 @@ unmodified npm package files with their licence and package metadata retained.
 `engine/three-view.js` is original presentation code. Visual direction follows
 generic isometric twin-stick conventions; no assets, names or UI from other games
 are used.
+
+## SI chat panel styling, October 13, 2026
+
+`vendor/nova/nova-chat.css` is adapted from `static/style.css` of
+[Nova - Cyberpunk AI Chatbot](https://github.com/dragonpilee/Nova---Cyberpunk-AI-Chatbot)
+(commit `68b938c`, MIT, Copyright (c) 2025 Alan Cyril); its licence is kept at
+`vendor/nova/LICENSE`. Selectors were remapped to the SI chat panel, page-wide rules
+were dropped, and animations honour `prefers-reduced-motion`. No Nova code, prompt,
+model or API client is used. The panel font, Share Tech Mono, is
+`vendor/fonts/share-tech-mono/` from npm `@fontsource/share-tech-mono` 5.3.0
+(OFL-1.1, Copyright (c) 2012 Carrois Type Design), served locally.
+
+## HUD frames (augmented-ui), October 13, 2026
+
+`vendor/augmented-ui/augmented-ui.min.css` is augmented-ui 2.0.0 by James0x57 / PropJockey
+(https://github.com/propjockey/augmented-ui), BSD 2-Clause License, copyright (c) 2020;
+the full licence is in `vendor/augmented-ui/LICENSE`. `engine/aug-frames.js` applies it to
+existing panels and buttons; the CSS file is unmodified.

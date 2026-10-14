@@ -1,0 +1,3 @@
+// Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: Apache-2.0
+// Tags HUD/dock panels so vendor/augmented-ui (BSD-2-Clause) draws clipped sci-fi frames.
+(function(){var sel='.chip,.action,#siChannel,#autopilotHud,#dockTools button,#gameDataPanel';function tag(){document.querySelectorAll(sel).forEach(function(e){if(!e.hasAttribute('data-augmented-ui'))e.setAttribute('data-augmented-ui','tl-clip br-clip border')})}function go(){if(!document.querySelectorAll||!document.body)return;tag();if(window.MutationObserver)new MutationObserver(tag).observe(document.body,{childList:true,subtree:true})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();

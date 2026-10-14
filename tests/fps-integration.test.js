@@ -46,8 +46,9 @@ function game(opts = {}) {
   const events = {};
   let approach;
   const context = vm.createContext({
-    document: { getElementById: node },
-    window: { localStorage, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; } },
+    document: { getElementById: node, ...(opts.iso ? { createElement: () => ({}) } : {}) },
+    window: { localStorage, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; }, ...(opts.search ? { location: { search: opts.search } } : {}) },
+    ...(opts.iso ? { THREE: {}, HailThreeView: { ...require('../engine/three-view.js'), createIso: () => ({ aimAt: () => null, project: () => ({ x: 0, y: 0 }) }) } } : {}),
     HailGameplayData: require('../engine/gameplay-data.js'),
     TacticalUI: { start(card, mission, jack, callback) { approach = { mission, jack, callback }; } },
     performance: { now() { return 1000; } },
@@ -71,7 +72,7 @@ function game(opts = {}) {
       telemetry: gameplayData,
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine,
       metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo, hero: () => hero, saveHero, maxHp,
-      enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice
+      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice
     };
   `;
   const at=source.lastIndexOf('title();');
@@ -550,4 +551,18 @@ test('dying in the city respawns at the safehouse; dying in a city mission offer
   Object.assign(f.player(), { x: 6.5, y: 13.5, a: Math.PI / 2 }); f.use(); g.nodes.get('primary').onclick();
   f.die(); assert.ok(g.nodes.get('card').innerHTML.includes('RETURN TO VESSELL CITY'));
   g.nodes.get('cityBack').onclick(); assert.equal(f.checkpoint().missionIndex, 7);
+});
+
+test('autopilot runs in the isometric view with the same tank steering it uses in first person', () => {
+  const step = (opts) => {
+    const g = game(opts), f = g.fps; f.loadLevel(0);
+    Object.assign(f.player(), { a: 0 }); const x0 = f.player().x, y0 = f.player().y;
+    f.keys().KeyW = true; f.update(0.1);
+    return { iso: f.isoOn(), dx: f.player().x - x0, dy: f.player().y - y0, a: f.player().a };
+  };
+  const fp = step({ search: '?autopilot=1&view=fp' }), auto = step({ search: '?autopilot=1', iso: true }), human = step({ search: '?', iso: true });
+  assert.equal(fp.iso, false); assert.equal(auto.iso, true, 'autopilot no longer forces first person');
+  assert.ok(fp.dx > 0 && Math.abs(fp.dy) < 1e-9);
+  assert.deepEqual([auto.dx, auto.dy, auto.a], [fp.dx, fp.dy, fp.a], 'W walks along the facing in both views');
+  assert.ok(human.iso && Math.abs(human.dy) > 1e-6, 'a human in isometric still moves screen-relative');
 });

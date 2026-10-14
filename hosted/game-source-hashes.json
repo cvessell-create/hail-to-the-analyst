@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "1c895d29611d9dc27d4ed5b547daa326748232703c29cc474e769b572b850c63"
+      "sha256": "dd216662447ff9294db0b2532d290da4dc6d75ab5041931a2d4a62abce334287"
     },
     {
       "path": "COPYING-GPL-3",
@@ -117,6 +117,10 @@
     {
       "path": "engine/README.md",
       "sha256": "11e5d6435d9bf06ad48a62cd1a4fa769c6fc7647941dcfb534fb8a1f482f5c8a"
+    },
+    {
+      "path": "engine/aug-frames.js",
+      "sha256": "11acb6098686977d112b160ff09ec9251abc8027bdf7f853311aacbc2bc6ea13"
     },
     {
       "path": "engine/autopilot.js",
@@ -244,7 +248,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "d178b259f80e93d429b8d02433d0cfbc2578be5639a6a004edb9a3e5e77e602f"
+      "sha256": "998247e2a3c428ca9d98e64bece557c8e50a4dc90c00172609a6f9fb2caed1f6"
     },
     {
       "path": "js/emulation-engine.js",
@@ -324,7 +328,7 @@
     },
     {
       "path": "server/index.js",
-      "sha256": "8fe6eeb143de400403a5e76660714ae43503dda0a0061d357708481d7599d189"
+      "sha256": "e33a9bb22c435ae90af2f16988053f50d6c291302fb4dfac28f86c83b6f80985"
     },
     {
       "path": "server/request-clock.js",
@@ -372,7 +376,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "b3a8b01820defc212fad1861df147c4de78d00f1a4a06181198723de2db33dec"
+      "sha256": "a5f47577869b852dbf6477a7e433650d06564e2f29e882c5fcabb66f505039ae"
     },
     {
       "path": "tests/fx.test.js",
@@ -445,6 +449,30 @@
     {
       "path": "tests/weight-trace.test.js",
       "sha256": "21e2e55425247aa7147951f09e960a5b6626cde989958bf14a4da061c581b3b1"
+    },
+    {
+      "path": "vendor/augmented-ui/LICENSE",
+      "sha256": "4a5cec470c5bce6cc9298bfe8010764d69628d770103cc4f76d50b22b3489d01"
+    },
+    {
+      "path": "vendor/augmented-ui/augmented-ui.min.css",
+      "sha256": "7c6e075febcb715c27c52be9ab7a101d50bfc9127e47c6f7b579ae6280d8a959"
+    },
+    {
+      "path": "vendor/augmented-ui/package.json",
+      "sha256": "cc5b89537cbbf69f683163ff4963137bfe9bc39333d3d0af0eee4056ef263317"
+    },
+    {
+      "path": "vendor/fonts/share-tech-mono/LICENSE",
+      "sha256": "9909bc951ab73dcf212a1675aab327ffafa853c2b8e8d11a066b1bcc57afeefb"
+    },
+    {
+      "path": "vendor/fonts/share-tech-mono/package.json",
+      "sha256": "4d5671956dbe5590cb1df6b6b338dd12737d27e22c07b143abc4ae1c42f96560"
+    },
+    {
+      "path": "vendor/fonts/share-tech-mono/share-tech-mono-latin-400-normal.woff2",
+      "sha256": "41e6b9f297f7d9a2df2aaa274092f76d2f72711a15ca455f7f4f4f92caf16b72"
     },
     {
       "path": "vendor/jsnes/LICENSE",
@@ -657,6 +685,14 @@
     {
       "path": "vendor/jsnes/upstream-package.json",
       "sha256": "84884fb82a3e50290d69aab75184a26412a546c72b1db5b2500733685821aea6"
+    },
+    {
+      "path": "vendor/nova/LICENSE",
+      "sha256": "e28d690f5e638f8e8bac6e58b716aaef99d6b039a3f46ee7664fa8de7ba3dc32"
+    },
+    {
+      "path": "vendor/nova/nova-chat.css",
+      "sha256": "af3e66aea2e41540dd552616a4acf64ff026fda7bbe64f1688c6c39c3e33db1e"
     },
     {
       "path": "vendor/three/LICENSE",
