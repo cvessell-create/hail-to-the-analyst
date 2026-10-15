@@ -257,11 +257,17 @@ test('entry point uses local classic scripts and styles that work without a buil
     const target = match[1];
     if (target.startsWith('data:')) continue;
     assert.ok(!/^(https?:)?\/\//.test(target), target);
-    assert.ok(fs.existsSync(path.join(root, target)), target);
+    assert.ok(fs.existsSync(path.join(root, target.split('?')[0])), target);
   }
   assert.ok(!html.includes('type="module"'));
   assert.ok(html.includes('canvas[hidden]{display:none}'));
   assert.ok(html.includes('.card{max-height:100%;overflow-y:auto}'));
+});
+test('campaign scripts share a release revision to prevent old cached engine contracts', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script src="((?:engine|js)\/[^"]+)"/g)].map(match => match[1]);
+  assert.ok(scripts.length > 20);
+  assert.ok(scripts.every(source => source.endsWith('?v=20261014')));
 });
 test('campaign uses shared collision/LOS, bounded clock and live mission emulator', () => {
   const g = game(); g.fps.loadLevel(0);
