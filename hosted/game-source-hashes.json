@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "2e5e50ba0f81dd6f0e002579aadf362eac2adbc4f408f21e89c054d9b311418d"
+      "sha256": "2e99f6d29496059f01b37b00804b01e5c0ab229f2e2f92ce1d3b449c77942378"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "1b43b8d07dab8c223d5b03003ebed8a0ecffda2daac66bf931e7433118dd137c"
+      "sha256": "10f0807aef3a1d717b35520ad9f4e15c1b83c4fb2b24149c9ed53c7618635085"
     },
     {
       "path": "engine/aug-frames.js",
@@ -288,7 +288,7 @@
     },
     {
       "path": "homebrew/README.md",
-      "sha256": "2acbadb38dc253bfb33285f674026c62c726609fab9e5160573b9a4860c96d98"
+      "sha256": "f9ccfd692243f3273b0e6fb1d5fcfdca609c33094bf0a52f4115be846c553609"
     },
     {
       "path": "homebrew/main.c",

@@ -2,11 +2,8 @@
 
 ## Selected rebuild: direct-game Flycast fork
 
-The owner corrected the rebuild target: refactor the existing Hail engine
-from its source and modify Flycast itself into the new game engine. Do not
-substitute booting the existing campaign or a small Dreamcast guest for this
-work. Here, "disassemble" means source-level decomposition and reconstruction,
-not reverse engineering a commercial game's executable.
+Rebuild Hail from its source using a modified Flycast host. Run gameplay
+directly, without a Dreamcast guest or BIOS.
 
 The owner selected native desktop first, followed by the browser port. The
 intended direct-game path is:
@@ -16,60 +13,38 @@ Hail campaign systems -> direct-game update/scene interface
                      -> modified Flycast host/graphics/input -> display
 ```
 
-It must not require an ELF/ROM, BIOS, REIOS boot or SH4 instruction execution
-to run Hail. The existing KallistiOS slice and guest replay remain historical
-experiments, not completion of this rebuild.
-
-Source decomposition must cover the campaign orchestration in `../index.html`
-and the modules listed below: movement/collision, third-person scene rendering,
-combat, progression/loadout, flight, campaign/city/side quests, tactical tools,
-save/checkpoint/RNG state, formula/SI dialogue, autopilot and local-consent data.
-Carry forward their existing behavior and tests; do not reduce the campaign
-to the earlier two-collectible demo. Keep the playable campaign unchanged
-until its replacement is ready.
+Rebuild every campaign system: movement, collision, rendering, combat,
+progression, loadout, flight, missions, cities, side quests, tactical tools,
+saves, randomness, formulas, dialogue, autopilot and data controls.
+Keep the current game playable until its replacement is ready.
 
 ### Upgrade scope and selected art direction
 
-The original game is the design blueprint, not the visual or technical ceiling.
-The owner selected stylized high-detail 3D: an expanded fictional St. Louis
-cyberpunk world, dynamic lighting, detailed characters and a modern inventory
-UI. Keep the third-person camera locked, including autopilot.
+Selected style: high-detail 3D, fictional St. Louis cyberpunk environments,
+dynamic lighting, detailed characters and a modern inventory UI.
+Keep the third-person camera locked, including autopilot.
 
-Rebuild maps, levels, art, animation, effects, audio, HUD, controls and inventory
-alongside the gameplay code, algorithms and formulas. Preserve mission identity,
-progression, existing improvements and supported workflows while upgrading their
-implementation and presentation. A higher-resolution copy or a small standalone
-demo does not fulfill the whole-project scope. Do not invent a pixel, asset or
-performance target before measuring a representative native scene.
+Upgrade maps, art, animation, effects, audio, HUD and controls alongside the
+code. Preserve mission identity and progression. Set performance targets
+after measuring a representative native scene.
 
 ### Built-in project communication and development loop
 
-The requested engine includes game/framework communication supporting the
-owner's wider project: bounded test scenarios, analytics, weight calculations,
-methods, process comparisons and AI-assisted development feedback. This is
-planned work, not an implemented cross-repository orchestrator.
+The planned game/framework connection carries test scenarios, analytics,
+weights, method comparisons and AI-assisted feedback.
 
-Reuse the framework's existing specialist contract where applicable rather than
-inventing a parallel authority model. Keep simulation state, gameplay weights,
-analytical results and execution permissions distinct. Record scenario/source
-revisions, parameters, random seeds, units and measured results so a result can
-be traced to the exact game build and method. A test failure must remain visible;
-neither an AI suggestion nor a game result automatically changes weights,
-rewrites code, pushes to repositories or releases reports.
+Reuse the framework API. Record build/source versions, parameters, seeds,
+units and results. Keep simulation state, weights, analysis and execution
+permissions separate. Suggestions require approval before changing code or
+weights, pushing files or releasing reports.
 
-Project communication is scoped to explicitly configured repositories and
-services, not unrestricted account access. Keep private development results
-separate from reviewed public exports and preserve local gameplay-data consent.
-Desktop rendering and the development loop must report their own failures
-without silently reverting to first person or pretending an unavailable service
-returned a successful result.
+Connect only configured repositories and services. Keep private results out
+of public exports, preserve data consent and display failures.
 
 ### Implemented service foundation
 
-`../server/engine-services.js` now provides a renderer-independent local
-service boundary used by the existing Node server. Open
-`/engine/development.html` on that server for the executable development console.
-It is a service workbench, not the new game renderer.
+`../server/engine-services.js` runs on the Node server.
+Open `/engine/development.html` for the local console.
 
 - `GET /api/engine/status`: queries the configured loopback SI service.
   Lists the five AI/SI development levels without promoting any from model
@@ -77,27 +52,18 @@ It is a service workbench, not the new game renderer.
 - `POST /api/engine/chat`: forwards a bounded message to the existing framework
   chatbot; retains generated/owner/telemetry identity, routes and sources.
   Errors are explicit. One pending request and 20 messages/minute are allowed.
-- `GET /api/engine/formula`: reads framework formula/local receipt status;
-  does not reinterpret a local receipt as a blockchain transaction or payment.
+- `GET /api/engine/formula`: reads framework formula and local receipt status.
 - `POST /api/engine/artifact`: validates an allowlisted run record and produces
-  exact metadata JSON bytes plus SHA-256 for local preview/download. Rejects
-  unknown fields instead of accidentally including chat or private state.
-  Run fields are caller-supplied, not attested engine measurements.
+  metadata JSON and a SHA-256 checksum for preview/download. Unknown fields
+  are rejected. Users supply the run fields.
 
-These endpoints reject tunnel access and require a loopback peer. The SI URL
-must be a loopback HTTP origin; no framework process, model or autonomous loop
-is started automatically. Chat invokes the existing framework service, whose
-own local memory policy still applies. Do not treat this developer service as
-a multiuser authenticated API or expose its port externally.
+These developer endpoints are loopback-only. They do not start models or
+loops. Chat uses the framework service's memory policy. Do not expose the port.
 
-Coinbase Wallet is the owner's preferred integration, with real mainnet
-transactions and optional game-result NFTs as the intended destination.
-Implemented here: local artifact preparation and receipt-status reading only.
-Not implemented: wallet SDK/session, native-browser pairing, storage upload,
-mint contract, signing, spending, chain confirmation or public publication.
-No wallet keys, funds, RPC credentials or NFT SDK dependencies were added.
-Preview text is a public candidate and still needs inspection for personal
-information. The metadata digest is not an HMAC receipt, NFT or truth check.
+Coinbase Wallet and optional game-result NFTs are planned.
+Only local metadata preparation and receipt-status reading are implemented.
+Wallet connection, uploads, minting and transactions are unfinished.
+Check preview text for private information before any future publication.
 
 Source review for this foundation: existing `si-dialogue.js`,
 `vessell-formula.js`, framework `vessell/si_chat.py` response and HTTP-handler
@@ -108,19 +74,13 @@ not tested by these backend tests.
 
 The inspected Flycast host entry is `core/ui/mainui.cpp::mainui_rend_frame()`
 at upstream revision `80471d57b02606f53828daa916de6ecc94ca1877`; graphics
-presentation is exposed through `core/ui/imgui_driver.h`. These are candidate
-integration seams, not a completed scene API. Reusing an emulator host does
-not itself supply game physics, campaign rules or a general-purpose renderer.
-Review the actual reused files and linked dependencies before combining them;
-the prior separate GPLv2 browser experiment does not clear a combined build's
-licensing. No public-shell licence change or publication is authorized here.
+presentation uses `core/ui/imgui_driver.h`. These are candidate integration
+points. The scene API, physics and campaign migration still need work.
+Check file licences and linked dependencies before combining components.
 
-Status: direction selected; direct-game fork and full campaign migration are
-not implemented. The browser guest experiment was stopped after linking but
-showing a black canvas without guest telemetry. Its frontend frame count is
-not a guest-execution result.
+Status: direct-game fork and campaign migration not implemented.
 
-## Current continuation
+## Current game
 
 Solo campaign missions use a locked third-person isometric camera, including
 autopilot. Legacy first-person URLs and the V key cannot switch it; renderer
@@ -130,12 +90,7 @@ contract are documented in [the repair handoff](../hosted/GAME_REPAIR.md).
 Game credits have actual auction purchasing effects but no real-money value.
 Relay, armour and ammo inventory allocations equip on replay with proportional
 effects and explicit caps; conserved influence savings is not a purchase pool.
-The original [NES visual program](nes-visual.js) remains a tested legacy module;
-its companion display is not part of the current campaign UI.
-
-An executable, original math-driven starter engine and game workbench, imported
-from the owner's Vessell-engine-source ZIP and extended here. It is not a
-complete commercial engine or a general solver for every game.
+The math-driven engine and workbench extend the owner's original source.
 
 ## Run
 
@@ -178,7 +133,7 @@ NPC level scaling is enabled by the browser tactical adapter.
 `gameplay-data.js` implements the campaign's opt-in, local-only gameplay event
 store and suggestion report. Consent is a separate, explicit browser-profile
 setting and defaults off. Telemetry starts only after consent and is attached to
-first-person mission start, death and objective completion; practice and
+mission start, death and objective completion; practice and
 campaign attempts remain separate. On revoke, an active attempt is left
 unfinished/censored. Per-tab random session IDs are not persisted as user or
 device identifiers. Events allow only mission/mode, start/end, bounded
@@ -334,5 +289,20 @@ Reviewed accessible descriptions, not full proofs of every original paper:
   reviewed car/boat and multiple-good examples; tests reproduce the car result.
 - U.S. Census Bureau [computing apportionment](https://www.census.gov/topics/public-sector/congressional-apportionment/about/computing.html):
   reviewed geometric-mean priorities and initial-one allocation.
-  Dean's harmonic threshold is the explicit formula above; no claim of reading
-  Dean's original paper or validating political fairness is made.
+  Dean's harmonic threshold is the formula above; the original paper was not read.
+
+## Archive
+
+These earlier experiments are retained for reference:
+
+- [KallistiOS slice and native Flycast guest test](../homebrew/README.md).
+  The 21-action replay passed; this is not the direct-game rebuild.
+- WASM guest build: linked locally, but produced a black canvas without
+  guest telemetry. The experiment was stopped; cached binaries are excluded.
+- [NES companion display](nes-visual.js): tested legacy module, removed
+  from the campaign UI.
+- Tactical checkpoint presentation: retained for compatibility, with its
+  first-person display disabled.
+
+Their code stays in place to preserve tests, saved-game compatibility and
+research history. Use the current game setup above.

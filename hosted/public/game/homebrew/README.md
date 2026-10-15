@@ -1,13 +1,12 @@
-# Original Hail homebrew engine slice
+# Archive: original Hail homebrew engine slice
 
-## Scope correction
+## Archived experiment
 
 The selected rebuild is now a source-level reconstruction of Hail inside a
 modified Flycast game engine, not a guest boot. See the
 [direct-game rebuild direction](../engine/README.md#selected-rebuild-direct-game-flycast-fork).
-This directory preserves the earlier KallistiOS slice and measured native
-guest experiment. Neither is the complete campaign or the selected engine
-replacement; no BIOS search or further guest boot is needed for that target.
+This directory preserves the earlier KallistiOS slice and native guest test.
+It is outside the current game setup.
 
 This original GPL-3.0-or-later C engine is separate from the current playable
 JavaScript campaign. It is a bounded migration slice, not the complete campaign.
@@ -30,11 +29,9 @@ and `kos-cc`. `Makefile.kos` compiles the original guest to
 `build/hail-slice.elf`. A host build is not a Dreamcast boot result.
 
 `native-build.sh` prepares the pinned SDK and C-only SH4 toolchain under the
-ignored `.deps/` directory, builds KOS and then the original ELF. On this Mac,
-the owner approved the documented Homebrew prerequisites. It never uses sudo
-or installs the cross-compiler outside this checkout. Downloaded compiler
-components follow the pinned SDK's stable profile, not a claim that every
-transitive build input has an independently verified source digest.
+ignored `.deps/` directory, builds KOS and then the original ELF.
+The cross-compiler stays in this checkout. Compiler components follow the
+pinned SDK's stable profile; transitive source checks are incomplete.
 
 Source/API review: KallistiOS
 `568c3404c292a941bcf550465bd968f4fa249aa2`, `dc/video.h`,
@@ -63,7 +60,7 @@ collectibles and completed extraction. The runtime captured a 640x480 PNG;
 inspection showed the isometric board and white avatar on the green exit.
 This is native guest execution, not a WASM-port boot or a completed campaign.
 
-Private development checkout commands:
+Reproduce the archived native test:
 
 ```sh
 bash homebrew/native-flycast.sh build

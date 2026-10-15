@@ -9,10 +9,8 @@ Original game and simulation research by Christopher R. Vessell.
 
 ## For reviewers
 
-The playable browser campaign is the current implementation. The planned
-native desktop engine rebuild is a separate workstream, not a finished product.
-This repository is public for academic review. Original research, source
-history and upstream licence notices are preserved.
+The browser campaign is playable. The native desktop rebuild is planned.
+This repository is public for academic review.
 
 | Component | Current state |
 | --- | --- |
@@ -20,14 +18,11 @@ history and upstream licence notices are preserved.
 | Mathematics | Allocation, game theory, tactical methods, Vessell formula and traceable weight calculations |
 | AI/SI | Owner-source dialogue, optional framework chatbot and local formula/receipt status; requires separately running services for generated replies |
 | Development console | Local AI/SI service checks, chat and run-collectible metadata preview/download |
-| Native experiment | Original C engine slice; KallistiOS build and native Flycast replay tested |
 | Replacement engine | Modified Flycast direct-game engine, upgraded stylized 3D art/maps/UI: selected direction, not yet implemented |
 | Coinbase / NFTs | Planned mainnet integration; local metadata preview only. No wallet, payment, upload or mint implementation |
 
-The original game is the blueprint, not the ceiling. The full rebuild covers
-maps, levels, art, algorithms, formulas, inventory and supporting services.
-AI/SI, repository communication and blockchain are supporting systems, not a
-replacement for rebuilding the game. Native desktop first, browser afterward.
+The full rebuild covers maps, art, gameplay, algorithms, formulas and inventory,
+with AI/SI and backend services built in. Native desktop first, browser afterward.
 See the [selected architecture](engine/README.md#selected-rebuild-direct-game-flycast-fork).
 
 ## Play
@@ -63,18 +58,17 @@ effects but are not money, cryptocurrency or redeemable assets.
 
 The framework chatbot is optional and separately operated. The game's local
 Node server proxies chat to `HAIL_SI_URL` (default loopback port 8790).
-Model availability does not establish that any SI evaluation level passed.
-Generated text, owner-source selections and telemetry retain distinct labels.
+Generated text, owner-source selections and telemetry have separate labels.
+SI levels use their own tests.
 
 Gameplay-data collection defaults off. Consent, revoke/delete and local export
 controls remain in the game. Chat submitted to the optional framework service
 is subject to that service's local memory policy; it is not part of the
 browser-only gameplay-data store. No wallet keys belong in this repository.
 
-The development console prepares allowlisted, caller-supplied run metadata.
-It neither attests a run nor publishes or mints it. Coinbase Wallet is the
-preferred future integration; signing, spending and public data release remain
-separate explicit actions. No blockchain earnings are claimed.
+The development console previews run metadata entered by the user.
+Coinbase connection and NFT minting are planned. No uploads or transactions
+are performed.
 
 ## Tests and source
 
@@ -83,17 +77,27 @@ npm test
 npm run test:homebrew
 ```
 
-The October 14 local game suite passed **207 tests** before this documentation
-and Pages repair; subsequent validation is reported in the commit/CI output.
-[Homebrew documentation](homebrew/README.md) records the bounded native
-experiment. The black-screen WASM guest experiment was stopped and is not the
-selected rebuild route. Ignored SDKs, binaries and private runtime captures are
-not part of this source publication.
+The October 14 game suite passed **208 tests**. CI records later runs.
 
 Canonical source changes are synchronized with
 `node scripts/sync-hosted-game.js`; tests enforce byte-identical hosted mirrors.
-The source-package CI uploads a downloadable source ZIP. Source packages do
-not substitute for deploying the playable Pages site.
+CI also produces a source ZIP.
+
+## Archive
+
+Earlier experiments remain in the repository for reference, outside the
+current setup path:
+
+- [KallistiOS C slice and native Flycast replay](homebrew/README.md):
+  movement, collection and extraction test.
+- Source-built WASM guest: linked locally, but stopped after a black canvas
+  and no guest telemetry. Cached sources and binaries are excluded.
+- [NES companion module](engine/nes-visual.js): legacy display module, removed
+  from the campaign UI.
+- Legacy tactical checkpoints: retained for saved-game compatibility.
+
+These are not the replacement engine. Original source and research history
+remain available.
 
 ## Licence and source preservation
 
