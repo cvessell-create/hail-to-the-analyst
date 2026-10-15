@@ -36,7 +36,9 @@ function game(opts = {}) {
       classList: { add() {}, remove() {} }, style: {},
       innerHTML: '', textContent: '', onclick: null,
       attributes: {},
-      setAttribute(name, value) { this.attributes[name] = String(value); }, addEventListener() {}, insertAdjacentHTML() {},
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+      events: {}, addEventListener(name, handler) { this.events[name] = handler; }, insertAdjacentHTML() {},
+      setPointerCapture() {}, getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; },
       focus() { this.focused = true; }, click() {},
       querySelector() { return node('nub'); },
       getContext() { return canvas; }
@@ -47,11 +49,11 @@ function game(opts = {}) {
   let approach;
   const context = vm.createContext({
     document: { getElementById: node, ...(opts.noCamera ? {} : { createElement: () => ({}) }) },
-    window: { localStorage, HailAutopilot: { ...require('../engine/autopilot.js'), start() {} }, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; }, ...(opts.search ? { location: { search: opts.search } } : {}) },
+    window: { localStorage, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; }, ...(opts.search ? { location: { search: opts.search } } : {}) },
     ...(opts.noCamera ? {} : { THREE: {}, HailThreeView: { ...require('../engine/three-view.js'), createIso: () => {
       if(opts.cameraFailure)throw new Error('WebGL unavailable');
       return { canvas: {}, render: scene => drawing.push({kind:'iso',scene}),
-        aimAt: () => null, project: () => ({ x: 0, y: 0 }) };
+        aimAt: () => opts.aimAt || null, project: () => ({ x: 0, y: 0 }) };
     } } }),
     HailGameplayData: require('../engine/gameplay-data.js'),
     TacticalUI: { start(card, mission, jack, callback) { approach = { mission, jack, callback }; } },
@@ -81,12 +83,12 @@ function game(opts = {}) {
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine,
       metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo, hero: () => hero, saveHero, maxHp,
       sideQuestReturn: () => sideQuestReturn,
-      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice, message: () => message, autoSkills: () => autoSkills
+      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice, message: () => message
     };
   `;
   const at=source.lastIndexOf('title();');
   vm.runInContext(source.slice(0,at)+hooks+source.slice(at), context);
-  return { fps: context.fps, nodes, events, drawing, stored, approach: () => approach };
+  return { fps: context.fps, nodes, events, drawing, stored, window: context.window, approach: () => approach };
 }
 
 test('all seven campaign missions enter third-person play directly and victory follows the final map', () => {
@@ -258,7 +260,7 @@ test('manual play focuses the game and offers routes without starting autopilot'
   g.nodes.get('routeBtn').onclick();
   assert.ok(g.fps.hint().path.length > 0);
   assert.equal(Object.keys(g.fps.keys()).length, 0);
-  assert.equal(g.fps.autoSkills(), false);
+  assert.equal(g.window.HailAutopilotRun, undefined);
   g.fps.render();
   assert.ok(g.drawing.some(d => d.text === g.fps.levels()[0].objective));
   assert.ok(g.drawing.some(d => d.text && d.text.includes('G / ROUTE: HINT')));
@@ -317,10 +319,10 @@ test('chat and form focus releases held movement and does not trigger game short
   const g = game(); g.fps.loadLevel(0);
   g.events.keydown({ code: 'KeyW' });
   assert.equal(g.fps.keys().KeyW, true);
-  g.events.focusin({ target: { id: 'siAsk' } });
+  g.events.focusin({ target: { id: 'siAsk', closest: () => ({}) } });
   assert.equal(Object.keys(g.fps.keys()).length, 0);
   g.events.keydown({ code: 'KeyP', target: { closest: () => ({}) } });
-  assert.equal(g.fps.state(), 'play');
+  assert.equal(g.fps.state(), 'pause');
   assert.equal(Object.keys(g.fps.keys()).length, 0);
 });
 
@@ -356,10 +358,147 @@ test('keyboard-only Archive run collects clearance, extracts and advances withou
   assert.equal(f.player().red, true);
   assert.ok(f.player().hp > 0);
   assert.equal(f.state(), 'brief');
-  assert.equal(f.autoSkills(), false);
+  assert.equal(g.window.HailAutopilotRun, undefined);
   g.nodes.get('primary').onclick(); g.nodes.get('primary').onclick();
   assert.equal(f.state(), 'play');
   assert.equal(f.checkpoint().missionIndex, 1);
+});
+
+test('skills consume one point without changing weapons or leaking movement when closed', () => {
+  const g = game({ progression: true }), f = g.fps;
+  f.loadLevel(0); f.hero().points = 3; f.player().weapon = 2;
+  g.events.keydown({ code: 'KeyW' });
+  g.events.keydown({ code: 'KeyK' });
+  g.events.keydown({ code: 'Digit1', preventDefault() {} });
+  assert.equal(f.hero().skills.insight, 1);
+  assert.equal(f.player().weapon, 2);
+  const before = { x: f.player().x, y: f.player().y, bullets: f.player().bullets };
+  f.fire();
+  g.events.keydown({ code: 'KeyK' });
+  f.update(1 / 60);
+  assert.equal(f.player().bullets, before.bullets);
+  assert.equal(f.player().x, before.x);
+  assert.equal(f.player().y, before.y);
+});
+
+test('touch action menu exposes abilities, skill spending and inventory without keyboard-only steps', () => {
+  const g = game({ progression: true }), f = g.fps;
+  f.loadLevel(0); f.hero().points = 2;
+  const click = id => g.nodes.get(id).onclick();
+  click('actionsBtn');
+  const before = JSON.stringify(f.checkpoint());
+  f.update(1); f.fire(); f.use();
+  assert.equal(JSON.stringify(f.checkpoint()), before);
+  for (const id of ['roll', 'grenade', 'shockwave', 'drone', 'barrier', 'hack', 'skills', 'gear']) {
+    assert.equal(typeof g.nodes.get('action-' + id).onclick, 'function', id);
+  }
+  click('action-skills');
+  click('action-skill-insight');
+  assert.equal(f.hero().skills.insight, 1);
+  assert.equal(f.hero().points, 1);
+  assert.match(g.nodes.get('actionFeedback').textContent, /INCREASED/);
+  click('actionClose'); click('actionsBtn'); click('action-gear');
+  f.hero().gear.credits = 1000;
+  click('action-gear-gyro');
+  assert.equal(f.hero().gear.equipped.weapon, 'gyro');
+  assert.equal(f.hero().gear.credits, 900);
+  click('action-upgrade-weapon');
+  assert.equal(f.hero().gear.owned.weapon.gyro, 1);
+  click('actionClose'); click('actionsBtn'); click('action-barrier');
+  assert.equal(f.hero().energy, 60);
+  assert.equal(g.nodes.get('actionMenu').hidden, true);
+  click('actionsBtn'); click('action-roll');
+  assert.ok(f.player().rollT > 0);
+});
+
+test('menus permit native Tab and button activation and ignore repeated skill purchases', () => {
+  const g = game({ progression: true }); g.fps.loadLevel(0); g.fps.hero().points = 3;
+  g.events.keydown({ code: 'KeyK' });
+  let prevented = false;
+  for (const code of ['Tab', 'Enter', 'Space']) {
+    g.events.keydown({ code, target: { closest: () => ({}) }, preventDefault() { prevented = true; } });
+  }
+  assert.equal(prevented, false);
+  g.events.keydown({ code: 'Digit1', repeat: true, preventDefault() {} });
+  assert.equal(g.fps.hero().points, 3);
+});
+
+test('pause, blur and touch cancellation clear held actions and do not resume them', () => {
+  const g = game({ progression: true }); g.fps.loadLevel(0);
+  const down = id => g.nodes.get(id).events.pointerdown({ pointerId: 1, stopPropagation() {} });
+  down('fire'); down('run'); down('raise'); down('jet');
+  assert.equal(g.fps.keys().ShiftLeft, true);
+  assert.equal(g.fps.keys().KeyR, true);
+  g.nodes.get('run').events.pointercancel();
+  g.nodes.get('raise').events.pointercancel();
+  assert.equal(g.fps.keys().ShiftLeft, false);
+  assert.equal(g.fps.keys().KeyR, false);
+  g.nodes.get('pauseBtn').onclick();
+  assert.equal(g.fps.state(), 'pause');
+  assert.equal(g.fps.checkpoint().controls.touch.fire, false);
+  assert.equal(g.fps.checkpoint().controls.touch.jet, false);
+  const ammo = g.fps.player().bullets;
+  g.nodes.get('primary').onclick(); g.fps.update(1 / 60);
+  assert.equal(g.fps.player().bullets, ammo);
+  g.events.blur();
+  assert.equal(g.fps.state(), 'pause');
+});
+
+test('first pointer click aims before firing, while secondary clicks do not shoot', () => {
+  const g = game({ aimAt: { x: 1.5, y: 4.5 } }); g.fps.loadLevel(0);
+  const pointer = g.nodes.get('game').events.pointerdown;
+  const ammo = g.fps.player().bullets;
+  pointer({ button: 2, clientX: 200, clientY: 200 });
+  assert.equal(g.fps.player().bullets, ammo);
+  pointer({ button: 0, clientX: 200, clientY: 200 });
+  assert.equal(g.fps.player().bullets, ammo - 1);
+  assert.equal(g.fps.player().a, Math.PI / 2);
+});
+
+test('legacy automation URL cannot start a driver or automate skill spending', () => {
+  const g = game({ progression: true, search: '?autopilot=1' });
+  g.fps.loadLevel(0);
+  assert.equal(g.window.HailSetAutopilotActive, undefined);
+  assert.equal(g.window.HailAutopilotRun, undefined);
+  g.fps.hero().points = 3;
+  g.fps.keys().KeyW = true; g.fps.update(0.1);
+  assert.ok(g.fps.player().y > 1.5);
+  assert.equal(g.fps.hero().points, 3);
+  g.fps.saveHero();
+  assert.equal(g.stored.has('hail-analyst-profile/v1'), true);
+});
+
+test('player entry excludes development drivers, framework UI and network calls', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.doesNotMatch(html, /HailAutopilot|HailSIDialogue|HailStoryCorpus|HailSetAutopilotActive|autoSkills/);
+  assert.doesNotMatch(html, /(?:src|href)="[^"]*(?:autopilot|si-dialogue|si-story-corpus|vessell-formula|nova-chat)/);
+  assert.doesNotMatch(html, /siConnect|siChannel|autopilotHud|STOP AUTOPILOT|CONNECT FRAMEWORK|id="dock"/);
+  assert.doesNotMatch(html, /STATE LOG|LOAD STATE|dockTools|No AI connection/);
+  assert.doesNotMatch(html, /\bfetch\s*\(|XMLHttpRequest|WebSocket/);
+});
+
+test('route hints respect clearance and walls, then point to controller and exit without changing state', () => {
+  const combat = require('../engine/combat-assist.js');
+  const snapshot = {
+    map: ['#######', '#.R..X#', '#.#####', '#...#.#', '#######'],
+    player: { x: 1.5, y: 1.5, red: false }, doors: {},
+    pickups: [
+      { x: 5.5, y: 3.5, alive: true, type: 'r' },
+      { x: 2.5, y: 3.5, alive: true, type: 'r' }
+    ],
+    enemies: [{ x: 4.5, y: 1.5, alive: true, type: 'FABRICATOR' }]
+  };
+  const before = structuredClone(snapshot);
+  const route = combat.hint(snapshot);
+  assert.equal(route.kind, 'clearance');
+  assert.deepEqual(route.path.at(-1), { x: 2.5, y: 3.5 });
+  assert.deepEqual(snapshot, before);
+  snapshot.pickups.forEach(q => { q.alive = false; });
+  assert.equal(combat.hint(snapshot), null, 'locked red door blocks exit and controller');
+  snapshot.player.red = true;
+  assert.equal(combat.hint(snapshot).kind, 'controller');
+  snapshot.enemies[0].alive = false;
+  assert.equal(combat.hint(snapshot).kind, 'exit');
 });
 
 test('entry point uses local classic scripts and styles that work without a build or fetch', () => {
@@ -378,7 +517,7 @@ test('campaign scripts share a release revision to prevent old cached engine con
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script src="((?:engine|js)\/[^"]+)"/g)].map(match => match[1]);
   assert.ok(scripts.length > 20);
-  assert.ok(scripts.every(source => source.endsWith('?v=20261014')));
+  assert.ok(scripts.every(source => source.endsWith('?v=20261014-controls2')));
 });
 test('campaign uses shared collision/LOS, bounded clock and live mission emulator', () => {
   const g = game(); g.fps.loadLevel(0);
@@ -765,7 +904,7 @@ test('dying in the city respawns at the safehouse; dying in a city mission offer
   g.nodes.get('cityBack').onclick(); assert.equal(f.checkpoint().missionIndex, f.city().index);
 });
 
-test('autopilot keeps tank steering in locked third-person even with a legacy URL', () => {
+test('legacy autopilot URLs leave the same human third-person controls', () => {
   const step = (opts) => {
     const g = game(opts), f = g.fps; f.loadLevel(0);
     Object.assign(f.player(), { a: 0 }); const x0 = f.player().x, y0 = f.player().y;
@@ -773,9 +912,9 @@ test('autopilot keeps tank steering in locked third-person even with a legacy UR
     return { iso: f.isoOn(), dx: f.player().x - x0, dy: f.player().y - y0, a: f.player().a };
   };
   const fp = step({ search: '?autopilot=1&view=fp' }), auto = step({ search: '?autopilot=1', iso: true }), human = step({ search: '?', iso: true });
-  assert.equal(fp.iso, true); assert.equal(auto.iso, true, 'autopilot stays third-person');
-  assert.ok(fp.dx > 0 && Math.abs(fp.dy) < 1e-9);
-  assert.deepEqual([auto.dx, auto.dy, auto.a], [fp.dx, fp.dy, fp.a], 'legacy URL does not change autopilot steering');
+  assert.equal(fp.iso, true); assert.equal(auto.iso, true);
+  assert.deepEqual([auto.dx, auto.dy, auto.a], [fp.dx, fp.dy, fp.a]);
+  assert.deepEqual([auto.dx, auto.dy, auto.a], [human.dx, human.dy, human.a]);
   assert.ok(human.iso && Math.abs(human.dy) > 1e-6, 'a human in isometric still moves screen-relative');
 });
 

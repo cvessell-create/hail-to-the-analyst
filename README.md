@@ -16,7 +16,7 @@ This repository is public for academic review.
 | --- | --- |
 | Browser game | Seven solo missions, third-person/isometric camera, combat, flight, progression, inventory, city hubs and optional Footprint Purge |
 | Mathematics | Allocation, game theory, tactical methods, Vessell formula and traceable weight calculations |
-| AI/SI | Owner-source dialogue, optional framework chatbot and local formula/receipt status; requires separately running services for generated replies |
+| Development tools | AI/SI experiments and automation tests are separate from the playable campaign |
 | Development console | Local AI/SI service checks, chat and run-collectible metadata preview/download |
 | Replacement engine | Modified Flycast direct-game engine, upgraded stylized 3D art/maps/UI: selected direction, not yet implemented |
 | Coinbase / NFTs | Planned mainnet integration; local metadata preview only. No wallet, payment, upload or mint implementation |
@@ -43,16 +43,20 @@ Open `http://127.0.0.1:8787/index.html` for the game,
 The separate hosted application has its own
 [setup and deployment guide](hosted/GAME_REPAIR.md).
 
-The camera stays third-person/isometric, including autopilot. `V` and legacy
+The camera stays third-person/isometric. `V` and legacy
 first-person URL options cannot change it. Renderer errors appear explicitly,
 not as a first-person fallback. Desktop uses WASD/arrows, mouse aiming and the
 displayed action controls; mobile provides touch controls. **M / HEX MAP**
 shows the current mission's tactical minimap while gameplay continues.
-Human play does not need autopilot or an AI service. **G / ROUTE** briefly marks
+The game has no autopilot or framework chatbot. **G / ROUTE** briefly marks
 a suggested path; you still move, fight and interact yourself. The mission
 objective stays on screen. Approach a door or exit and press **E / USE** when
 its prompt appears; clearance cards and boss requirements still apply.
-Click the game view after typing in chat to return to game controls.
+**ACTIONS** provides touch/click access to rolls, grenades, augments, hacking,
+skills and inventory. Skills and inventory show readable buttons and prices.
+On touch screens, hold **RUN** to sprint or **RAISE** to aim over low cover.
+Menus suspend combat. Losing page focus pauses the game; use
+**RESUME** to return. Held movement, fire and flight do not carry across menus.
 
 The story, enemies and operations are fictional. Gateway Sprawl and Vessell
 City are free-roam settings; Footprint Purge is an optional simulated exposure
@@ -61,13 +65,18 @@ effects but are not money, cryptocurrency or redeemable assets.
 
 ## AI, data and backend boundaries
 
-The framework chatbot is optional and separately operated. The game's local
-Node server proxies chat to `HAIL_SI_URL` (default loopback port 8790).
+The playable campaign loads no automation driver, framework dialogue, owner
+corpus or formula service. Legacy `?autopilot=1` links do not activate anything.
+Route hints only draw a path; they never move, fight or spend skill points.
+Development modules and their tests remain separate from gameplay.
+
+The development console uses separately operated services. The local
+Node server proxies its chat to `HAIL_SI_URL` (default loopback port 8790).
 Generated text, owner-source selections and telemetry have separate labels.
 SI levels use their own tests.
 
 Gameplay-data collection defaults off. Consent, revoke/delete and local export
-controls remain in the game. Chat submitted to the optional framework service
+controls remain in the game. Chat submitted through the development console
 is subject to that service's local memory policy; it is not part of the
 browser-only gameplay-data store. No wallet keys belong in this repository.
 
@@ -82,7 +91,7 @@ npm test
 npm run test:homebrew
 ```
 
-The October 14 game suite passed **215 tests**. CI records later runs.
+Run the suite above for current results. CI records published runs.
 
 Canonical source changes are synchronized with
 `node scripts/sync-hosted-game.js`; tests enforce byte-identical hosted mirrors.

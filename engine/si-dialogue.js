@@ -79,29 +79,41 @@
     const opts = { storageKey: 'hail-si-level1/v1', chatUrl: viaServer ? '/si' : 'http://127.0.0.1:8790', hideSources: true, ...options };
     const doc = win.document, dlg = createDialogue(corpus);
     // Provenance for every line shown in game; citations stay out of game play when hideSources is set.
-    const records = [];
-    let linkReady = false;
+    const records = [], episodes = [], controllers = new Set();
+    let linkReady = false, enabled = false, destroyed = false, revision = 0, pending = false, chatCalls = 0;
     async function remote(path, body) {
-      if (!opts.chatUrl || typeof win.fetch !== 'function') return null;
+      if (!enabled || destroyed || !opts.chatUrl || typeof win.fetch !== 'function') return null;
+      const requestedRevision = revision;
       const ctl = typeof win.AbortController === 'function' ? new win.AbortController() : null;
+      if (ctl) controllers.add(ctl);
       const timer = ctl ? win.setTimeout(() => ctl.abort(), 30000) : 0;
       try {
         const res = await win.fetch(opts.chatUrl + path, body === undefined ? { signal: ctl && ctl.signal } :
           { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl && ctl.signal });
-        return res.ok ? await res.json() : null;
-      } catch (e) { return null; } finally { if (timer) win.clearTimeout(timer); }
+        if (!res.ok) throw Error('HTTP ' + res.status);
+        const data = await res.json();
+        return !destroyed && enabled && requestedRevision === revision ? data : null;
+      } catch (e) {
+        if (!destroyed && enabled && requestedRevision === revision) {
+          post('LOOP', 'Framework request failed: ' + e.message + '. Local owner-text chat remains available.');
+          disconnect();
+        }
+        return null;
+      } finally { if (timer) win.clearTimeout(timer); if (ctl) controllers.delete(ctl); }
     }
     function postReply(r) {
-      records.push({ at: Date.now(), kind: r.kind, label: r.label, model: r.model, text: r.text, sources: r.sources });
+      if (destroyed) return;
+      const sources = Array.isArray(r.sources) ? r.sources : [];
+      records.push({ at: Date.now(), kind: r.kind, label: r.label, model: r.model, text: r.text, sources });
       if (records.length > 200) records.shift();
-      post(r.kind === 'generated' ? 'SI' : r.kind === 'telemetry' ? 'LOOP' : 'AUTHOR', r.text, opts.hideSources ? null : (r.sources[0] || {}).cite);
+      post(r.kind === 'generated' ? 'SI' : r.kind === 'telemetry' ? 'LOOP' : 'AUTHOR', r.text, opts.hideSources ? null : (sources[0] || {}).cite);
     }
     let floor = 0;
     try { floor = JSON.parse(win.localStorage.getItem(opts.storageKey)).stage | 0; } catch (e) { floor = 0; }
 
     // One channel per page: a later mount (e.g. autopilot) replaces the earlier panel.
     const prior = doc.getElementById ? doc.getElementById('siChannel') : null;
-    if (prior && prior.formulaTimer && win.clearInterval) win.clearInterval(prior.formulaTimer);
+    if (prior && prior.destroyChannel) prior.destroyChannel();
     if (prior && prior.parentNode) prior.parentNode.removeChild(prior);
     const panel = doc.createElement('div');
     panel.id = 'siChannel';
@@ -119,16 +131,61 @@
       doc.body.appendChild(panel);
     }
     const log = panel.querySelector('#siLog'), head = panel.querySelector('#siHead'), ask = panel.querySelector('#siAsk');
+    ask.maxLength = 500;
+    const connection = doc.createElement('button');
+    connection.id = 'siConnect';
+    connection.textContent = 'CONNECT FRAMEWORK (OPTIONAL)';
+    panel.appendChild(connection);
     const formulaView = doc.createElement('div');
     formulaView.id = 'siFormula';
     formulaView.textContent = formula.describe(null);
     panel.appendChild(formulaView);
     let formulaStatus = null;
-    async function refreshFormula() {
-      formulaStatus = await remote('/formula');
-      formulaView.textContent = formula.describe(formulaStatus);
+    async function readFormula() {
+      if (!enabled || destroyed) return formulaStatus;
+      const requestedRevision = revision, response = await remote('/formula');
+      if (enabled && !destroyed && requestedRevision === revision) {
+        formulaStatus = response;
+        formulaView.textContent = formula.describe(formulaStatus);
+      }
       return formulaStatus;
     }
+    async function refreshFormula() {
+      if (pending) return formulaStatus;
+      pending = true;
+      try { return await readFormula(); } finally { pending = false; }
+    }
+    function disconnect() {
+      enabled = false; linkReady = false; revision++;
+      controllers.forEach(ctl => ctl.abort()); controllers.clear();
+      formulaStatus = null;
+      formulaView.textContent = 'LOCAL ONLY: no automatic framework requests.';
+      connection.textContent = 'CONNECT FRAMEWORK (OPTIONAL)';
+    }
+    async function connect() {
+      if (destroyed || pending || enabled) return;
+      if (!opts.chatUrl || typeof win.fetch !== 'function') {
+        post('LOOP', 'Framework connection unavailable; local owner-text chat remains available.');
+        return;
+      }
+      enabled = true; pending = true;
+      connection.textContent = 'DISCONNECT FRAMEWORK';
+      try {
+        const st = await remote('/status');
+        if (!enabled || destroyed) return;
+        linkReady = Boolean(st && st.model_ready);
+        post('LOOP', st ? 'Framework connected: ' + st.backend + (linkReady ? ' online.' : ' model unavailable; local replies.') :
+          'Framework status unavailable; local replies.');
+        await readFormula();
+      } finally { pending = false; }
+    }
+    connection.onclick = () => { if (enabled) disconnect(); else return connect(); };
+    function destroy() {
+      destroyed = true;
+      disconnect();
+    }
+    panel.destroyChannel = destroy;
+    disconnect();
     if (dock && head.addEventListener) head.addEventListener('click', (e) => {
       if (e && e.stopPropagation) e.stopPropagation();
       const narrow = win.matchMedia && win.matchMedia('(pointer:coarse),(max-width:760px),(max-aspect-ratio:1/1)').matches;
@@ -136,6 +193,7 @@
     });
 
     function post(who, text, cite) {
+      if (destroyed) return;
       const row = doc.createElement('div');
       row.style.margin = '3px 0';
       const color = who === 'AUTHOR' ? '#ffd27a' : who === 'YOU' ? '#9cf' : who === 'SI' ? '#7ff' : '#9f9';
@@ -158,6 +216,8 @@
     ['keydown', 'keyup'].forEach(type => ask.addEventListener(type, e => {
       e.stopPropagation();
       if (type === 'keydown' && e.key === 'Enter' && ask.value.trim()) {
+        if (pending) { post('LOOP', 'One request is already pending. Wait or disconnect to cancel.'); return; }
+        if (ask.value.trim().length > 500) { post('LOOP', 'Message limit: 500 characters.'); return; }
         const q = ask.value.trim(); ask.value = '';
         post('YOU', q);
         const learner = opts.learner && opts.learner();
@@ -167,36 +227,36 @@
             corpus.stages.map((s, i) => (i < p.stage ? '✓' : '·') + s.name).join(' '));
         }
         const stageId = learner ? progress(corpus, learner.history, floor).current.id : null;
-        remote('/chat', { message: q, view: 'game', game: opts.facts ? opts.facts() : null }).then(rr => {
-          if (rr && rr.text) return postReply(rr);
+        const localReply = () => {
           const r = dlg.respond(q, stageId);
           if (r) postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: r.text, sources: [r] });
           else post('LOOP', 'No matching line in the owner corpus.');
-        });
+        };
+        if (!enabled) { localReply(); return; }
+        if (chatCalls >= 20) { post('LOOP', 'Session limit: 20 framework chat requests. Local chat is still available.'); disconnect(); localReply(); return; }
+        pending = true; chatCalls++;
+        remote('/chat', { message: q, view: 'game', game: opts.facts ? opts.facts() : null }).then(rr => {
+          if (rr && rr.text) postReply(rr); else localReply();
+        }).finally(() => { pending = false; });
       }
     }));
 
     post('LOOP', 'Corpus loaded: ' + corpus.lines.length + ' owner lines from ' + corpus.sources.length + ' sources. Text is selected, never rewritten.');
     const intro = dlg.say('intake', 0);
     postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: intro.text, sources: [intro] });
-    remote('/status').then(st => {
-      linkReady = Boolean(st && st.model_ready);
-      post('LOOP', st ? 'Framework link up: ' + st.backend + (linkReady ? ' online' : ' offline, owner-text fallback') +
-        ' · loop memory ' + st.loop.episodes + ' episodes.' : 'Framework link down; local Level 1 chatbot only.');
-    });
-    refreshFormula();
-    if (win.setInterval) panel.formulaTimer = win.setInterval(refreshFormula, 30000);
+    post('LOOP', 'Local owner-text chat. No model calls or polling. Connect only if you want framework access; each submitted message may use the configured model.');
 
     return {
       dialogue: dlg,
       onEpisode(learner, episode, result) {
-        refreshFormula();
+        if (destroyed) return;
         const before = floor, p = status(learner);
         post('LOOP', 'gen ' + (learner.generation - 1) + ' · mission ' + (episode.mission + 1) + ' · ' + episode.outcome +
           ' · kills ' + episode.kills + ' · fitness ' + Math.round(result.score) + (result.improved ? ' · NEW CHAMPION' : ''));
         if (p.stage > before) {
           floor = p.stage;
-          try { win.localStorage.setItem(opts.storageKey, JSON.stringify({ stage: floor })); } catch (e) { /* ignore */ }
+          try { win.localStorage.setItem(opts.storageKey, JSON.stringify({ stage: floor })); }
+          catch (e) { post('LOOP', 'Milestone save failed: ' + e.message); }
           for (let s = before; s < p.stage; s++) {
             const st = corpus.stages[s];
             post('LOOP', 'STAGE ' + (s + 1) + '/' + p.total + ' ' + st.name.toUpperCase() + ' reached: ' + st.milestone + '.');
@@ -212,17 +272,20 @@
           event.footprints = episode.footprints.map(({ id, category, severity, difficulty, t }) => ({ id, category, severity, difficulty, t }));
           event.footprints_total = episode.footprints_total;
         }
-        remote('/chat', { message: '', view: 'game', event, game: opts.facts ? opts.facts() : null }).then(rr => {
-          if (rr && rr.text) return postReply(rr);
-          if (p.stage === before && (result.improved || episode.died)) {
-            const q = dlg.say(p.current.id, learner.generation * 7 + (episode.died ? 3 : 0));
-            postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: q.text, sources: [q] });
-          }
-        });
+        episodes.push(event);
+        if (episodes.length > 200) episodes.shift();
+        if (p.stage === before && (result.improved || episode.died)) {
+          const q = dlg.say(p.current.id, learner.generation * 7 + (episode.died ? 3 : 0));
+          postReply({ kind: 'owner', label: 'owner text, verbatim', model: null, text: q.text, sources: [q] });
+        }
       },
       status,
       post,
       records,
+      episodes,
+      connect,
+      disconnect,
+      destroy,
       refreshFormula,
       formulaStatus: () => formulaStatus,
       linkReady: () => linkReady

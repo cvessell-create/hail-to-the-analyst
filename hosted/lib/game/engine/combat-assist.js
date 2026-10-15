@@ -69,11 +69,46 @@
 
   function vialChance(player) { return VIAL.base + VIAL.lowHpBonus * (1 - Math.max(0, Math.min(100, player.hp)) / 100); }
 
-  function hint(snapshot, autopilot) {
-    if (!snapshot || !autopilot || !autopilot.chooseGoal) return null;
-    var goal = autopilot.chooseGoal(snapshot, autopilot.DEFAULT_PARAMS);
-    if (!goal || !goal.path || goal.kind === 'idle') return null;
-    return { kind: goal.kind, path: goal.path.map(function (p) { return { x: p.x + 0.5, y: p.y + 0.5 }; }), t: HINT_SECONDS };
+  function hint(snapshot) {
+    if (!snapshot) return null;
+    var p = snapshot.player, map = snapshot.map, start = [Math.floor(p.x), Math.floor(p.y)];
+    var queue = [start], previous = new Map([[start.join(','), null]]);
+    var targets = [];
+    snapshot.pickups.forEach(function (q) {
+      if (!q.alive) return;
+      if (q.type === 'r' || q.type === 'q') targets.push({ x: q.x, y: q.y, kind: 'clearance', priority: 0 });
+      if (q.type === 'e') targets.push({ x: q.x, y: q.y, kind: 'footprint', priority: 1 });
+    });
+    snapshot.enemies.forEach(function (e) {
+      if (e.alive && (e.type === 'FABRICATOR' || e.type === 'STALKER')) targets.push({ x: e.x, y: e.y, kind: 'controller', priority: 2 });
+    });
+    map.forEach(function (row, y) {
+      for (var x = 0; x < row.length; x++) if (row[x] === 'X') targets.push({ x: x, y: y, kind: 'exit', priority: 3 });
+    });
+    var found = null, dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    for (var i = 0; i < queue.length; i++) {
+      var cell = queue[i];
+      targets.forEach(function (target) {
+        if (Math.floor(target.x) === cell[0] && Math.floor(target.y) === cell[1] &&
+            (!found || target.priority < found.priority)) found = Object.assign({}, target, { cell: cell });
+      });
+      dirs.forEach(function (dir) {
+        var next = [cell[0] + dir[0], cell[1] + dir[1]], key = next.join(',');
+        var tile = map[next[1]] && map[next[1]][next[0]];
+        if (previous.has(key)) return;
+        var door = snapshot.doors && snapshot.doors[key];
+        if (tile !== '.' && tile !== 'X' && tile !== 'D' &&
+            !(tile === 'R' && p.red) && !(tile === 'B' && p.blue) &&
+            !(door && door.open >= 0.88)) return;
+        previous.set(key, cell); queue.push(next);
+      });
+    }
+    if (!found) return null;
+    var path = [];
+    for (var at = found.cell; previous.get(at.join(',')); at = previous.get(at.join(','))) {
+      path.unshift({ x: at[0] + 0.5, y: at[1] + 0.5 });
+    }
+    return { kind: found.kind, path: path, t: HINT_SECONDS };
   }
 
   var PICK_COLORS = { h: '#ff4a4a', k: '#ff4a4a', a: '#5e9bd0', b: '#d6a33c', s: '#cf3b2f', i: '#64ff58', r: '#ff3b30', q: '#3489f0', j: '#8ae7ff', v: '#ffc963' };

@@ -82,8 +82,19 @@ Status: direct-game fork and campaign migration not implemented.
 
 ## Current game
 
-Solo campaign missions use a locked third-person isometric camera, including
-autopilot. Legacy first-person URLs and the V key cannot switch it; renderer
+Human controls are available through the **ACTIONS** menu as well as the
+keyboard. Menus suspend gameplay and expose skill spending, inventory,
+upgrades and combat abilities to touch players. Focus loss
+pause combat; resuming clears held inputs.
+
+The campaign does not load autopilot, framework dialogue, the owner corpus or
+formula services. There are no chat, connection or automation controls.
+Legacy automation URLs have no effect. Route hints draw a path without
+controlling the player. Automation and SI modules remain development tools,
+tested separately rather than mounted in the player entry.
+
+Solo campaign missions use a locked third-person isometric camera.
+Legacy first-person URLs and the V key cannot switch it; renderer
 failures show an error instead of falling back. Legacy tactical orders remain,
 but their first-person campaign-canvas presentation is disabled. The hosted app and mirror
 contract are documented in [the repair handoff](../hosted/GAME_REPAIR.md).

@@ -150,9 +150,89 @@ test('browser driver carries ordered footprint telemetry through completion and 
   footprint = ops.scrub({ ...footprint, time: 3 }, 'F1'); s.mode = 'victory'; interval();
   assert.deepEqual(events[0].footprints, ops.episode(footprint));
   assert.equal(events[0].footprints_total, 8);
+  assert.equal(run.status().running, false);
+  A.start(win);
   s = makeState({ mode: 'play', missionIndex: 0 }); interval();
   s.mode = 'dead'; interval();
   assert.equal(Object.hasOwn(events[1], 'footprints'), false);
   assert.equal(Object.hasOwn(events[1], 'footprints_total'), false);
   run.stop();
+});
+
+function driver(options = {}) {
+  let interval, time = 0, s = makeState({ mode: 'play' }), clicks = 0, clears = 0;
+  const events = [], listeners = new Map(), nodes = new Map();
+  const el = () => ({ style: {}, children: [], remove() {}, appendChild(child) { this.children.push(child); } });
+  const win = {
+    document: { createElement: el, body: el(), getElementById(id) { return nodes.get(id) || null; }, querySelector: () => null, querySelectorAll: () => [] },
+    localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    performance: { now: () => time },
+    HailCampaignState: () => s, HailSetAutopilotActive(value) { this.autoActive = value; },
+    setInterval(fn) { interval = fn; return 1; }, clearInterval() { clears++; },
+    addEventListener(type, fn) { listeners.set(type, fn); }, removeEventListener(type) { listeners.delete(type); },
+    dispatchEvent(event) { events.push(event); },
+    KeyboardEvent: class { constructor(type, fields) { Object.assign(this, { type }, fields); } }
+  };
+  nodes.set('primary', { click() { clicks++; } });
+  const run = A.start(win, options);
+  return { win, run, events, nodes, listeners, tick: () => interval(), state: () => s,
+    setState(value) { s = value; }, advance(value) { time += value; }, clicks: () => clicks, clears: () => clears };
+}
+
+test('autopilot stops at pause, death and victory instead of resuming or restarting', () => {
+  for (const mode of ['pause', 'dead', 'victory']) {
+    const d = driver(); d.tick(); d.state().mode = mode; d.tick(); d.tick();
+    assert.equal(d.run.status().running, false, mode);
+    assert.equal(d.clicks(), 0, mode);
+    assert.equal(d.win.autoActive, false);
+    assert.equal(d.clears(), 1);
+    assert.ok(d.events.every(e => !(e.type === 'keydown' && e.code === 'Escape')));
+  }
+});
+
+test('autopilot episode and wall-clock limits end runs rather than starting more episodes', () => {
+  const timeout = driver({ levelTimeout: 1 }); timeout.tick();
+  timeout.state().stats.elapsed = 1; timeout.tick(); timeout.tick();
+  assert.equal(timeout.run.status().running, false);
+  assert.match(timeout.run.status().stopReason, /Episode time limit/);
+  assert.equal(timeout.run.learner.generation, 1);
+  assert.equal(timeout.run.learner.history[0].outcome, 'timeout');
+  const wall = driver({ maxDurationMs: 100 }); wall.tick(); wall.advance(100); wall.tick();
+  assert.match(wall.run.status().stopReason, /Session time limit/);
+  const complete = driver(); complete.tick(); complete.state().mode = 'brief'; complete.tick();
+  assert.match(complete.run.status().stopReason, /Episode limit/);
+  assert.equal(complete.clicks(), 0);
+});
+
+test('autopilot stops on human input, lost focus, hidden page and data review; duplicate start cleans up', () => {
+  for (const event of ['keydown', 'pointerdown', 'blur', 'pagehide']) {
+    const d = driver(); d.tick(); d.listeners.get(event)({ isTrusted: true }); d.tick();
+    assert.equal(d.run.status().running, false, event);
+    assert.equal(d.listeners.size, 0);
+  }
+  const hidden = driver(); hidden.tick(); hidden.win.document.hidden = true; hidden.tick();
+  assert.equal(hidden.run.status().running, false);
+  const modal = driver(); modal.nodes.set('gameDataPanel', { hidden: false }); modal.tick();
+  assert.equal(modal.run.status().running, false);
+  const duplicate = driver(); const first = duplicate.run; A.start(duplicate.win);
+  assert.equal(first.status().running, false);
+  assert.equal(duplicate.clears(), 1);
+  assert.equal(duplicate.win.HailAutopilotRun.status().running, true);
+  duplicate.win.HailAutopilotRun.stop();
+});
+
+test('autopilot visible stop button releases keys and rejects unbounded configuration', () => {
+  const d = driver(); d.tick();
+  const hud = d.win.document.body.children[0];
+  d.listeners.get('blur')({ type: 'blur', target: hud.children[1] });
+  d.listeners.get('pointerdown')({ type: 'pointerdown', isTrusted: true, target: hud.children[1] });
+  assert.equal(d.run.status().running, true);
+  hud.children[1].onclick();
+  assert.equal(d.run.status().running, false);
+  assert.equal(d.run.status().stopReason, 'Stopped by player.');
+  assert.equal(hud.children[1].disabled, true);
+  assert.ok(d.events.some(e => e.type === 'keyup'));
+  for (const options of [{ maxEpisodes: Infinity }, { maxDurationMs: Infinity }, { tickMs: 0 }, { levelTimeout: NaN }]) {
+    assert.throws(() => driver(options), /finite/);
+  }
 });

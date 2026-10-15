@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "8df6ed8316fe2d80126b70600bb7446610c8fd4f8947a216f3997ba833394bd8"
+      "sha256": "0a9120bfac87b293aebc605af2c9b6d540d4b3e9e95e2b3d757a251fabc9d801"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,15 +116,15 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "10f0807aef3a1d717b35520ad9f4e15c1b83c4fb2b24149c9ed53c7618635085"
+      "sha256": "34d243b9e75e8c345aa266709064cfd6f1011441ed2701c348fd25e925220c7e"
     },
     {
       "path": "engine/aug-frames.js",
-      "sha256": "11acb6098686977d112b160ff09ec9251abc8027bdf7f853311aacbc2bc6ea13"
+      "sha256": "0e0a848e462de96eeccb1a69842d0be58671b44eb0816837ed9fde101b0d4683"
     },
     {
       "path": "engine/autopilot.js",
-      "sha256": "05d257dd39d8bc885f0012de61c07c39d70b89539a17c517a29232ab92626567"
+      "sha256": "81b3bc0af31dab20d0f108ae5c321dd01a558e6af77e994325eba842de8658ff"
     },
     {
       "path": "engine/boss.js",
@@ -140,7 +140,7 @@
     },
     {
       "path": "engine/combat-assist.js",
-      "sha256": "c8af9b636d49991379e42e0acd90646e937977ecb30e05d86efc66f699acd67d"
+      "sha256": "0da41636eb7edcbaee609571427d583675c0a5e958d48c076b24e83641efe857"
     },
     {
       "path": "engine/controls.js",
@@ -220,7 +220,7 @@
     },
     {
       "path": "engine/si-dialogue.js",
-      "sha256": "1b448094c3de0365696a979818130b79d654695cb3f9ff8315879fe442618eea"
+      "sha256": "906a85c77e369152a230f67404c53b6dc7d2e008b89bae3d367cee3c25883823"
     },
     {
       "path": "engine/si-story-corpus.js",
@@ -320,7 +320,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "c65714fb46d6e08375f036b735b206b1f38115f12ce0839e5645c656c201c017"
+      "sha256": "8c945704c394ac3836b911bf7511f5a590db55114dea7d9ad94b2b711be9b731"
     },
     {
       "path": "js/emulation-engine.js",
@@ -428,7 +428,7 @@
     },
     {
       "path": "tests/autopilot.test.js",
-      "sha256": "ac797808bb3601965658113d38053768d46ac20c4f8dc74d75806ea82bda6a36"
+      "sha256": "6050eb7473c2236c2cd72992c4df24a7b146708f9a67e8b8c7cd126cfe9b5264"
     },
     {
       "path": "tests/campaign-story.test.js",
@@ -468,7 +468,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "1fa56e1c66a7e8425d480297571b6a2f252ae2d5aeeac887d572c6a10bdcd123"
+      "sha256": "1d26c1b10c77e079d998e9e651c5974bef189f655a881eb688ae82a8788915ef"
     },
     {
       "path": "tests/fx.test.js",
@@ -512,7 +512,7 @@
     },
     {
       "path": "tests/si-dialogue.test.js",
-      "sha256": "cc8064f0edb02bb03f8f5e035177826e6137dbc7b022ca1aeb913bc6341d78fb"
+      "sha256": "aedd0ae5a85574d5397a7f25c6f30f01bfe5bbd68500d1ae6019d3b7f36df5e6"
     },
     {
       "path": "tests/solo-expansion.test.js",

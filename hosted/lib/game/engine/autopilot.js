@@ -246,18 +246,27 @@
 
   // Browser driver: keyboard events and on-screen buttons only; never writes game state.
   function start(win, options) {
-    const opts = { tickMs: 50, levelTimeout: 240, storageKey: 'hail-autopilot/v1', ...options };
+    const opts = { tickMs: 50, levelTimeout: 240, maxEpisodes: 1, maxDurationMs: 300000, storageKey: 'hail-autopilot/v1', ...options };
+    if (!Number.isFinite(opts.tickMs) || opts.tickMs < 16 || opts.tickMs > 1000 ||
+        !Number.isFinite(opts.levelTimeout) || opts.levelTimeout <= 0 || opts.levelTimeout > 2400 ||
+        !Number.isInteger(opts.maxEpisodes) || opts.maxEpisodes < 1 || opts.maxEpisodes > 100 ||
+        !Number.isFinite(opts.maxDurationMs) || opts.maxDurationMs < 100 || opts.maxDurationMs > 3600000) {
+      throw Error('Autopilot requires finite tick, episode and duration limits.');
+    }
+    if (win.HailAutopilotRun) win.HailAutopilotRun.destroy();
     const doc = win.document, store = win.localStorage;
     let saved = null;
     try { saved = JSON.parse(store.getItem(opts.storageKey)); } catch (e) { saved = null; }
     const learner = createLearner(saved);
     let held = new Set(), memory = {}, episode = null, lastMode = null, lastMission = null, facts = null;
+    let running = true, stopReason = null, completedEpisodes = 0;
+    const now = () => win.performance ? win.performance.now() : Date.now(), started = now();
     const hud = doc.createElement('div');
     hud.id = 'autopilotHud';
     const dock = doc.getElementById ? doc.getElementById('dock') : null;
     if (dock) dock.insertBefore(hud, dock.firstChild);
     else {
-      hud.style.cssText = 'position:fixed;right:8px;top:8px;z-index:99;background:#000c;color:#9f9;font:12px/1.35 Courier New,monospace;padding:6px 8px;border:1px solid #3a3;pointer-events:none;white-space:pre';
+      hud.style.cssText = 'position:fixed;right:8px;top:8px;z-index:99;background:#000c;color:#9f9;font:12px/1.35 Courier New,monospace;padding:6px 8px;border:1px solid #3a3;white-space:pre';
       doc.body.appendChild(hud);
     }
     const nes = doc.querySelector('[aria-label*="NES"]');
@@ -266,6 +275,12 @@
     const si = win.HailSIDialogue && win.HailStoryCorpus
       ? win.HailSIDialogue.mount(win, win.HailStoryCorpus, { learner: () => learner, facts: () => facts }) : null;
     if (si) si.status(learner);
+    const hudText = doc.createElement('div'), stopButton = doc.createElement('button');
+    hud.appendChild(hudText);
+    stopButton.textContent = 'STOP AUTOPILOT';
+    stopButton.onclick = () => stop('Stopped by player.');
+    hud.appendChild(stopButton);
+    if (win.HailSetAutopilotActive) win.HailSetAutopilotActive(true);
 
     const send = (type, code) => win.dispatchEvent(new win.KeyboardEvent(type, { code, key: code, bubbles: true }));
     const release = () => { held.forEach(c => send('keyup', c)); held = new Set(); };
@@ -283,8 +298,10 @@
       };
       if (episode.footprints) Object.assign(ep, episode.footprints);
       const result = recordEpisode(learner, ep);
+      completedEpisodes++;
       if (si) si.onEpisode(learner, ep, result);
-      try { store.setItem(opts.storageKey, serialize(learner)); } catch (e) { /* storage full */ }
+      try { store.setItem(opts.storageKey, serialize(learner)); }
+      catch (e) { hudText.textContent = 'Autopilot history save failed: ' + e.message; stop('History save failed.'); }
       episode = null;
     };
     const clickPrimary = () => {
@@ -293,19 +310,51 @@
       if (b) b.click();
     };
 
+    const trustedInput = e => {
+      if (e.isTrusted && !(e.type === 'pointerdown' && e.target === stopButton)) stop('Player took control.');
+    };
+    const lostFocus = e => { if (e.type !== 'blur' || e.target === win) stop('Page lost focus.'); };
+    const hidden = () => { if (doc.hidden) stop('Page hidden.'); };
+    const listen = (type, handler) => { if (win.addEventListener) win.addEventListener(type, handler, true); };
+    const unlisten = (type, handler) => { if (win.removeEventListener) win.removeEventListener(type, handler, true); };
+    function stop(reason = 'Stopped by player.') {
+      if (!running) return;
+      running = false; stopReason = reason;
+      win.clearInterval(timer); release();
+      if (si && si.disconnect) si.disconnect();
+      if (win.HailSetAutopilotActive) win.HailSetAutopilotActive(false);
+      hudText.textContent = 'AUTOPILOT STOPPED\n' + reason + '\nHuman controls active.';
+      stopButton.disabled = true;
+      unlisten('keydown', trustedInput); unlisten('pointerdown', trustedInput);
+      unlisten('blur', lostFocus); unlisten('pagehide', lostFocus); unlisten('visibilitychange', hidden);
+    }
     const timer = win.setInterval(() => {
+      if (!running) return;
+      if (doc.hidden) { stop('Page hidden.'); return; }
+      if (now() - started >= opts.maxDurationMs) { stop('Session time limit reached.'); return; }
+      const panel = doc.getElementById && doc.getElementById('gameDataPanel');
+      if (panel && panel.hidden === false) { stop('Player opened gameplay data.'); return; }
       let s;
-      try { s = win.HailCampaignState(); } catch (e) { return; }
+      try { s = win.HailCampaignState(); }
+      catch (e) { stop('Campaign snapshot failed: ' + e.message); return; }
       if (episode && s.missionIndex === episode.mission && typeof win.HailFootprintEpisode === 'function') episode.footprints = win.HailFootprintEpisode();
       if (s.mode !== 'play') {
         release();
-        // Pause keeps the episode open; only real exits from play are scored.
+        if (s.mode === 'pause') { stop('Game paused by player.'); return; }
         if ((lastMode === 'play' || lastMode === 'pause') && s.mode !== 'pause') finish(s, exitOutcome(s.mode));
-        if (s.mode !== 'pause') clickPrimary(); else send('keydown', 'Escape');
+        if (!running) return;
+        if (s.mode === 'dead' || s.mode === 'victory' || s.mode === 'tactical') { stop('Game ' + s.mode + '.'); return; }
+        if (completedEpisodes >= opts.maxEpisodes) { stop('Episode limit reached.'); return; }
+        clickPrimary();
       } else {
-        if (!episode || lastMission !== s.missionIndex) { if (episode) finish(s, 'complete'); begin(s); }
+        if (!episode || lastMission !== s.missionIndex) {
+          if (episode) finish(s, 'complete');
+          if (!running) return;
+          if (completedEpisodes >= opts.maxEpisodes) { stop('Episode limit reached.'); return; }
+          begin(s);
+        }
         if (typeof win.HailFootprintEpisode === 'function') episode.footprints = win.HailFootprintEpisode();
-        if (((s.stats.elapsed || 0) - episode.startTime) > opts.levelTimeout) { finish(s, 'timeout'); begin(s); }
+        if (((s.stats.elapsed || 0) - episode.startTime) >= opts.levelTimeout) { finish(s, 'timeout'); stop('Episode time limit reached.'); return; }
         const out = act(s, memory, learner.candidate);
         for (const c of held) if (!out.keys.has(c)) send('keyup', c);
         for (const c of out.keys) send('keydown', c); // re-sent each tick: the game clears keys on load/blur
@@ -315,15 +364,20 @@
         facts = { mission: s.missionIndex + 1, hp: Math.round(pl.hp), bullets: pl.bullets || 0, shells: pl.shells || 0,
           red_clearance: Boolean(pl.red), blue_clearance: Boolean(pl.blue), boss_down: Boolean(s.bossDead),
           enemies_left: (s.enemies || []).filter(e => e.hp > 0).length, autopilot_goal: out.mode };
-        hud.textContent = 'AUTOPILOT GEN ' + learner.generation + '\nbest ' + (Number.isFinite(learner.bestFitness) ? learner.bestFitness.toFixed(0) : '-') +
+        hudText.textContent = 'AUTOPILOT GEN ' + learner.generation + '\nepisodes ' + completedEpisodes + '/' + opts.maxEpisodes +
+          ' · ' + Math.max(0, Math.ceil((opts.maxDurationMs - (now() - started)) / 1000)) + 's left\nbest ' + (Number.isFinite(learner.bestFitness) ? learner.bestFitness.toFixed(0) : '-') +
           '\nmission ' + (s.missionIndex + 1) + '  hp ' + Math.round(s.player.hp) + '\n' + out.mode;
       }
       lastMode = s.mode; lastMission = s.missionIndex;
     }, opts.tickMs);
+    listen('keydown', trustedInput); listen('pointerdown', trustedInput);
+    listen('blur', lostFocus); listen('pagehide', lostFocus); listen('visibilitychange', hidden);
 
     const handle = {
       learner,
-      stop() { win.clearInterval(timer); release(); hud.remove(); const p = doc.getElementById('siChannel'); if (p) p.remove(); },
+      stop,
+      status() { return { running, stopReason, completedEpisodes, maxEpisodes: opts.maxEpisodes, maxDurationMs: opts.maxDurationMs }; },
+      destroy() { stop('Replaced or closed.'); if (si && si.destroy) si.destroy(); hud.remove(); },
       export() { return JSON.parse(serialize(learner)); },
       reset() { store.removeItem(opts.storageKey); }
     };
