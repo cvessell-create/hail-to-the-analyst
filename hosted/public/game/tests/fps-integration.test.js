@@ -37,7 +37,7 @@ function game(opts = {}) {
       innerHTML: '', textContent: '', onclick: null,
       attributes: {},
       setAttribute(name, value) { this.attributes[name] = String(value); }, addEventListener() {}, insertAdjacentHTML() {},
-      focus() {}, click() {},
+      focus() { this.focused = true; }, click() {},
       querySelector() { return node('nub'); },
       getContext() { return canvas; }
     });
@@ -47,7 +47,7 @@ function game(opts = {}) {
   let approach;
   const context = vm.createContext({
     document: { getElementById: node, ...(opts.noCamera ? {} : { createElement: () => ({}) }) },
-    window: { localStorage, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; }, ...(opts.search ? { location: { search: opts.search } } : {}) },
+    window: { localStorage, HailAutopilot: { ...require('../engine/autopilot.js'), start() {} }, confirm() { return true; }, addEventListener(name, handler) { events[name] = handler; }, ...(opts.search ? { location: { search: opts.search } } : {}) },
     ...(opts.noCamera ? {} : { THREE: {}, HailThreeView: { ...require('../engine/three-view.js'), createIso: () => {
       if(opts.cameraFailure)throw new Error('WebGL unavailable');
       return { canvas: {}, render: scene => drawing.push({kind:'iso',scene}),
@@ -75,13 +75,13 @@ function game(opts = {}) {
       briefing, startTactics, loadLevel, finishLevel, die,
       state: () => state, player: () => player,
       enemies: () => enemies, keys: () => keys
-      , update, fire, use, moveEntity, hasLOS, solid, engineClock, drawDoorStrip, drawEntrances, render, drawMap,
+      , update, fire, use, interactionTarget, interactionPrompt, moveEntity, hasLOS, solid, engineClock, drawDoorStrip, drawEntrances, render, drawMap,
       levels: () => levels, pickups: () => pickups,
       telemetry: gameplayData,
       checkpoint: () => window.HailCampaignState(), restore: v => window.HailRestoreCampaign(v), mission: () => missionMachine,
       metros: () => metros, trip: () => metroTrip, hint: () => hintPath, damage, killEnemy, surround: () => surroundInfo, hero: () => hero, saveHero, maxHp,
       sideQuestReturn: () => sideQuestReturn,
-      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice, message: () => message
+      isoOn, enterCity, cityCard, city: () => ({ cleared: cityCleared, run: cityRun, back: cityReturn, index: CITY_INDEX, campaign: CAMPAIGN_N }), practice: () => practice, message: () => message, autoSkills: () => autoSkills
     };
   `;
   const at=source.lastIndexOf('title();');
@@ -249,6 +249,117 @@ test('tactical keyboard input stays native and cannot fire FPS weapon handlers',
   g.events.keydown({ code: 'Digit3', preventDefault() {} });
   assert.equal(prevented, false);
   assert.equal(Object.keys(g.fps.keys()).length, 0);
+});
+
+test('manual play focuses the game and offers routes without starting autopilot', () => {
+  const g = game();
+  g.fps.briefing(0); g.nodes.get('primary').onclick();
+  assert.equal(g.nodes.get('game').focused, true);
+  g.nodes.get('routeBtn').onclick();
+  assert.ok(g.fps.hint().path.length > 0);
+  assert.equal(Object.keys(g.fps.keys()).length, 0);
+  assert.equal(g.fps.autoSkills(), false);
+  g.fps.render();
+  assert.ok(g.drawing.some(d => d.text === g.fps.levels()[0].objective));
+  assert.ok(g.drawing.some(d => d.text && d.text.includes('G / ROUTE: HINT')));
+});
+
+test('third-person door prompts and E use the same reachable target even when facing away', () => {
+  const g = game(); g.nodes.get('muteBtn').onclick(); g.fps.loadLevel(0);
+  Object.assign(g.fps.player(), { x: 3.5, y: 5.5, a: -Math.PI / 2 });
+  assert.equal(g.fps.interactionTarget().tile, 'D');
+  assert.equal(g.fps.interactionPrompt(g.fps.interactionTarget()), 'E / USE: OPEN DOOR');
+  g.fps.render();
+  assert.ok(g.drawing.some(d => d.text === 'E / USE: OPEN DOOR'));
+  g.events.keydown({ code: 'KeyE' });
+  assert.equal(g.fps.checkpoint().doors['3,6'].open, 1);
+  assert.equal(g.fps.checkpoint().map[6][3], '.');
+});
+
+test('nearby interaction cannot open a door through a wall or beyond reach', () => {
+  const g = game(); g.nodes.get('muteBtn').onclick(); g.fps.loadLevel(0);
+  Object.assign(g.fps.player(), { x: 2.4, y: 5.8, a: Math.PI });
+  assert.equal(g.fps.interactionTarget(), null, 'wall at 2,6 blocks the diagonal approach');
+  g.events.keydown({ code: 'KeyE' });
+  assert.equal(g.fps.checkpoint().doors['3,6'].open, 0);
+  Object.assign(g.fps.player(), { x: 3.5, y: 4.5 });
+  assert.equal(g.fps.interactionTarget(), null, 'two tiles away is not reachable');
+});
+
+test('human interaction preserves locked doors and permits extraction while standing on the exit', () => {
+  const g = game(); g.nodes.get('muteBtn').onclick(); g.fps.loadLevel(0);
+  Object.assign(g.fps.player(), { x: 15.5, y: 3.5, a: Math.PI });
+  assert.equal(g.fps.interactionPrompt(g.fps.interactionTarget()), 'RED CARD REQUIRED');
+  g.events.keydown({ code: 'KeyE' });
+  assert.equal(g.fps.checkpoint().doors['15,2'].open, 0);
+  g.fps.player().red = true;
+  g.events.keydown({ code: 'KeyE' });
+  assert.equal(g.fps.checkpoint().doors['15,2'].open, 1);
+  Object.assign(g.fps.player(), { x: 15.5, y: 1.5 });
+  g.fps.player().red = false;
+  g.events.keydown({ code: 'KeyE' });
+  assert.equal(g.fps.state(), 'play', 'extraction still requires clearance');
+  g.fps.player().red = true;
+  g.events.keydown({ code: 'KeyE' });
+  assert.equal(g.fps.state(), 'brief', 'normal completion without autopilot');
+  assert.match(g.nodes.get('card').innerHTML, /THE ARCHIVE SECURED/);
+});
+
+test('manual nearby targeting does not change legacy directional interaction', () => {
+  const g = game({ noCamera: true }); g.nodes.get('muteBtn').onclick(); g.fps.loadLevel(0);
+  Object.assign(g.fps.player(), { x: 3.5, y: 5.5, a: -Math.PI / 2 });
+  assert.equal(g.fps.interactionTarget(), null);
+  g.fps.player().a = Math.PI / 2;
+  assert.equal(g.fps.interactionTarget().tile, 'D');
+});
+
+test('chat and form focus releases held movement and does not trigger game shortcuts', () => {
+  const g = game(); g.fps.loadLevel(0);
+  g.events.keydown({ code: 'KeyW' });
+  assert.equal(g.fps.keys().KeyW, true);
+  g.events.focusin({ target: { id: 'siAsk' } });
+  assert.equal(Object.keys(g.fps.keys()).length, 0);
+  g.events.keydown({ code: 'KeyP', target: { closest: () => ({}) } });
+  assert.equal(g.fps.state(), 'play');
+  assert.equal(Object.keys(g.fps.keys()).length, 0);
+});
+
+test('keyboard-only Archive run collects clearance, extracts and advances without autopilot', () => {
+  const g = game(), f = g.fps;
+  g.nodes.get('muteBtn').onclick();
+  f.briefing(0); g.nodes.get('primary').onclick();
+  function go(x, y) {
+    for (const axis of ['x', 'y']) {
+      const delta = (axis === 'x' ? x : y) - f.player()[axis];
+      if (Math.abs(delta) < 0.04) continue;
+      const codes = axis === 'x'
+        ? (delta > 0 ? ['KeyW', 'KeyA'] : ['KeyS', 'KeyD'])
+        : (delta > 0 ? ['KeyW', 'KeyD'] : ['KeyS', 'KeyA']);
+      for (const code of [...codes, 'ShiftLeft']) g.events.keydown({ code });
+      const ticks = Math.round(Math.abs(delta) / 3.4 * 60);
+      for (let tick = 0; tick < ticks; tick++) f.engineClock.advance(1 / 60);
+      for (const code of [...codes, 'ShiftLeft']) g.events.keyup({ code });
+      assert.equal(f.state(), 'play');
+      assert.ok(Math.abs(f.player()[axis] - (axis === 'x' ? x : y)) < 0.1);
+    }
+  }
+  for (const [x, y, interact] of [
+    [1.5, 5.5], [3.5, 5.5, true], [3.5, 7.5], [1.5, 7.5],
+    [1.5, 12.5], [3.5, 12.5], [3.5, 13.5], [6.5, 13.5],
+    [6.5, 12.5, true], [8.5, 12.5], [8.5, 13.5], [10.5, 13.5],
+    [12.5, 13.5], [12.5, 7.5], [14.5, 7.5], [14.5, 3.5],
+    [15.5, 3.5, true], [15.5, 1.5, true]
+  ]) {
+    go(x, y);
+    if (interact) { g.events.keydown({ code: 'KeyE' }); g.events.keyup({ code: 'KeyE' }); }
+  }
+  assert.equal(f.player().red, true);
+  assert.ok(f.player().hp > 0);
+  assert.equal(f.state(), 'brief');
+  assert.equal(f.autoSkills(), false);
+  g.nodes.get('primary').onclick(); g.nodes.get('primary').onclick();
+  assert.equal(f.state(), 'play');
+  assert.equal(f.checkpoint().missionIndex, 1);
 });
 
 test('entry point uses local classic scripts and styles that work without a build or fetch', () => {

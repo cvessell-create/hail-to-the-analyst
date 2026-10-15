@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "2e99f6d29496059f01b37b00804b01e5c0ab229f2e2f92ce1d3b449c77942378"
+      "sha256": "8df6ed8316fe2d80126b70600bb7446610c8fd4f8947a216f3997ba833394bd8"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -320,7 +320,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "08651fd2a90a39ceb9bf724bc260a6d90f9ebc2c7c50370230f0b89aaea02ac5"
+      "sha256": "c65714fb46d6e08375f036b735b206b1f38115f12ce0839e5645c656c201c017"
     },
     {
       "path": "js/emulation-engine.js",
@@ -468,7 +468,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "d656d46101f73d5436a2f29261b8357c1a0e261ccd903cd194817fdd042579ee"
+      "sha256": "1fa56e1c66a7e8425d480297571b6a2f252ae2d5aeeac887d572c6a10bdcd123"
     },
     {
       "path": "tests/fx.test.js",

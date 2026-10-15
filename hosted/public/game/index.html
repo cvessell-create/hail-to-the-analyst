@@ -54,7 +54,7 @@ body:has(#dock>#siChannel,#dock>#autopilotHud) #dock{display:flex}
 <div id="shell">
 <canvas id="game" width="960" height="540" tabindex="0" aria-label="Jack's third-person isometric view. WASD moves, mouse aims, E interacts."></canvas>
 <div id="crt"></div><div id="vignette"></div>
-<div id="topbar"><button class="chip" id="mapBtn" aria-pressed="false" aria-label="Toggle live hex tactical minimap">HEX MAP [M]</button><button class="chip" id="muteBtn" aria-pressed="false">SOUND ON</button><button class="chip" id="pauseBtn">PAUSE</button></div>
+<div id="topbar"><button class="chip" id="routeBtn">ROUTE [G]</button><button class="chip" id="mapBtn" aria-pressed="false" aria-label="Toggle live hex tactical minimap">HEX MAP [M]</button><button class="chip" id="muteBtn" aria-pressed="false">SOUND ON</button><button class="chip" id="pauseBtn">PAUSE</button></div>
 <div id="touch"><div id="look"></div><div id="joy" class="touchzone"><div class="nub"></div></div><button id="weapon" class="touchbtn">WEAPON</button><button id="use" class="touchbtn">USE</button><button id="fire" class="touchbtn">FIRE</button><button id="jet" class="touchbtn" aria-label="Hold to fly jetpack">JET</button></div>
 <div id="overlay"><div class="card" id="card"></div></div>
 </div>
@@ -195,7 +195,7 @@ function setMessage(s,t){message=s;messageT=t||2.3}
 function beginGameplayAttempt(mission,practiceMode){attemptStartStats={kills:stats.kills,shots:stats.shots,hits:stats.hits};recordGameplay(function(){return gameplayData.beginAttempt(mission,practiceMode)});}
 function endGameplayAttempt(outcome){if(!attemptStartStats)return;var start=attemptStartStats;attemptStartStats=null;recordGameplay(function(){return gameplayData.endAttempt(outcome,{durationMs:levelTime*1000,kills:stats.kills-start.kills,shots:stats.shots-start.shots,hits:stats.hits-start.hits,x:player&&player.x,y:player&&player.y})});}
 function tone(type){if(muted)return;if(!audio){var Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;try{audio=new Audio();}catch(e){return;}}if(audio.state==='suspended')audio.resume();var now=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);var f=220,d=.1,kind='square';if(type==='shot'){f=125;d=.08}else if(type==='boom'){f=72;d=.24}else if(type==='hurt'){f=58;d=.16}else if(type==='pick'){f=520;d=.15;kind='sine'}else if(type==='intel'){f=660;d=.34;kind='square'}else if(type==='door'){f=90;d=.3;kind='sawtooth'}else if(type==='boss'){f=44;d=.75;kind='sawtooth'}else if(type==='death'){f=170;d=.6;kind='sawtooth'}else if(type==='exit'){f=320;d=.5;kind='sine'}o.type=kind;o.frequency.setValueAtTime(f,now);o.frequency.exponentialRampToValueAtTime(type==='death'?45:f*1.45,now+d);g.gain.setValueAtTime(.11,now);g.gain.exponentialRampToValueAtTime(.001,now+d);o.start();o.stop(now+d)}
-function title(){state='title';cityRun=false;cityReturn=null;overlay.classList.remove('hidden');touch.classList.remove('active');card.innerHTML='<div class="kicker">CIVILIAN STRATEGY LAB // FIRST-PERSON OPERATIONS</div><h1 class="title">HAIL TO THE<span>ANALYST</span></h1><div class="brief">You are Jack Slade, a civilian analyst in an original training simulation. Recover access, manage scarce resources and choose a route through autonomous opponents. The strategy lab models declared incentives and cooperation.</div><button class="action" id="primary">DEPLOY</button> <button class="chip" id="practiceBtn">MISSION SELECT // PRACTICE</button>'+(City?' <button class="chip" id="cityBtn">VESSELL CITY // FREE ROAM</button>':'')+'<div class="small desktop"><span class="keys">WASD</span> move · <span class="keys">← →</span> turn · <span class="keys">SPACE / CLICK</span> fire · <span class="keys">E</span> use · <span class="keys">J</span> jetpack · <span class="keys">1–3</span> weapons · <span class="keys">M</span> map</div><div class="small">Touch controls appear automatically on iPhone. Audio initializes on deploy.</div><div class="small">Gameplay data is off unless you opt in. <button class="chip" id="openGameData">REVIEW PRIVACY &amp; DATA</button></div>';document.getElementById('primary').onclick=function(){practice=false;initAudio();briefing(0)};document.getElementById('practiceBtn').onclick=missionSelect;if(City)document.getElementById('cityBtn').onclick=cityCard;document.getElementById('openGameData').onclick=openGameplayData;}
+function title(){state='title';cityRun=false;cityReturn=null;overlay.classList.remove('hidden');touch.classList.remove('active');card.innerHTML='<div class="kicker">CIVILIAN STRATEGY LAB // THIRD-PERSON OPERATIONS</div><h1 class="title">HAIL TO THE<span>ANALYST</span></h1><div class="brief">You are Jack Slade, a civilian analyst in an original training simulation. Recover access, manage scarce resources and choose a route through autonomous opponents. The strategy lab models declared incentives and cooperation.</div><button class="action" id="primary">DEPLOY</button> <button class="chip" id="practiceBtn">MISSION SELECT // PRACTICE</button>'+(City?' <button class="chip" id="cityBtn">VESSELL CITY // FREE ROAM</button>':'')+'<div class="small desktop"><span class="keys">WASD</span> move · <span class="keys">MOUSE</span> aim · <span class="keys">SPACE / CLICK</span> fire · <span class="keys">E</span> use · <span class="keys">G</span> route · <span class="keys">J</span> jetpack · <span class="keys">1–3</span> weapons · <span class="keys">I</span> inventory · <span class="keys">M</span> map</div><div class="small">Touch controls appear automatically on iPhone. ROUTE marks a path; you stay in control. No AI connection is needed.</div><div class="small">Gameplay data is off unless you opt in. <button class="chip" id="openGameData">REVIEW PRIVACY &amp; DATA</button></div>';document.getElementById('primary').onclick=function(){practice=false;initAudio();briefing(0)};document.getElementById('practiceBtn').onclick=missionSelect;if(City)document.getElementById('cityBtn').onclick=cityCard;document.getElementById('openGameData').onclick=openGameplayData;}
 function missionSelect(){
   state='brief';overlay.classList.remove('hidden');touch.classList.remove('active');
   card.innerHTML='<div class="kicker">MISSION SELECT // PRACTICE ONLY</div><h2 class="title" style="font-size:44px">CHOOSE YOUR MAP</h2><div class="brief">Practice a single arena from its normal spawn. This does not complete the campaign or unlock a victory.</div>'+levels.slice(0,CAMPAIGN_N).map(function(L,i){return '<p><button class="chip" id="mission-'+i+'">PLAY '+L.name+'</button></p>';}).join('')+'<p><button class="chip" id="mission-sidequest">OPTIONAL SIDE QUEST // FOOTPRINT PURGE</button></p><button class="chip" id="primary">BACK</button>';
@@ -217,7 +217,7 @@ function briefing(i){
   levelIndex=i;state='brief';overlay.classList.remove('hidden');touch.classList.remove('active');
   var L=levels[i],beat=HailCampaignStory.mission(L.name)||HailCampaignStory.sideQuest(L.name),isSideQuest=Boolean(L.sideQuest);
   var story=(i===0?'<b>CAMPAIGN PREMISE:</b> '+HailCampaignStory.OPENING+'<br><br>':'')+(beat&&beat.apparatus?'<b>APPARATUS LAYER // '+beat.apparatus.stage+':</b> '+beat.apparatus.note+'<br><br>':'')+(beat?'<b>STORY:</b> '+beat.story+'<br><br><b>TACTICS:</b> '+beat.tactics+'<br><br>':'');
-  card.innerHTML='<div class="kicker">'+(isSideQuest?'OPTIONAL SIDE QUEST':'MISSION '+(i+1)+' OF '+CAMPAIGN_N)+' // '+L.objective+'</div><h2 class="title" style="font-size:clamp(36px,7vw,72px)">'+L.name+'</h2><div class="brief">'+L.brief+'<br><br>'+story+'<b>FIRST-PERSON OPERATION:</b> Move, aim and fire in real time. Recover access cards, manage ammunition and choose a safe route.</div><button class="action" id="primary">ENTER MISSION</button>'+(sideQuestReturn?' <button class="chip" id="cityBack">RETURN TO SIGNAL EXCHANGE</button>':cityRun?' <button class="chip" id="cityBack">BACK TO VESSELL CITY</button>':'');
+  card.innerHTML='<div class="kicker">'+(isSideQuest?'OPTIONAL SIDE QUEST':'MISSION '+(i+1)+' OF '+CAMPAIGN_N)+' // '+L.objective+'</div><h2 class="title" style="font-size:clamp(36px,7vw,72px)">'+L.name+'</h2><div class="brief">'+L.brief+'<br><br>'+story+'<b>THIRD-PERSON CONTROLS:</b> WASD / stick moves; mouse / look aims. Press E / USE near a door or exit. G / ROUTE marks a suggested path without taking control. Recover access cards, manage ammunition and choose a safe route.</div><button class="action" id="primary">ENTER MISSION</button>'+(sideQuestReturn?' <button class="chip" id="cityBack">RETURN TO SIGNAL EXCHANGE</button>':cityRun?' <button class="chip" id="cityBack">BACK TO VESSELL CITY</button>':'');
   document.getElementById('primary').onclick=function(){startSolo(i)};
   if(sideQuestReturn)document.getElementById('cityBack').onclick=returnFromFootprint;else if(cityRun)document.getElementById('cityBack').onclick=returnToCity;
 }
@@ -256,7 +256,7 @@ function loadLevel(i){
       !enemies.some(function(e){return e.x===x+.5&&e.y===y+.5}))reinforcements.push({x:x+.5,y:y+.5});
   }
   for(var n=0;n<bonus.extraEnemies&&n<reinforcements.length;n++)spawnEnemy('m',reinforcements[n].x,reinforcements[n].y);
-  keys={};touchInput.fire=false;touchInput.jet=false;state='play';overlay.classList.add('hidden');touch.classList.add('active');levelTime=0;if(!levels[i].city)beginGameplayAttempt(i,practice);
+  keys={};touchInput.fire=false;touchInput.jet=false;state='play';overlay.classList.add('hidden');touch.classList.add('active');cv.focus();levelTime=0;if(!levels[i].city)beginGameplayAttempt(i,practice);
   if(!stats.start)stats.start=1;
   setMessage(levels[i].city?'— '+levels[i].name+' — '+levels[i].district:levels[i].requires==='footprints'?'SCRUB EVERY CRITICAL EXPOSURE. OPTIONAL NODES EARN EXTRA INTEL.':i===0?"IT'S TIME TO KICK ASS AND VERIFY SOURCES.":'FIND THE SOURCE. END THE STORY.',3.8);
   if(window.DeceptionOps){var intel=DeceptionOps.solve(DeceptionOps.cardFor(i));window.HailIntel=intel;
@@ -270,10 +270,36 @@ function playerSolid(x,y){return solidAt(x,y,player.height||0)}
 function moveEntity(o,dx,dy,r){VessellEngine.move(o,dx,dy,r||.22,o===player?playerSolid:solid)}
 function shotReach(a,ang){var h=a.height||0;return VessellEngine.castRay(map,a.x,a.y,ang,7,function(x,y){return solidAt(x,y,h)}).distance}
 function hasLOS(a,b){var h=Math.max(a.height||0,b.height||0);return VessellEngine.lineOfSight(map,a,b,function(x,y){return solidAt(x,y,h)})}
+function interactionTarget(){
+  if(state!=='play')return null;
+  function actionable(c){return Boolean(c)&&(c==='X'||'DRB'.indexOf(c)>=0||City&&levels[levelIndex].city&&City.entrance(c)||levels[levelIndex].name===HailGatewaySprawl.NAME&&HailGatewaySprawl.sideQuestEntrance(c))}
+  var fx=Math.floor(player.x+Math.cos(player.a)*.85),fy=Math.floor(player.y+Math.sin(player.a)*.85),c=map[fy]&&map[fy][fx];
+  if(actionable(c))return {x:fx,y:fy,tile:c};
+  if(!isoOn()||autoSkills)return null;
+  var best=null,distance=1.35;
+  for(var y=Math.floor(player.y)-1;y<=Math.floor(player.y)+1;y++)for(var x=Math.floor(player.x)-1;x<=Math.floor(player.x)+1;x++){
+    c=map[y]&&map[y][x];if(!actionable(c))continue;
+    var dx=x+.5-player.x,dy=y+.5-player.y,d=Math.hypot(dx,dy);if(d>distance)continue;
+    var ray=VessellEngine.castRay(map,player.x,player.y,Math.atan2(dy,dx),d,solid);
+    if(ray.distance<d&&(ray.x!==x||ray.y!==y))continue;
+    best={x:x,y:y,tile:c};distance=d;
+  }
+  return best;
+}
+function interactionPrompt(target){
+  if(metroAt()>=0)return 'E / USE: RIDE METRO';
+  if(!target)return '';
+  var c=target.tile;
+  if(c==='R'&&!player.red)return 'RED CARD REQUIRED';
+  if(c==='B'&&!player.blue)return 'BLUE CARD REQUIRED';
+  return 'E / USE: '+(c==='X'?'EXTRACT':'DRB'.indexOf(c)>=0?'OPEN DOOR':'ENTER');
+}
 function use(){
   if(state!=='play')return;
   var st=metroAt();if(st>=0){callTrain(st);return}
-  var fx=Math.floor(player.x+Math.cos(player.a)*.85),fy=Math.floor(player.y+Math.sin(player.a)*.85),c=map[fy]&&map[fy][fx];
+  var target=interactionTarget();
+  if(!target){setMessage('NO ACTIONABLE INTELLIGENCE.');return}
+  var fx=target.x,fy=target.y,c=target.tile;
   if(City&&levels[levelIndex].city&&City.entrance(c)){cityUse(c);return}
   if(levels[levelIndex].name===HailGatewaySprawl.NAME&&HailGatewaySprawl.sideQuestEntrance(c)){enterFootprintSideQuest();return}
   if('DRB'.indexOf(c)>=0){
@@ -379,7 +405,14 @@ function drawScenery(){
   }
 }
 function drawCitySigns(){if(!City||!levels[levelIndex].city)return;var list=City.signs(map,cityCleared).map(function(sg){return {x:sg.x,y:sg.y,label:sg.label,sub:sg.locked?'LOCKED':'E: ENTER',color:sg.color,h:(HailThreeView.ISO_HEIGHT[map[Math.floor(sg.y)][Math.floor(sg.x)]]||1)+.25}});metros.forEach(function(m,i){list.push({x:m.x,y:m.y,label:'METRO '+stopLabel(i),sub:'E: RIDE',color:City.PALETTE.U,h:.9})});if(levels[levelIndex].name===HailGatewaySprawl.NAME){for(var y=0;y<mh;y++)for(var x=0;x<mw;x++)if(map[y][x]==='S')list.push({x:x+.5,y:y+.5,label:'FOOTPRINT PURGE',sub:'E: ENTER',color:'#FFB85C',h:.9})}ctx.save();ctx.textAlign='center';list.forEach(function(sg){var p=iso.project(sg.x,sg.y,sg.h);if(p.x<-60||p.x>W+60||p.y<-20||p.y>H+20)return;var near=Math.hypot(sg.x-player.x,sg.y-player.y)<2.2;ctx.font='900 12px Courier New';var w=ctx.measureText(sg.label).width+12;ctx.fillStyle='rgba(16,24,38,.86)';ctx.fillRect(p.x-w/2,p.y-16,w,near?32:20);ctx.strokeStyle=sg.color;ctx.lineWidth=2;ctx.strokeRect(p.x-w/2,p.y-16,w,near?32:20);ctx.fillStyle='#E8E0C8';ctx.fillText(sg.label,p.x,p.y-2);if(near){ctx.font='900 10px Courier New';ctx.fillStyle=sg.sub==='LOCKED'?'#D23B3B':sg.color;ctx.fillText(sg.sub,p.x,p.y+12)}});ctx.restore()}
-function renderIso(){ctx.save();var sx=shake?Math.sin(levelTime*97)*5:0,sy=shake?Math.cos(levelTime*113)*3.5:0;ctx.translate(sx,sy);iso.render({map:map,level:levels[levelIndex],player:player,enemies:enemies,pickups:pickups,shots:shots,tracers:tracers,grenades:grenades,allies:allies,strikes:strikes,barrier:barrier,metros:metros,hint:hintPath,time:levelTime,dt:1/60});ctx.drawImage(iso.canvas,0,0,W,H);drawCitySigns();if(flash){ctx.fillStyle='rgba(120,220,255,'+flash*2+')';var mp=iso.project(player.x+Math.cos(player.a)*.4,player.y+Math.sin(player.a)*.4,.38);ctx.beginPath();ctx.arc(mp.x,mp.y,10,0,6.29);ctx.fill()}drawHUD();drawJetHUD();drawAssist();drawProgression();if(mapVisible)drawMap();if(hurtFlash){ctx.fillStyle='rgba(255,20,10,'+(hurtFlash*.6)+')';ctx.fillRect(-10,-10,W+20,H+20)}ctx.restore()}
+function drawHumanGuide(){
+  ctx.save();ctx.textAlign='center';ctx.font='900 13px Courier New';
+  ctx.fillStyle='rgba(4,5,3,.9)';ctx.fillRect(12,H-116,W-24,44);ctx.fillStyle='#baff78';
+  ctx.fillText(levels[levelIndex].objective||levels[levelIndex].name,W/2,H-99,W-32);
+  ctx.fillStyle='#fff2b8';ctx.fillText(interactionPrompt(interactionTarget())||'WASD / STICK: MOVE | MOUSE / LOOK: AIM | E / USE: INTERACT | G / ROUTE: HINT',W/2,H-80,W-32);
+  ctx.restore();
+}
+function renderIso(){ctx.save();var sx=shake?Math.sin(levelTime*97)*5:0,sy=shake?Math.cos(levelTime*113)*3.5:0;ctx.translate(sx,sy);iso.render({map:map,level:levels[levelIndex],player:player,enemies:enemies,pickups:pickups,shots:shots,tracers:tracers,grenades:grenades,allies:allies,strikes:strikes,barrier:barrier,metros:metros,hint:hintPath,time:levelTime,dt:1/60});ctx.drawImage(iso.canvas,0,0,W,H);drawCitySigns();if(flash){ctx.fillStyle='rgba(120,220,255,'+flash*2+')';var mp=iso.project(player.x+Math.cos(player.a)*.4,player.y+Math.sin(player.a)*.4,.38);ctx.beginPath();ctx.arc(mp.x,mp.y,10,0,6.29);ctx.fill()}drawHUD();drawJetHUD();drawAssist();drawProgression();if(mapVisible)drawMap();drawHumanGuide();if(hurtFlash){ctx.fillStyle='rgba(255,20,10,'+(hurtFlash*.6)+')';ctx.fillRect(-10,-10,W+20,H+20)}ctx.restore()}
 function render(scene){
 var desiredHeight=scene&&cv.clientWidth&&cv.clientHeight?Math.round(W*cv.clientHeight/cv.clientWidth):540;
 if(H!==desiredHeight){H=desiredHeight;cv.height=H;ctx.imageSmoothingEnabled=false;}
@@ -478,8 +511,10 @@ function drawMap(){
 function toggleMap(){if(state!=='play')return;mapVisible=!mapVisible;document.getElementById('mapBtn').setAttribute('aria-pressed',mapVisible)}
 function loop(t){if(t-lastStateLog>=1000||(!wholeStateLog.length||wholeStateLog[wholeStateLog.length-1].mode!==state)){lastStateLog=t;wholeStateLog.push(wholeState());if(wholeStateLog.length>180)wholeStateLog.shift();}var dt=last?Math.min(3600,(t-last)/1000):0;last=t;if(state==='play'&&(!dataPanel||dataPanel.hidden!==false)&&dt>0&&dt<=.25)recordGameplay(function(){return gameplayData.sampleFrameTime(dt*1000)});engineClock.advance(dt);if(state==='play')render();else if(state==='tactical'){var scene=TacticalUI.scene();if(scene)render(scene);}requestAnimationFrame(loop)}
 function initAudio(){if(!audio&&!muted){try{audio=new (window.AudioContext||window.webkitAudioContext)();tone('intel')}catch(e){}}}
+function showRoute(){if(state!=='play'||!Combat)return;hintPath=Combat.hint(window.HailCampaignState&&window.HailCampaignState(),window.HailAutopilot);setMessage(hintPath?'ROUTE TO '+hintPath.kind.toUpperCase()+' MARKED ON RADAR.':'NO ROUTE AVAILABLE.',2)}
 window.addEventListener('keydown',function(e){
   if(dataPanel&&dataPanel.hidden===false)return;
+  if(e.target&&e.target.closest&&e.target.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])'))return;
   if(state==='tactical')return;
   keys[e.code]=true;
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0)e.preventDefault();
@@ -491,13 +526,15 @@ window.addEventListener('keydown',function(e){
   if(state==='play'&&e.code==='KeyV'){setMessage('THIRD-PERSON VIEW LOCKED.',3)}
   if(e.code==='KeyE')use();
   if(state==='play'&&Combat&&e.code==='KeyQ'){var rf=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),rs=(keys.KeyD?1:0)-(keys.KeyA?1:0);var im=isoOn()&&!autoSkills&&(rf||rs)?HailThreeView.isoMove(rf,rs):null;if(Combat.startRoll(player,im?Math.atan2(im.y,im.x):rf||rs?player.a+Math.atan2(rs,rf):player.a)){if(hero)player.rollCd*=Prog.rollCooldownScale(hero)*(1+gs('roll'));tone('pick')}}
-  if(state==='play'&&Combat&&e.code==='KeyG'){hintPath=Combat.hint(window.HailCampaignState&&window.HailCampaignState(),window.HailAutopilot);setMessage(hintPath?'ROUTE TO '+hintPath.kind.toUpperCase()+' MARKED ON RADAR.':'NO ROUTE AVAILABLE.',2)}
+  if(state==='play'&&e.code==='KeyG')showRoute();
   if(state==='play'&&skillsOpen&&/^Digit[1-8]$/.test(e.code)){var sk=Prog.SKILLS[+e.code.slice(-1)-1];if(Prog.spend(hero,sk.id)){tone('pick');saveHero()}return}
   if(e.code==='KeyM'&&!e.repeat)toggleMap();
   if(state==='play'&&(e.code==='Digit1'||e.code==='Digit2'||e.code==='Digit3')){player.weapon=+e.code.slice(-1)-1;setMessage(weaponDefs[player.weapon].name)}
   if(e.code==='Escape'||e.code==='KeyP')pause();
 });window.addEventListener('keyup',function(e){keys[e.code]=false});cv.addEventListener('mousemove',function(ev){var rc=cv.getBoundingClientRect();isoAim={x:(ev.clientX-rc.left)/rc.width*2-1,y:-((ev.clientY-rc.top)/rc.height*2-1)}});cv.addEventListener('mouseleave',function(){isoAim=null});cv.addEventListener('mousedown',function(ev){initAudio();if(gearOpen&&Gear&&state==='play'){var rc=cv.getBoundingClientRect();gearAct(Gear.click(hero,(ev.clientX-rc.left)/rc.width*W,(ev.clientY-rc.top)/rc.height*H,W,H));return}fire()});
 window.addEventListener('blur',function(){keys={};touchInput.active=false;touchInput.fire=false;touchInput.jet=false;touchInput.dx=touchInput.dy=0;last=0;engineClock.reset()});
+window.addEventListener('focusin',function(e){if(e.target!==cv)keys={}});
+document.getElementById('routeBtn').onclick=function(){showRoute();cv.focus()};
 function pause(){if(state==='play'){saveHero();state='pause';overlay.classList.remove('hidden');touch.classList.remove('active');card.innerHTML='<div class="kicker">FIELD OPERATIONS SUSPENDED</div><h2 class="title" style="font-size:clamp(45px,8vw,86px)">PAUSED</h2><div class="brief">Simulation paused. Review your resources, route and next action.</div><button class="action" id="primary">RESUME</button>';document.getElementById('primary').onclick=pause}else if(state==='pause'){state='play';overlay.classList.add('hidden');touch.classList.add('active')}}
 document.getElementById('pauseBtn').onclick=pause;document.getElementById('muteBtn').onclick=function(){muted=!muted;this.textContent=muted?'SOUND OFF':'SOUND ON';this.setAttribute('aria-pressed',muted);if(!muted)initAudio()};document.getElementById('mapBtn').onclick=toggleMap;
 var dataPanel=document.getElementById('gameDataPanel'),dataOpen=document.getElementById('gameDataOpen'),dataConsent=document.getElementById('gameDataConsent'),dataStatus=document.getElementById('gameDataStatus'),dataReport=document.getElementById('gameDataReport');

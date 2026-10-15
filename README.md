@@ -48,6 +48,11 @@ first-person URL options cannot change it. Renderer errors appear explicitly,
 not as a first-person fallback. Desktop uses WASD/arrows, mouse aiming and the
 displayed action controls; mobile provides touch controls. **M / HEX MAP**
 shows the current mission's tactical minimap while gameplay continues.
+Human play does not need autopilot or an AI service. **G / ROUTE** briefly marks
+a suggested path; you still move, fight and interact yourself. The mission
+objective stays on screen. Approach a door or exit and press **E / USE** when
+its prompt appears; clearance cards and boss requirements still apply.
+Click the game view after typing in chat to return to game controls.
 
 The story, enemies and operations are fictional. Gateway Sprawl and Vessell
 City are free-roam settings; Footprint Purge is an optional simulated exposure
@@ -77,7 +82,7 @@ npm test
 npm run test:homebrew
 ```
 
-The October 14 game suite passed **208 tests**. CI records later runs.
+The October 14 game suite passed **215 tests**. CI records later runs.
 
 Canonical source changes are synchronized with
 `node scripts/sync-hosted-game.js`; tests enforce byte-identical hosted mirrors.
