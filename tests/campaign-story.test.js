@@ -12,8 +12,8 @@ test('the main campaign has a source-cautious character arc for every mission', 
   assert.equal(Story.campaignLength(), 7);
   assert.equal(levels.length, Story.campaignLength());
   assert.match(Story.OPENING, /Municipal Darwinism/i);
-  assert.match(Story.OPENING, /fictional civic intelligence apparatus/i);
-  assert.match(Story.OPENING, /leads, not proof/i);
+  assert.match(Story.OPENING, /A civic intelligence apparatus/);
+  assert.doesNotMatch(Story.OPENING, /\bmobile\b|\bfictional\b|The system is meant|shy salvage apprentice|not proof/);
   assert.deepEqual(Story.MISSIONS.map(row => row.apparatus.stage), [
     'DIRECTION', 'COLLECTION', 'PROCESSING', 'EXPLOITATION & ANALYSIS',
     'DISSEMINATION', 'EVALUATION & OVERSIGHT', 'HUMAN REVIEW & DECISION'
@@ -27,10 +27,13 @@ test('the main campaign has a source-cautious character arc for every mission', 
     assert.ok(beat.after);
   }
   assert.match(Story.mission('THE ARCHIVE').story, /shy/i);
-  assert.match(Story.mission('SHADOW DOSSIER').story, /fictional weapons system/i);
+  assert.match(Story.mission('SHADOW DOSSIER').story, /ODNI, a weapons system/);
   assert.match(Story.mission('SHADOW DOSSIER').story, /STALKER/);
   assert.match(Story.mission('SHADOW DOSSIER').tactics, /telegraphed volley/i);
-  assert.match(Story.mission('SHADOW DOSSIER').apparatus.note, /not authority/i);
+  assert.equal(Story.mission('SHADOW DOSSIER').apparatus.note, 'The Stalker guards access codes to the ODNI system. Defeating it secures evidence.');
+  assert.doesNotMatch(Story.OPENING, /St\. Louis/);
+  assert.match(Story.OPENING, /toward the city/);
+  assert.doesNotMatch(JSON.stringify(levels), /mobile|moving-city|fictional cyberpunk|Delmar|No real accounts|in this story/i);
 });
 
 test('footprint purge is framed as a fictional optional side quest', () => {

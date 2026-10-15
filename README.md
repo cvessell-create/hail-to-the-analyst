@@ -57,6 +57,8 @@ skills and inventory. Skills and inventory show readable buttons and prices.
 On touch screens, hold **RUN** to sprint or **RAISE** to aim over low cover.
 Menus suspend combat. Losing page focus pauses the game; use
 **RESUME** to return. Held movement, fire and flight do not carry across menus.
+**MAIN MENU** leaves the current run from gameplay, pause or a story screen.
+Hero progression stays saved; deploying again starts a fresh run, not a resume.
 
 The story, enemies and operations are fictional. Gateway Sprawl and Vessell
 City are free-roam settings; Footprint Purge is an optional simulated exposure

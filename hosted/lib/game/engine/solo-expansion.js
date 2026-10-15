@@ -75,13 +75,13 @@
   function levels(){
     return [
       {name:'FROST YARD',district:'NORTH CITY TRANSFER',theme:'gateway',outdoor:true,fx:'frost-snow',requires:'red',objective:'Cross the frozen transfer yard and recover the settlement route.',
-        brief:'North City’s winter transfer yard is full of rail-cut brick, iced-over service lanes and moving-city salvage. ICE PIG DROIDS guard the fuel stores. A jetpack can evade their ground charge, but fuel never regenerates and walls still block flight. Recover RED CLEARANCE and reach extraction.',
+        brief:'North City’s winter transfer yard is full of rail-cut brick, iced-over service lanes and city salvage. ICE PIG DROIDS guard the fuel stores. A jetpack can evade their ground charge, but fuel never regenerates and walls still block flight. Recover RED CLEARANCE and reach extraction.',
         map:arena(32,26,false)},
-      {name:'STARLIGHT BOULEVARD',district:'DELMAR LOOP',outdoor:true,theme:'gateway',fx:'neon-city',requires:'red',objective:'Check the competing broadcasts and cross the Delmar street grid.',
-        brief:'A fictional cyberpunk Delmar Loop: neon storefronts, brick facades and a rail line cut through the boulevard. Ice pig droids and watcher drones patrol the side streets. Treat every broadcast as a lead, use the buildings for cover and recover RED CLEARANCE.',
+      {name:'STARLIGHT BOULEVARD',district:'CITY LOOP',outdoor:true,theme:'gateway',fx:'neon-city',requires:'red',objective:'Check the competing broadcasts and cross the city loop street grid.',
+        brief:'The city loop: neon storefronts, brick facades and a rail line cut through the boulevard. Ice pig droids and watcher drones patrol the side streets. Treat every broadcast as a lead, use the buildings for cover and recover RED CLEARANCE.',
         map:city()},
       {name:'GLACIER DOCK',district:'MISSISSIPPI FREIGHT',outdoor:true,theme:'gateway',fx:'glacier-blizzard',requires:'blue-boss',objective:'Recover BLUE CLEARANCE, disable the dock controller and open an evacuation lane.',
-        brief:'The frozen Mississippi freight dock is contested by rival mobile-city patrols. ICE PIG DROIDS rush the ground lanes while drones cover the exposed riverfront. Use the freight walls as cover, preserve fuel and disable the controller before extraction.',
+        brief:'The frozen Mississippi freight dock is contested by rival city patrols. ICE PIG DROIDS rush the ground lanes while drones cover the exposed riverfront. Use the freight walls as cover, preserve fuel and disable the controller before extraction.',
         map:arena(36,28,true)},
       {name:'SKYLINE DISTRICT',district:'DOWNTOWN GRID',outdoor:true,theme:'gateway',fx:'neon-city',requires:'blue-boss',
         objective:'Trace the relay records, recover BLUE CLEARANCE and disable the plaza controller.',
@@ -90,7 +90,7 @@
         map:skyline(tuning)},
       {name:'SHADOW DOSSIER',district:'BURIED RIVERFRONT VAULT',theme:'gateway',fx:'neon-city',requires:'blue-boss',dossier:true,
         objective:'Face the STALKER, secure the ODNI artifact and leave the system dormant.',
-        brief: 'Under the riverfront, an evidence vault stores conflicting records about the cities’ harvests. A mechanical <b>STALKER</b> guards an artifact holding access codes to <b>ODNI</b>, a fictional weapons system in this story. The codes are not a firing order. Recover BLUE CLEARANCE, disable the guardian and leave the system dormant. No real accounts, people or agencies are involved.',
+        brief: 'Under the riverfront, an evidence vault stores conflicting records about the cities’ harvests. A mechanical <b>STALKER</b> guards an artifact holding access codes to <b>ODNI</b>, a weapons system. The codes are not a firing order. Recover BLUE CLEARANCE, disable the guardian and leave the system dormant.',
         map:dossier()}
     ];
   }

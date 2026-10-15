@@ -112,13 +112,14 @@ test('skyline metro stations are reachable and cycle to the next stop', () => {
   assert.ok(expansion.METRO_WAIT > 0);
 });
 
-test('shadow dossier level is fictional, gated and teaches evidence rules without personal data',()=>{
+test('shadow dossier level stays gated and teaches evidence rules without personal data',()=>{
   const d=expansion.levels().find(l=>l.name==='SHADOW DOSSIER');
   assert.ok(d&&d.dossier);assert.equal(d.requires,'blue-boss');
   const all=d.map.join('');
   for(const c of ['z','q','P','X'])assert.equal(all.split(c).length-1,1,c);
   assert.ok(all.split('i').length-1>=4,'evidence files');assert.ok(all.split('d').length-1>=5,'watcher drones');
-  assert.match(d.brief,/No real accounts, people or agencies/);
+  assert.doesNotMatch(d.brief,/fictional|in this story|No real accounts, people or agencies/);
+  assert.match(d.brief,/leave the system dormant/);
   assert.equal(expansion.DOSSIER_FILES.length,6);
   assert.match(expansion.dossierFile(0),/^FILE 1\/6: SEARCH SNIPPETS ARE LEADS/);
   assert.match(expansion.dossierFile(7),/^FILE 2\/6/);

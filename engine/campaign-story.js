@@ -7,7 +7,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var OPENING = 'In this speculative future, mobile cities survive by stripping smaller settlements for fuel, metal and water. Their rulers call the policy <b>MUNICIPAL DARWINISM</b>. A fictional civic intelligence apparatus routes questions from city councils to separate collection crews, record processors and analyst desks, then sends assessments back to human decision-makers. The system is meant to inform decisions, not make them; its tasking, source handling and oversight are now contested. Jack Slade, a shy salvage apprentice whose home was consumed, begins by wanting revenge. A trail of conflicting manifests leads toward St. Louis and a buried weapons archive. The records are leads, not proof: scarcity, sabotage and deliberate predation can look alike until sources are compared.';
+  var OPENING = 'In this speculative future, cities survive by stripping smaller settlements for fuel, metal and water. Their rulers call the policy <b>MUNICIPAL DARWINISM</b>. A civic intelligence apparatus routes questions from city councils to separate collection crews, record processors and analyst desks, then sends assessments back to human decision-makers. A trail of conflicting manifests leads toward the city and a buried weapons archive.';
   var MISSIONS = [
     {
       name: 'THE ARCHIVE',
@@ -21,7 +21,7 @@
       name: 'FABRICATION PLANT',
       district: 'OLD BRICK WORKS',
       apparatus: { stage: 'COLLECTION', note: 'Compare worker accounts, production ledgers and route telemetry; trace source lineage instead of counting copies as witnesses.' },
-      story: 'A production floor is converting salvaged town machinery into mobile-city parts. The Fabricators’ production logs may show a planned harvest—or emergency repairs after a route failure. Jack starts asking workers what the ledger leaves out.',
+      story: 'A production floor is converting salvaged town machinery into city parts. The Fabricators’ production logs may show a planned harvest—or emergency repairs after a route failure. Jack starts asking workers what the ledger leaves out.',
       tactics: 'Use the pillars as cover, clear the controller’s line of sight, and conserve shells for the boss. BLUE CLEARANCE alone does not stop the controller.',
       after: 'A maintenance note contradicts the harvest ledger. Jack records both rather than hiding the inconvenient copy.'
     },
@@ -35,7 +35,7 @@
     },
     {
       name: 'STARLIGHT BOULEVARD',
-      district: 'DELMAR LOOP',
+      district: 'CITY LOOP',
       apparatus: { stage: 'EXPLOITATION & ANALYSIS', note: 'Interpret the processed broadcasts, compare alternatives and state uncertainty, assumptions and disconfirming evidence.' },
       story: 'A neon street carries two evacuation broadcasts with different timestamps. One may be a decoy; the other may be an outdated warning. Jack remembers how easily a frightened crowd can be redirected.',
       tactics: 'Do not chase a signal blindly. Break drone sightlines, check side streets for clearance and supplies, and use the rooftops only when you have fuel to land safely.',
@@ -45,7 +45,7 @@
       name: 'GLACIER DOCK',
       district: 'MISSISSIPPI FREIGHT',
       apparatus: { stage: 'DISSEMINATION', note: 'Share a timely, audience-fit briefing with dock crews, including what is unknown; a report informs their choice but does not authorize seizure or force.' },
-      story: 'Two moving cities contest the same dock. A red-zone alarm could mark an active threat, a diversion, or a failing flood-control system. The dock crews are caught between all three possibilities.',
+      story: 'Two cities contest the same dock. A red-zone alarm could mark an active threat, a diversion, or a failing flood-control system. The dock crews are caught between all three possibilities.',
       tactics: 'Use the freight walls as cover, watch for ranged fire at your altitude, and clear the controller before crossing the exposed extraction lane.',
       after: 'Jack delays both convoys long enough for dock workers to evacuate. Neither city’s account of the incident is accepted without checking the other.'
     },
@@ -60,8 +60,8 @@
     {
       name: 'SHADOW DOSSIER',
       district: 'BURIED RIVERFRONT VAULT',
-      apparatus: { stage: 'HUMAN REVIEW & DECISION', note: 'The Stalker guards access codes to the fictional ODNI system. Defeating it secures evidence, not authority: Jack leaves activation to a separate, informed human decision.' },
-      story: 'The central vault contains an artifact holding access codes for ODNI, a fictional weapons system in this story. A mechanical guardian called the STALKER protects it under an old city command key. The dossier calls the codes a firing key; a maintenance record calls them a dormant defense lock. Neither record settles intent or who had authority to activate the system.',
+      apparatus: { stage: 'HUMAN REVIEW & DECISION', note: 'The Stalker guards access codes to the ODNI system. Defeating it secures evidence.' },
+      story: 'The central vault contains an artifact holding access codes for ODNI, a weapons system. A mechanical guardian called the STALKER protects it under an old city command key. The dossier calls the codes a firing key; a maintenance record calls them a dormant defense lock. Neither record settles intent or who had authority to activate the system.',
       tactics: 'Let the Stalker commit to its telegraphed volley, move out of the spread, then counterattack during its recovery. Keep cover between you and its line of fire.',
       after: 'Jack secures the artifact without activating the system. Defeating the guardian does not validate the dossier or confer authority. Revenge no longer answers the question by itself: the surviving settlements must review the conflicting records and decide what to do.'
     }

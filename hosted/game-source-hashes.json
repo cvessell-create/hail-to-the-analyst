@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0a9120bfac87b293aebc605af2c9b6d540d4b3e9e95e2b3d757a251fabc9d801"
+      "sha256": "e144606fe1ab3dcb504d253b0df6e9b215dbf49c3ae69dd5bc9dc6bd2ff8c319"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -132,7 +132,7 @@
     },
     {
       "path": "engine/campaign-story.js",
-      "sha256": "1c6c374cfcba257b96c287a9754c0a21de4e19538c45dc7add18f10b7eac70ec"
+      "sha256": "d721764fe885a4119e037f499c45dd0c8e5c59fadd970439d77c533785f1e4ff"
     },
     {
       "path": "engine/city.js",
@@ -228,7 +228,7 @@
     },
     {
       "path": "engine/solo-expansion.js",
-      "sha256": "e8e894c9527db3c50148157e2edd7ccbd68dbc3a158d26de7e33f1b73d689645"
+      "sha256": "05e0c33b4be86a02498c634fd874a5f112e36a2601051e143e4cd7c2a6aea34c"
     },
     {
       "path": "engine/stalker.js",
@@ -320,7 +320,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "8c945704c394ac3836b911bf7511f5a590db55114dea7d9ad94b2b711be9b731"
+      "sha256": "77c635c082859f9c5a277faa7f4c46d8431cfc701dce9728c794462220088515"
     },
     {
       "path": "js/emulation-engine.js",
@@ -432,7 +432,7 @@
     },
     {
       "path": "tests/campaign-story.test.js",
-      "sha256": "45cfad65a3a2f8e7cd13d24a34ff8b9eca9a40eefe8a14d2deb437e8ca829f51"
+      "sha256": "8909601769c5aa66728b1ec24e7c02d634da9b9e4c16388c9cc2c043e063b1ad"
     },
     {
       "path": "tests/city.test.js",
@@ -468,7 +468,7 @@
     },
     {
       "path": "tests/fps-integration.test.js",
-      "sha256": "1d26c1b10c77e079d998e9e651c5974bef189f655a881eb688ae82a8788915ef"
+      "sha256": "8b11d7f757340fbf86dd9ee7fa8c86ee038c6e77fa43f80630df1632e0de18b5"
     },
     {
       "path": "tests/fx.test.js",
@@ -516,7 +516,7 @@
     },
     {
       "path": "tests/solo-expansion.test.js",
-      "sha256": "3b108f66a63b0fa6787aaf3a0c1c4639aa768a5a749e05b2c8e3a3f55976776f"
+      "sha256": "af8c838af1099a48c0db12389b98a81982b8a0976bf06c9ee4cb0c9071b421ea"
     },
     {
       "path": "tests/stalker.test.js",

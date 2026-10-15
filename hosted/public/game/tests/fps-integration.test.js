@@ -96,7 +96,7 @@ test('all seven campaign missions enter third-person play directly and victory f
   g.nodes.get('muteBtn').onclick();
   g.fps.briefing(0);
   assert.ok(g.nodes.get('card').innerHTML.includes('ENTER MISSION'));
-  assert.match(g.nodes.get('card').innerHTML, /APPARATUS LAYER \/\/ DIRECTION/);
+  assert.match(g.nodes.get('card').innerHTML, /<b>Apparatus Layer:<\/b>/);
   g.nodes.get('primary').onclick();
   assert.equal(g.fps.state(), 'play');
   assert.equal(g.fps.isoOn(), true);
@@ -442,6 +442,46 @@ test('pause, blur and touch cancellation clear held actions and do not resume th
   assert.equal(g.fps.player().bullets, ammo);
   g.events.blur();
   assert.equal(g.fps.state(), 'pause');
+});
+
+test('main menu clears held controls and menus, saves the hero and starts a fresh deployment', () => {
+  const g = game({ progression: true }), f = g.fps;
+  f.loadLevel(0); f.hero().points = 3;
+  f.player().bullets = 1;
+  f.keys().KeyW = true;
+  g.nodes.get('run').events.pointerdown({ pointerId: 1, stopPropagation() {} });
+  g.nodes.get('actionsBtn').onclick();
+  g.nodes.get('mainMenuBtn').onclick();
+  assert.equal(f.state(), 'title');
+  assert.equal(f.player(), null);
+  assert.deepEqual(Object.keys(f.keys()), []);
+  assert.equal(g.nodes.get('actionMenu').hidden, true);
+  assert.equal(g.nodes.get('actionsBtn').attributes['aria-expanded'], 'false');
+  assert.equal(JSON.parse(g.stored.get('hail-analyst-profile/v1')).points, 3);
+  g.nodes.get('primary').onclick(); g.nodes.get('primary').onclick();
+  assert.equal(f.state(), 'play');
+  assert.ok(f.player().bullets > 1);
+  const before = { x: f.player().x, y: f.player().y };
+  f.update(0.1);
+  assert.equal(f.player().x, before.x);
+  assert.equal(f.player().y, before.y);
+  assert.equal(f.hero().points, 3);
+});
+
+test('main menu works from pause, death and briefings without awarding completion', () => {
+  for (const mode of ['pause', 'dead', 'brief']) {
+    const g = game({ progression: true }), f = g.fps;
+    f.loadLevel(0);
+    if (mode === 'pause') g.nodes.get('pauseBtn').onclick();
+    if (mode === 'dead') f.die();
+    if (mode === 'brief') f.briefing(1);
+    assert.equal(f.state(), mode);
+    const xp = f.hero().xp;
+    g.nodes.get('mainMenuBtn').onclick();
+    assert.equal(f.state(), 'title');
+    assert.equal(f.hero().xp, xp);
+    assert.equal(g.nodes.get('primary').focused, true);
+  }
 });
 
 test('first pointer click aims before firing, while secondary clicks do not shoot', () => {
