@@ -13,10 +13,10 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { execSync } = require('node:child_process');
-const Engine = require('../engine/core.js');
-const FairDivision = require('../engine/fair-division.js');
+const Engine = require('../../engine/core.js');
+const FairDivision = require('../../engine/fair-division.js');
 
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(__dirname, '../..');
 
 function profileRaycaster(iterations = 1000) {
   const grid = [
@@ -94,7 +94,7 @@ function runBuildAgent() {
     ]
   };
 
-  const reportPath = path.join(root, 'docs/build-agent-report.json');
+  const reportPath = path.join(root, 'outputs/archive-build-agent-report.json');
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
   console.log(`[Build Agent] Report generated at ${reportPath}`);

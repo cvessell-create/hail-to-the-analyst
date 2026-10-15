@@ -16,7 +16,39 @@
     },
     {
       "path": "README.md",
-      "sha256": "e144606fe1ab3dcb504d253b0df6e9b215dbf49c3ae69dd5bc9dc6bd2ff8c319"
+      "sha256": "d77507c986d20c773e9843c542c7f2eb0baff724c3ac50bd4a98dfeae80b8d6b"
+    },
+    {
+      "path": "archive/README.md",
+      "sha256": "ae52247f235daee299413cd4afdeb0c1bc6b3df0957e19a2ad3edd4e299c64e1"
+    },
+    {
+      "path": "archive/demos/raycaster.html",
+      "sha256": "459755fa69da8055eaee97a1b573db5fb59daa351c1094cb7e7116ee3fec8546"
+    },
+    {
+      "path": "archive/docs/build-agent-report.json",
+      "sha256": "d3ab664d17e577db00ac5d5196ab6bbd60a3615b5ea26a986e47239e6261fc61"
+    },
+    {
+      "path": "archive/docs/homebrew-guest.md",
+      "sha256": "9c099bd2d21befce443ec5202998d3fcb47f69a16f993d0c565a3252c311f497"
+    },
+    {
+      "path": "archive/docs/hosted-repair-handoff.md",
+      "sha256": "7212c31d94834055d192cbddc449a0a5bf07ae1cbb5ecc990354fb6e28a9b21a"
+    },
+    {
+      "path": "archive/docs/hosted-starter.md",
+      "sha256": "b670ba0eff3b6b1598f619278ca1f61eb609bebc1f80f68c56829905d715dac7"
+    },
+    {
+      "path": "archive/scripts/autonomous-interop.js",
+      "sha256": "5176755dfa644382b39b05a2871051997a70f51e5eacdc6b01e8e33be2afae9c"
+    },
+    {
+      "path": "archive/scripts/build-agent.js",
+      "sha256": "d2c28d420910d1ea45477a2c99381f385f93aa7e2b3e06d3be7ad4ed145dce56"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,7 +148,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "1f8bd6a3ab716a3af95e382a09c0466630f6b2f9d43eeb69708aab7ae2f201c5"
+      "sha256": "b0124a12b5292e9f7e9061b6700b61450fd0ca5b5151d76af6131d9518bcff6a"
     },
     {
       "path": "engine/aug-frames.js",
@@ -153,10 +185,6 @@
     {
       "path": "engine/deception-ops.js",
       "sha256": "0f457639acf807625d7a8d8241cef0d9d97390223a7daf7c799072003113ea48"
-    },
-    {
-      "path": "engine/demo.html",
-      "sha256": "1a6a4984a33f9cad17112acb882ac85a197ecad159f246125f869ef53b04bb05"
     },
     {
       "path": "engine/development.html",
@@ -288,7 +316,7 @@
     },
     {
       "path": "homebrew/README.md",
-      "sha256": "f9ccfd692243f3273b0e6fb1d5fcfdca609c33094bf0a52f4115be846c553609"
+      "sha256": "554767c4c2c6318db851af401f1e9b02091654b98653ea06f8ee86a58dcf18d7"
     },
     {
       "path": "homebrew/main.c",
@@ -352,11 +380,7 @@
     },
     {
       "path": "scripts/autonomous-interop.js",
-      "sha256": "fb17d74b5bb310da017ff5c76107e316ebc7387d82cde38cda5c531408b92ecd"
-    },
-    {
-      "path": "scripts/build-agent.js",
-      "sha256": "10536d5a44765cc8c164168dfd789201b5d390dffaa7d07606aead628c74b5fc"
+      "sha256": "1aa19c7c97311603339159aac68809417b97ce2276e87abf5a32f9fee8b350ad"
     },
     {
       "path": "scripts/build-level-tuning.js",
@@ -388,7 +412,7 @@
     },
     {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "55133f3708ec912e41d6990e6d85a4a9df791b8c8d2d4a2b41cdbe088fc9fde4"
+      "sha256": "6a8ad22d296bc1641d81f2ec4ff0cde62129414ab4f8518f8145050694042032"
     },
     {
       "path": "server/arena.js",
@@ -413,6 +437,10 @@
     {
       "path": "server/request-clock.js",
       "sha256": "73f076983f67857ac08fcb21ab94f1cb4ef45e4ae6b7ea0946f08f900c1e59e9"
+    },
+    {
+      "path": "tests/archive.test.js",
+      "sha256": "03df2bcf65928a568b7dd59549f4236ca1038ad403a7639809dd0f2596d013f5"
     },
     {
       "path": "tests/arena-persistence.test.js",
@@ -488,7 +516,7 @@
     },
     {
       "path": "tests/hosted-mirror.test.js",
-      "sha256": "3b14a502c2a9915e800f875cf0177967a0f105eba26d4743e43af36c48768de3"
+      "sha256": "77ce8a7c2de52db84554beb6ccdd7714ab52591a2255ad3c61ba563325f9ae2c"
     },
     {
       "path": "tests/huggingface.test.js",

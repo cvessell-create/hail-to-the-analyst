@@ -1,76 +1,24 @@
-# Hosted game repair and deployment handoff
+# Current hosted source handoff
 
-The canonical game source is the parent repository. Run
-`node scripts/sync-hosted-game.js` from that root after game edits; it verifies
-both `hosted/lib/game` (server imports) and `hosted/public/game` (browser assets).
-The hosted library keeps its CommonJS package boundary. The app itself is ESM.
-`game-source-hashes.json` identifies the current mirrors; supplied historical
-manifests in the game audit remain historical records, not current hashes.
+Canonical source lives at the repository root. Run
+`node scripts/sync-hosted-game.js` there after edits; both `hosted/lib/game`
+(server imports) and `hosted/public/game` (browser assets) are generated mirrors.
+The library's CommonJS boundary and hosted app's ESM boundary remain separate.
+`game-source-hashes.json` registers current source; audit manifests are historical.
 
-## Corrected defects
+The solo campaign has seven missions and a locked third-person/isometric camera.
+Legacy first-person/autopilot URL options do not enable those modes. There is
+no campaign framework chat or automation driver. Tactical checkpoint compatibility
+remains, with first-person presentation disabled. Development services and
+the development console are separate from player entry.
 
-- Catch-up ticks now advance a simulation clock from the persisted room time,
-  rather than using request-end time for every step. Input expiration remains
-  250 ms, but input is not prematurely stale for its whole valid interval.
-- Hosted multiplayer renders bounded, collision-aware local movement prediction
-  between server syncs and reconciles every frame from authoritative snapshots.
-  Predicted coordinates are display-only and are never sent to the server.
-- Short keyboard/touch fire presses are latched until the next sample.
-- All five solo missions enter first-person play directly; legacy tactical
-  checkpoint restoration remains supported, not a required new-game stage.
-- Victory loot equips next-encounter combat effects on host replay:
-  full relay share reduces cooldown by 0.1 s (minimum 0.1 s); armour share
-  supplies 30 absorbable damage (cap 100); ammo share adds 5 damage
-  (cap +15). Fractional AW allocations equip proportional effects.
-  Power cells persist and add 5 damage; inventory no longer has only labels.
-- In-game credits buy the precombat power cell through a genuine second-price
-  allocation. They have no real-money value. Savings/available XP remains
-  conserved bookkeeping and is not spent, converted or minted.
-- Solo adds larger Frost Yard, Starlight Boulevard and Glacier Dock arenas.
-  The original Hollywood-inspired district has neon theaters, palms and a
-  hillside sign. Ice pig droids are fictional icy robotic melee enemies.
-  Bright door frames, handles, clearance signs and exit markers aid navigation.
-- Solo jetpacks use hold-to-fly J / mobile JET and finite fuel (16/s).
-  Equipment adds 60 fuel; canisters add 35, capped at 100, never regenerating.
-  Altitude evades ground melee, not walls or aimed ranged shots. Supply
-  collection requires landing. Existing state logs/save replay include flight.
-  Explicit practice selection does not count as completing the campaign.
-  These are solo mechanics, not new multiplayer flight or NPC rules.
+Keep authoritative arena services, persistence, prediction, request-clock
+handling, loot/economy effects and consent/export/delete controls intact.
+The D1 binding and supplied rooms migration support the hosted arena.
+Game credits are not money. Local artifact previews do not upload or mint NFTs.
 
-## Deployment
-
-The recovered gameplay-metadata branch adds an optional local data/feedback
-panel. Collection is off by default, requires consent, and sends no telemetry
-over the network. It retains bounded summaries and category-only feedback;
-export/import/delete/revoke remain explicit owner actions. Suggestions require
-declared sample thresholds and human review, never automatic game changes.
-The panel suspends gameplay and controls while open.
-
-The 0.3.1 consolidation retains all branch histories and mirrors the live hex
-minimap, optional first-person tactical practice, fictional archive terminal,
-README Play image and hosted collision-aware movement prediction. New solo
-starts remain direct FPS; tactical practice is opt-in and never campaign victory.
-The isolated tactical renderer shares original art without changing FPS state.
-Tactical checkpoints retain the battle, selected unit, weapon, view and archive
-state; combat continues using the campaign's seeded RNG.
-
-Restore dependencies with `npm ci`, then `npm run build`.
-The D1 binding and supplied `rooms` migration are required for `/api/arena`.
-`npm start` runs the built Worker locally, not on the ChatGPT-hosted site.
-Publishing GitHub source does not update that separate hosted deployment.
-Use its owner-authorized hosting workflow to redeploy this source export.
-
-The uploaded source archive is preserved separately under Downloads;
-changes here do not modify it. Third-party notices and preferred source remain.
-The original NROM visual program uses JSNES CPU/PPU output for a low-resolution
-first-person companion display; gameplay authority stays in the game engine.
-No commercial ROM, Capcom game assets or unverified texture library is included.
-
-## Research boundaries
-
-The in-game story is an original civilian training simulation, not a
-real-world political allegation. Strategic models declare utilities and
-information structure; they do not certify a player's intelligence or motives.
-Owner audit fixtures, match observations, historical claims and blockchain
-proposals are distinct. No payment, chain transaction, hash-earned reward or
-contest submission is performed by these repairs.
+Use [README.md](README.md) for hosted commands and [the root guide](../README.md)
+for current gameplay. The [earlier repair handoff](../archive/docs/hosted-repair-handoff.md)
+is preserved byte-identically as history, not current behavior.
+No deployment, native engine integration or browser guest boot is verified by
+source synchronization or Node tests.

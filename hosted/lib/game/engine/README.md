@@ -15,14 +15,15 @@ Hail campaign systems -> direct-game update/scene interface
 
 Rebuild every campaign system: movement, collision, rendering, combat,
 progression, loadout, flight, missions, cities, side quests, tactical tools,
-saves, randomness, formulas, dialogue, autopilot and data controls.
+saves, randomness, formulas and data controls. Dialogue and automation remain
+separate development experiments, not live campaign behavior.
 Keep the current game playable until its replacement is ready.
 
 ### Upgrade scope and selected art direction
 
 Selected style: high-detail 3D, fictional St. Louis cyberpunk environments,
 dynamic lighting, detailed characters and a modern inventory UI.
-Keep the third-person camera locked, including autopilot.
+Keep the third-person camera locked and the current campaign human-only.
 
 Upgrade maps, art, animation, effects, audio, HUD and controls alongside the
 code. Preserve mission identity and progression. Set performance targets
@@ -312,7 +313,8 @@ Reviewed accessible descriptions, not full proofs of every original paper:
 
 ## Archive
 
-These earlier experiments are retained for reference:
+See the [archive index](../archive/README.md) for moved docs, demos and unused
+tools. These earlier experiments are retained for reference:
 
 - [KallistiOS slice and native Flycast guest test](../homebrew/README.md).
   The 21-action replay passed; this is not the direct-game rebuild.
@@ -323,5 +325,6 @@ These earlier experiments are retained for reference:
 - Tactical checkpoint presentation: retained for compatibility, with its
   first-person display disabled.
 
-Their code stays in place to preserve tests, saved-game compatibility and
-research history. Use the current game setup above.
+Dependency-bound code stays in place to preserve tests, saved-game compatibility
+and research history; obsolete standalone entry points are archived.
+Use the current game setup above.

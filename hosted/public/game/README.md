@@ -101,8 +101,9 @@ CI also produces a source ZIP.
 
 ## Archive
 
-Earlier experiments remain in the repository for reference, outside the
-current setup path:
+See the [archive index](archive/README.md) for exact relocations, historical
+docs/tools/demos and the dependency paths deliberately retained.
+Earlier experiments remain outside the current setup path:
 
 - [KallistiOS C slice and native Flycast replay](homebrew/README.md):
   movement, collection and extraction test.
