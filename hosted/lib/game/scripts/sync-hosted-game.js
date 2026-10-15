@@ -4,6 +4,10 @@ const fs = require('node:fs'), path = require('node:path'), crypto = require('no
 const root = path.resolve(__dirname, '..');
 const directories = ['engine', 'js', 'server', 'tests', 'css', 'vendor', 'audit', 'scripts'];
 const files = ['index.html', 'README.md', 'play-button.svg', 'LICENSE', 'COPYING-GPL-3', 'ATTRIBUTION.md'];
+for (const name of ['.gitignore', 'README.md', 'Makefile', 'Makefile.kos', 'slice.h',
+  'slice.c', 'main.c', 'worker.c', 'test_slice.c', 'native-build.sh', 'toolchain.json']) {
+  files.push(`homebrew/${name}`);
+}
 function collect(directory) {
   for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes: true })) {
     const relative = path.join(directory, entry.name);

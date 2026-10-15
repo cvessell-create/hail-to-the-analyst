@@ -1,0 +1,11 @@
+.DEFAULT_GOAL := all
+ifndef KOS_BASE
+$(error KOS_BASE must point at the reviewed KallistiOS checkout)
+endif
+include $(KOS_BASE)/Makefile.rules
+
+all: build/hail-slice.elf
+
+build/hail-slice.elf: main.c slice.c slice.h
+	mkdir -p build
+	kos-cc -std=gnu17 -Wall -Wextra -Werror main.c slice.c -o $@

@@ -2,11 +2,13 @@
   "name": "hail-to-the-analyst",
   "version": "0.3.1",
   "private": true,
-  "description": "Five-mission offline FPS campaign and original math-driven engine workbench",
+  "description": "Third-person campaign, math-driven research workbench and native engine rebuild",
   "license": "GPL-3.0-or-later",
   "engines": { "node": ">=24" },
   "scripts": {
     "test": "node --test tests/*.test.js",
+    "test:homebrew": "make -C homebrew host-test host-worker",
+    "public:preview": "node scripts/public-release.js preview",
     "start": "node server/index.js",
     "hf": "node scripts/hf-client.js",
     "package": "node scripts/package-source.js"

@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "dd216662447ff9294db0b2532d290da4dc6d75ab5041931a2d4a62abce334287"
+      "sha256": "4172ed9696d454b05ec817bae08334d0d31e17f688324f3d8756e657abdf2309"
     },
     {
       "path": "COPYING-GPL-3",
@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "8b03cd12b0bc66a8a9dcfd4eb0896034d6b5fbb61cb849ba8f81240a09184f9f"
+      "sha256": "2e5e50ba0f81dd6f0e002579aadf362eac2adbc4f408f21e89c054d9b311418d"
     },
     {
       "path": "audit/backward-induction-report.md",
@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "0e5bbf29932337706ce207147d55bca6716150412ebe615329474725d16ea677"
+      "sha256": "1b43b8d07dab8c223d5b03003ebed8a0ecffda2daac66bf931e7433118dd137c"
     },
     {
       "path": "engine/aug-frames.js",
@@ -157,6 +157,14 @@
     {
       "path": "engine/demo.html",
       "sha256": "1a6a4984a33f9cad17112acb882ac85a197ecad159f246125f869ef53b04bb05"
+    },
+    {
+      "path": "engine/development.html",
+      "sha256": "8ec695bb06d60bf0113f99d63871f68c57764ccba4715dca76e9e37e1d0a7fd3"
+    },
+    {
+      "path": "engine/development.js",
+      "sha256": "cac6b4ddb0ce86b1c3ba24d900196949de2272e618792b077422370280a30b42"
     },
     {
       "path": "engine/fair-division.js",
@@ -267,6 +275,50 @@
       "sha256": "bed6f6c33042b4ac6985731540ace48ab12dbc8300d78c4d13cf00be61a58326"
     },
     {
+      "path": "homebrew/.gitignore",
+      "sha256": "49225e94fe74f46765c9a6cfae6a8b84fc864d684375e043145e37a5d9920447"
+    },
+    {
+      "path": "homebrew/Makefile",
+      "sha256": "bd9f30ba2d7331235321e545a60f8e1cb5f8e381cb9c8a82116a1ef3bd891888"
+    },
+    {
+      "path": "homebrew/Makefile.kos",
+      "sha256": "83c52bb23dbc352ce98607f666161751dc35c9e0db7fe06537bd528ea7041d9b"
+    },
+    {
+      "path": "homebrew/README.md",
+      "sha256": "2acbadb38dc253bfb33285f674026c62c726609fab9e5160573b9a4860c96d98"
+    },
+    {
+      "path": "homebrew/main.c",
+      "sha256": "5d1aca357688587d85a1332b5a33697c1c098832d968c07dbbc243e9a6320571"
+    },
+    {
+      "path": "homebrew/native-build.sh",
+      "sha256": "428787fb5dc7f9a31b2fbb14459067fd60d263fae94dca4a9cfede1cf9b88c38"
+    },
+    {
+      "path": "homebrew/slice.c",
+      "sha256": "fe226e4b2aaa619a6ff8c9445d6b2ed9cd9eddd3012444b1b1885e6e1634e69e"
+    },
+    {
+      "path": "homebrew/slice.h",
+      "sha256": "be37384f25cda79780794f1147bde251064e5c4a52416dcaa0cc77398ca9862e"
+    },
+    {
+      "path": "homebrew/test_slice.c",
+      "sha256": "607b581ba6c2d3fa48851662c66d01f50293d5b0133a49de540cd52f2d2f698b"
+    },
+    {
+      "path": "homebrew/toolchain.json",
+      "sha256": "e5d384a33ec2b1d7f96460478a4a8566b6883e85e00ee77b5e21c3fec16a06fa"
+    },
+    {
+      "path": "homebrew/worker.c",
+      "sha256": "d632693829127012d85e1535fe410030ad8d4602b0496ee7ab1948059aefe626"
+    },
+    {
       "path": "index.html",
       "sha256": "e0892ae3ff0dbd09f1d60e09b6ad9cb04f26cba745c4ac94e10fbf443f4cdd0f"
     },
@@ -331,8 +383,12 @@
       "sha256": "8d5d13fc42b4eb5ab7c3de3651382f2e058c253de63ca864538101da70cc957e"
     },
     {
+      "path": "scripts/public-release.js",
+      "sha256": "72225171dfb897a12eff70d416eb946346e4c2a255fe57ac54a9453305b1370c"
+    },
+    {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "3099bbb15f5c7b8dd5a23966e893782c4277beb02aeb28d48f315426fb51ccac"
+      "sha256": "55133f3708ec912e41d6990e6d85a4a9df791b8c8d2d4a2b41cdbe088fc9fde4"
     },
     {
       "path": "server/arena.js",
@@ -343,12 +399,16 @@
       "sha256": "96b0987991f805bcc23f9ac14c312f719ac855a842348347b71e02d9a6ae06b8"
     },
     {
+      "path": "server/engine-services.js",
+      "sha256": "1d57c0883b3a70c89d10e8d7b0433bca3b9c33d7d97cc4e9bbfec3c8834d42e2"
+    },
+    {
       "path": "server/huggingface.js",
       "sha256": "a2ba3ea141f16a30be963773f7c9b0842e30df4e6c84fa5d18b9481dcaff3279"
     },
     {
       "path": "server/index.js",
-      "sha256": "3e661d03f64813dee96a458c19f0442aeb0f5c2d873f813aaa37185179797fa5"
+      "sha256": "3a7d8c22f220f426205f59f0aaee57b9923a673a183506cfa542e3f352deced7"
     },
     {
       "path": "server/request-clock.js",
@@ -395,6 +455,10 @@
       "sha256": "98ab96d891756747848e892fa329b6d1006208d455777b704d648fab442da681"
     },
     {
+      "path": "tests/engine-services.test.js",
+      "sha256": "58c15e302e25b904bfd7de4975add99f0ea73a00eee3bebc02523bfa54cdd0d7"
+    },
+    {
       "path": "tests/engine-systems.test.js",
       "sha256": "42258b7121ad2fffd8c34a3c500fa07764344459bdde068f5f0657ef8b81f4bf"
     },
@@ -424,7 +488,7 @@
     },
     {
       "path": "tests/hosted-mirror.test.js",
-      "sha256": "f0c22f235590f43f8315d77bd97ec3216082e6613d2c7dcd6e1922f09f6e257e"
+      "sha256": "3b14a502c2a9915e800f875cf0177967a0f105eba26d4743e43af36c48768de3"
     },
     {
       "path": "tests/huggingface.test.js",

@@ -1,0 +1,19 @@
+{
+  "schema": "hail-homebrew-toolchain/v1",
+  "kos_repository": "https://github.com/KallistiOS/KallistiOS.git",
+  "kos_revision": "568c3404c292a941bcf550465bd968f4fa249aa2",
+  "profile": "stable",
+  "platform": "dreamcast",
+  "binutils": "2.45.1",
+  "gcc": "15.2.0",
+  "newlib": "4.6.0.20260123",
+  "host": "macos-arm64",
+  "install_scope": "homebrew/.deps/sh-elf",
+  "homebrew_prerequisites": ["wget", "gettext", "texinfo", "gmp", "mpfr", "libmpc", "libelf", "jpeg-turbo", "libpng"],
+  "guest": "Original GPL-3.0-or-later game slice",
+  "runtime_candidate": {
+    "repository": "https://github.com/nasomers/flycast-wasm",
+    "revision": "16e9c7b4b7065a4bd42e7490e8aab3e9283d5415",
+    "state": "BLOCKED_PENDING_STUB_SOURCE_AND_BOOT_REVIEW"
+  }
+}

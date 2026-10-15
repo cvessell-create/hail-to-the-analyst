@@ -6,6 +6,11 @@ test('hosted server and browser copies match canonical source hashes', () => {
   const register = path.join(root, 'hosted/game-source-hashes.json');
   if (!fs.existsSync(register)) throw Error('Run node scripts/sync-hosted-game.js before tests.');
   const manifest = JSON.parse(fs.readFileSync(register, 'utf8'));
+  assert.ok(manifest.files.some(row => row.path === 'homebrew/slice.c'));
+  assert.ok(manifest.files.every(row => !row.path.startsWith('homebrew/.deps/') &&
+    !row.path.startsWith('homebrew/build/') && !row.path.startsWith('homebrew/runtime/')));
+  for (const helper of ['flycast-macos.cmake', 'native-flycast.sh', 'flycast-smoke.js'])
+    assert.ok(!manifest.files.some(row => row.path === `homebrew/${helper}`));
   for (const row of manifest.files) {
     const source = fs.readFileSync(path.join(root, row.path));
     assert.equal(crypto.createHash('sha256').update(source).digest('hex'), row.sha256, row.path);

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hail engine services</title>
+<style>
+body{margin:0;background:#0c101b;color:#dbecff;font:16px system-ui}
+main{max-width:1000px;margin:auto;padding:24px}
+section{background:#172135;border:1px solid #426185;border-radius:12px;padding:20px;margin:20px 0}
+input,select,button{font:inherit;padding:10px;margin:5px;max-width:90%}
+button{background:#a1f3e3;color:#10221f;border:0;border-radius:6px;cursor:pointer}
+label{display:block}pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.error{color:#ffadad}small{color:#bdd0e8}
+</style>
+<main>
+<h1>Hail / engine services</h1>
+<p>Local development console for the native-first rebuild. This is not the rebuilt game renderer.</p>
+<section>
+<h2>AI / SI channel</h2>
+<button id="status">Check service</button><pre id="service">Not queried. No background loops.</pre>
+<button id="formula">Read formula / local receipt status</button><pre id="formulaStatus">Not queried.</pre>
+<form id="chat"><label>Message <input id="message" maxlength="500" required></label><button>Send</button></form>
+<pre id="reply" aria-live="polite"></pre>
+<small>Replies retain generated / owner-text / telemetry identity. Model availability does not promote SI levels.</small>
+</section>
+<section>
+<h2>Coinbase / run collectible preview</h2>
+<p>Local metadata only. No wallet connection, transaction, upload or mint.</p>
+<form id="artifact">
+<label>Collectible title <input name="title" maxlength="80" required></label>
+<label>Run ID <input name="run_id" maxlength="64" pattern="[a-zA-Z0-9_\-]+" required></label>
+<label>Game build SHA-256 <input name="build_sha256" pattern="[a-f0-9]{64}" required></label>
+<label>Mission <input name="mission" maxlength="80" required></label>
+<label>Seed <input name="seed" type="number" min="0" max="4294967295" step="1" required></label>
+<label>Simulation ticks (60 Hz) <input name="ticks" type="number" min="0" max="21600000" step="1" required></label>
+<label>Outcome <select name="outcome"><option>complete</option><option>dead</option><option>aborted</option></select></label>
+<button>Preview public fields</button>
+</form>
+<pre id="preview" aria-live="polite"></pre>
+<button id="download" disabled>Download local preview</button>
+<p>Text fields are public candidates: do not enter private information. A digest binds bytes, not truth or monetary value.</p>
+</section>
+</main>
+<script src="development.js"></script>
+</html>

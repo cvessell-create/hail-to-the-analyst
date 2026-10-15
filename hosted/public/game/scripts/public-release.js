@@ -1,0 +1,11 @@
+// Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: Apache-2.0
+'use strict';
+const path = require('node:path');
+const {execFileSync} = require('node:child_process');
+const publicRoot = path.resolve(__dirname, '../../vessell-public-access');
+const [command, approval, push] = process.argv.slice(2);
+if (command !== 'preview' && command !== 'stage') throw Error('Use preview or stage APPROVED_DIGEST [--push]');
+const args = [path.join(publicRoot, 'scripts/release-bridge.js'), command, 'game', path.resolve(__dirname, '..')];
+if (command === 'stage') args.push(publicRoot, approval);
+if (push === '--push') args.push(push);
+execFileSync(process.execPath, args, {stdio: 'inherit'});

@@ -1,5 +1,125 @@
 # Vessell Engine 0.2
 
+## Selected rebuild: direct-game Flycast fork
+
+The owner corrected the rebuild target: refactor the existing Hail engine
+from its source and modify Flycast itself into the new game engine. Do not
+substitute booting the existing campaign or a small Dreamcast guest for this
+work. Here, "disassemble" means source-level decomposition and reconstruction,
+not reverse engineering a commercial game's executable.
+
+The owner selected native desktop first, followed by the browser port. The
+intended direct-game path is:
+
+```
+Hail campaign systems -> direct-game update/scene interface
+                     -> modified Flycast host/graphics/input -> display
+```
+
+It must not require an ELF/ROM, BIOS, REIOS boot or SH4 instruction execution
+to run Hail. The existing KallistiOS slice and guest replay remain historical
+experiments, not completion of this rebuild.
+
+Source decomposition must cover the campaign orchestration in `../index.html`
+and the modules listed below: movement/collision, third-person scene rendering,
+combat, progression/loadout, flight, campaign/city/side quests, tactical tools,
+save/checkpoint/RNG state, formula/SI dialogue, autopilot and local-consent data.
+Carry forward their existing behavior and tests; do not reduce the campaign
+to the earlier two-collectible demo. Keep the playable campaign unchanged
+until its replacement is ready.
+
+### Upgrade scope and selected art direction
+
+The original game is the design blueprint, not the visual or technical ceiling.
+The owner selected stylized high-detail 3D: an expanded fictional St. Louis
+cyberpunk world, dynamic lighting, detailed characters and a modern inventory
+UI. Keep the third-person camera locked, including autopilot.
+
+Rebuild maps, levels, art, animation, effects, audio, HUD, controls and inventory
+alongside the gameplay code, algorithms and formulas. Preserve mission identity,
+progression, existing improvements and supported workflows while upgrading their
+implementation and presentation. A higher-resolution copy or a small standalone
+demo does not fulfill the whole-project scope. Do not invent a pixel, asset or
+performance target before measuring a representative native scene.
+
+### Built-in project communication and development loop
+
+The requested engine includes game/framework communication supporting the
+owner's wider project: bounded test scenarios, analytics, weight calculations,
+methods, process comparisons and AI-assisted development feedback. This is
+planned work, not an implemented cross-repository orchestrator.
+
+Reuse the framework's existing specialist contract where applicable rather than
+inventing a parallel authority model. Keep simulation state, gameplay weights,
+analytical results and execution permissions distinct. Record scenario/source
+revisions, parameters, random seeds, units and measured results so a result can
+be traced to the exact game build and method. A test failure must remain visible;
+neither an AI suggestion nor a game result automatically changes weights,
+rewrites code, pushes to repositories or releases reports.
+
+Project communication is scoped to explicitly configured repositories and
+services, not unrestricted account access. Keep private development results
+separate from reviewed public exports and preserve local gameplay-data consent.
+Desktop rendering and the development loop must report their own failures
+without silently reverting to first person or pretending an unavailable service
+returned a successful result.
+
+### Implemented service foundation
+
+`../server/engine-services.js` now provides a renderer-independent local
+service boundary used by the existing Node server. Open
+`/engine/development.html` on that server for the executable development console.
+It is a service workbench, not the new game renderer.
+
+- `GET /api/engine/status`: queries the configured loopback SI service.
+  Lists the five AI/SI development levels without promoting any from model
+  availability. The six analytical pillars are a separate framework concept.
+- `POST /api/engine/chat`: forwards a bounded message to the existing framework
+  chatbot; retains generated/owner/telemetry identity, routes and sources.
+  Errors are explicit. One pending request and 20 messages/minute are allowed.
+- `GET /api/engine/formula`: reads framework formula/local receipt status;
+  does not reinterpret a local receipt as a blockchain transaction or payment.
+- `POST /api/engine/artifact`: validates an allowlisted run record and produces
+  exact metadata JSON bytes plus SHA-256 for local preview/download. Rejects
+  unknown fields instead of accidentally including chat or private state.
+  Run fields are caller-supplied, not attested engine measurements.
+
+These endpoints reject tunnel access and require a loopback peer. The SI URL
+must be a loopback HTTP origin; no framework process, model or autonomous loop
+is started automatically. Chat invokes the existing framework service, whose
+own local memory policy still applies. Do not treat this developer service as
+a multiuser authenticated API or expose its port externally.
+
+Coinbase Wallet is the owner's preferred integration, with real mainnet
+transactions and optional game-result NFTs as the intended destination.
+Implemented here: local artifact preparation and receipt-status reading only.
+Not implemented: wallet SDK/session, native-browser pairing, storage upload,
+mint contract, signing, spending, chain confirmation or public publication.
+No wallet keys, funds, RPC credentials or NFT SDK dependencies were added.
+Preview text is a public candidate and still needs inspection for personal
+information. The metadata digest is not an HMAC receipt, NFT or truth check.
+
+Source review for this foundation: existing `si-dialogue.js`,
+`vessell-formula.js`, framework `vessell/si_chat.py` response and HTTP-handler
+implementations, `vessell/si_levels.py` level judgments, `vessell/receipts.py`
+and the framework specialist/blockchain roadmap contracts. No third-party code
+was imported. Live wallet/chain behavior and native engine integration were
+not tested by these backend tests.
+
+The inspected Flycast host entry is `core/ui/mainui.cpp::mainui_rend_frame()`
+at upstream revision `80471d57b02606f53828daa916de6ecc94ca1877`; graphics
+presentation is exposed through `core/ui/imgui_driver.h`. These are candidate
+integration seams, not a completed scene API. Reusing an emulator host does
+not itself supply game physics, campaign rules or a general-purpose renderer.
+Review the actual reused files and linked dependencies before combining them;
+the prior separate GPLv2 browser experiment does not clear a combined build's
+licensing. No public-shell licence change or publication is authorized here.
+
+Status: direction selected; direct-game fork and full campaign migration are
+not implemented. The browser guest experiment was stopped after linking but
+showing a black canvas without guest telemetry. Its frontend frame count is
+not a guest-execution result.
+
 ## Current continuation
 
 Solo campaign missions use a locked third-person isometric camera, including
@@ -10,8 +130,8 @@ contract are documented in [the repair handoff](../hosted/GAME_REPAIR.md).
 Game credits have actual auction purchasing effects but no real-money value.
 Relay, armour and ammo inventory allocations equip on replay with proportional
 effects and explicit caps; conserved influence savings is not a purchase pool.
-The original [NES visual program](nes-visual.js) drives JSNES CPU/PPU frames
-for a low-resolution first-person companion view, separate from the mission VM. 0.2
+The original [NES visual program](nes-visual.js) remains a tested legacy module;
+its companion display is not part of the current campaign UI.
 
 An executable, original math-driven starter engine and game workbench, imported
 from the owner's Vessell-engine-source ZIP and extended here. It is not a
@@ -48,7 +168,7 @@ Restart the server for a fresh arena.
 | `../server/` | Loopback authoritative co-op: server-owned position, NPC attacks, health, progression and fictional economy; sequenced bounded inputs, stale-input timeout, sealed valuations and one-use settlement. |
 
 The campaign now shares collision, DDA/LOS, fixed-step timing and a JSNES
-homebrew 6502 mission processor. It retains its original art, audio, FPS rules,
+homebrew 6502 mission processor. It retains its original art, audio, combat rules,
 two tactical handoffs and campaign progression. New tactical influence XP is
 capped, logged separately and guarded against duplicate encounter awards.
 NPC level scaling is enabled by the browser tactical adapter.
@@ -216,4 +336,3 @@ Reviewed accessible descriptions, not full proofs of every original paper:
   reviewed geometric-mean priorities and initial-one allocation.
   Dean's harmonic threshold is the explicit formula above; no claim of reading
   Dean's original paper or validating political fairness is made.
-

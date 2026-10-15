@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createArena } = require('./arena.js');
 const { createHuggingFaceClient } = require('./huggingface.js');
+const { createEngineServices } = require('./engine-services.js');
 const Engine = require('../engine/core.js');
 const root = path.resolve(__dirname, '..');
 const PUBLIC_HOST = /^[a-z0-9-]+\.trycloudflare\.com$/;
@@ -14,6 +15,9 @@ function createServer({ manual = false, hfClient = null, publicMode = process.en
   siUrl = process.env.HAIL_SI_URL || 'http://127.0.0.1:8790', fetchImpl = globalThis.fetch } = {}) {
   const arena = createArena(), rates = new Map(), siRates = new Map();
   const hf = hfClient || createHuggingFaceClient();
+  // The direct-engine service boundary is local-only, independent of tunnel chat.
+  let engineServices;
+  let engineChatBusy = false;
   const server = http.createServer(async (req, res) => {
     const json = (status, body) => {
       res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body));
@@ -29,6 +33,38 @@ function createServer({ manual = false, hfClient = null, publicMode = process.en
       if (Date.now() - rate.start > 1000) { rate.start = Date.now(); rate.count = 0; }
       rates.set(address, rate);
       if (++rate.count > 300) return json(429, { error: 'Local request budget exceeded.' });
+      if (url.pathname.startsWith('/api/engine/')) {
+        if (remote || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress)) {
+          return json(403, { error: 'Engine services are local only.' });
+        }
+        engineServices ||= createEngineServices({ siUrl, fetchImpl });
+        if (url.pathname === '/api/engine/status' || url.pathname === '/api/engine/formula') {
+          if (req.method !== 'GET') return json(405, { error: 'GET required.' });
+          return json(200, await (url.pathname.endsWith('/formula') ? engineServices.formula() : engineServices.status()));
+        }
+        if (!['/api/engine/chat', '/api/engine/artifact'].includes(url.pathname)) return json(404, { error: 'Unknown engine route.' });
+        if (req.method !== 'POST') return json(405, { error: 'POST required.' });
+        if (!req.headers['content-type']?.startsWith('application/json')) return json(415, { error: 'JSON required.' });
+        const chunks = [];
+        let size = 0;
+        for await (const chunk of req) {
+          size += chunk.length;
+          if (size > 4096) return json(413, { error: 'Body exceeds 4096 bytes.' });
+          chunks.push(chunk);
+        }
+        let data;
+        try { data = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
+        catch { return json(400, { error: 'Malformed JSON.' }); }
+        if (url.pathname === '/api/engine/artifact') return json(200, engineServices.artifactPreview(data));
+        if (engineChatBusy) return json(429, { error: 'Engine chat already has a pending request.' });
+        const si = siRates.get(address) || { start: Date.now(), count: 0 };
+        if (Date.now() - si.start > 60000) { si.start = Date.now(); si.count = 0; }
+        siRates.set(address, si);
+        if (++si.count > 20) return json(429, { error: 'SI budget is 20 messages per minute.' });
+        engineChatBusy = true;
+        try { return json(200, await engineServices.chat(data)); }
+        finally { engineChatBusy = false; }
+      }
       if (url.pathname === '/si/status' || url.pathname === '/si/chat' || url.pathname === '/si/formula') {
         if (remote && url.pathname === '/si/formula') return json(403, { error: 'Formula status is local only.' });
         const post = url.pathname === '/si/chat';

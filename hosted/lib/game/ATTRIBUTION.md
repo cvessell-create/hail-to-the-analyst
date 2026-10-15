@@ -1,5 +1,34 @@
 # Attribution and licence records
 
+## Original Dreamcast development slice, October 14, 2026
+
+`homebrew/` contains original GPL-3.0-or-later C code, not Sega SDK code or a
+port of commercial game assets. Its development dependency is KallistiOS at
+`568c3404c292a941bcf550465bd968f4fa249aa2`, downloaded into ignored
+`homebrew/.deps/kos`. The exact KOS core licence, licensing guide, video/input
+headers and build documentation were opened before using those APIs.
+The KOS core uses its BSD-like KOS licence; keep `doc/license/LICENSE.KOS` and
+`AUTHORS` with any linked guest distribution, and inspect other linked components.
+Only the fixed original guest-source files are copied into hosted game mirrors;
+the SDK checkout and build products are not copied into mirrors or public exports.
+
+The separate native Flycast development experiment uses upstream
+`flyinghead/flycast` at `80471d57b02606f53828daa916de6ecc94ca1877`.
+`homebrew/runtime/NOTICE` identifies the exact automation compatibility patch,
+the affected file's original copyright and GPL-2.0-or-later permission, the
+GPLv3 selection for local modifications and the retained upstream licence text.
+The full emulator is not relicensed by that file-specific permission.
+Native sources/binaries remain in ignored development caches; the runtime
+patch and helpers are excluded from the curated guest-source exports.
+
+The selected Flycast WASM port was built and linked locally from source with
+an original separate frontend, without linking its opaque precompiled stub.
+The browser experiment showed a black canvas and no guest telemetry and was
+stopped; no working WASM guest boot is claimed. Its ignored experimental
+sources and binaries are not included in this publication.
+The original access shell's pending licence does not change these component
+licences. The current game engine remains canonical until migration acceptance.
+
 ## Owner-supplied hosted continuation
 
 The hosted source export and final branch bundle were supplied by Christopher
@@ -10,7 +39,7 @@ hosted server/browser copies are generated mirrors.
 
 The new NES visual program, pattern tiles and palette arrangement are original
 project code/assets, executed by the included JSNES runtime. No commercial ROM,
-Capcom assets or purported CC0 third-party textures were imported in this repair. and licence records
+Capcom assets or purported CC0 third-party textures were imported in this repair.
 
 ## Engine integration, October 7, 2026
 

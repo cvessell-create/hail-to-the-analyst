@@ -1,0 +1,24 @@
+Separate native Flycast development component
+
+Upstream: https://github.com/flyinghead/flycast
+Revision: 80471d57b02606f53828daa916de6ecc94ca1877
+File: core/input/gamepad_device.cpp
+Original notice: Copyright 2019 flyinghead. This file is part of reicast.
+Its header permits GPL version 2 or, at the recipient's option, any later
+version, and disclaims warranty. COPYING-GPL-2 retains upstream's licence text.
+This file-specific permission is not a licence conclusion for every component
+in the full emulator.
+
+flycast-automation-macos.patch modifies that file: explicitly types two
+std::max calls for Apple's int64_t, uses the matching uint64_t scan format,
+and bounds the action string scan. Local modifications:
+Copyright 2026 Christopher R. Vessell, GPL-3.0-or-later, selecting version 3
+from the affected source file's version-2-or-later permission.
+See ../../COPYING-GPL-3 for the selected licence text.
+
+The runtime runs as a separate executable. It is not linked into the
+GPLv3 game guest or Apache framework. Its downloaded sources, dependencies
+and binaries stay in ignored .deps/; native test captures stay in build/.
+This directory and the native emulator helpers are excluded from the
+curated hosted/public guest-source exports. There is no public runtime
+distribution or licence-compatibility clearance for such a distribution.
