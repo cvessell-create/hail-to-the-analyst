@@ -82,6 +82,14 @@ Status: direct-game fork and campaign migration not implemented.
 
 ## Current game
 
+The development-only `vessell-formula.js` helper also implements the corrected
+ASCII case policy: check the current string, correct only mismatches, verify
+and stop after at most one correction pass. Required lowercase is compliant;
+case bit 0 is not a failed check. Masks use one-based letter positions in a
+`Map`. Empty case masks pass; empty runtime evidence sets still fail.
+The helper does not change evidence observations, SI thresholds or gameplay,
+and is not loaded by the player entry.
+
 Human controls are available through the **ACTIONS** menu as well as the
 keyboard. Menus suspend gameplay and expose skill spending, inventory,
 upgrades and combat abilities to touch players. Focus loss

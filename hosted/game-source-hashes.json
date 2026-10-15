@@ -116,7 +116,7 @@
     },
     {
       "path": "engine/README.md",
-      "sha256": "34d243b9e75e8c345aa266709064cfd6f1011441ed2701c348fd25e925220c7e"
+      "sha256": "1f8bd6a3ab716a3af95e382a09c0466630f6b2f9d43eeb69708aab7ae2f201c5"
     },
     {
       "path": "engine/aug-frames.js",
@@ -256,7 +256,7 @@
     },
     {
       "path": "engine/vessell-formula.js",
-      "sha256": "5d1057379506f30e775c62e11e9e1b2b12a84f56cf498c6fdc32147f5dafaba2"
+      "sha256": "a4f5c1dd0007b7f2a8cc9b954ca2595c75f0dcb2d67f91d2b4195cdbea71d247"
     },
     {
       "path": "engine/weight-trace.js",
@@ -548,7 +548,7 @@
     },
     {
       "path": "tests/vessell-formula.test.js",
-      "sha256": "f0f3c8cd2605950a513efe5d93f73d456e70b942c85e042c202508e7ddc9433b"
+      "sha256": "0639d98e91ab3ffac84bef1da89791cbe859135d7d21f73dcd84e113c8c909b2"
     },
     {
       "path": "tests/weight-trace.test.js",
