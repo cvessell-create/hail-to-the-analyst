@@ -43,9 +43,7 @@ Open `http://127.0.0.1:8787/index.html` for the game,
 The separate hosted application has its own
 [setup and deployment guide](hosted/GAME_REPAIR.md).
 
-The camera stays third-person/isometric. `V` and legacy
-first-person URL options cannot change it. Renderer errors appear explicitly,
-not as a first-person fallback. Desktop uses WASD/arrows, mouse aiming and the
+Desktop uses WASD/arrows, mouse aiming and the
 displayed action controls; mobile provides touch controls. **M / HEX MAP**
 shows the current mission's tactical minimap while gameplay continues.
 The game has no autopilot or framework chatbot. **G / ROUTE** briefly marks
@@ -62,42 +60,23 @@ Hero progression stays saved; deploying again starts a fresh run, not a resume.
 
 The story, enemies and operations are fictional. Gateway Sprawl and Vessell
 City are free-roam settings; Footprint Purge is an optional simulated exposure
-side quest, not an account-removal tool. Game credits have gameplay purchasing
-effects but are not money, cryptocurrency or redeemable assets.
+side quest, not an account-removal tool. 
 
 ## AI, data and backend boundaries
 
-The playable campaign loads no automation driver, framework dialogue, owner
-corpus or formula service. Legacy `?autopilot=1` links do not activate anything.
+
 Route hints only draw a path; they never move, fight or spend skill points.
 Development modules and their tests remain separate from gameplay.
 
-The development console uses separately operated services. The local
-Node server proxies its chat to `HAIL_SI_URL` (default loopback port 8790).
-Generated text, owner-source selections and telemetry have separate labels.
-SI levels use their own tests.
+The development console uses separately operated services.
 
-Gameplay-data collection defaults off. Consent, revoke/delete and local export
-controls remain in the game. Chat submitted through the development console
-is subject to that service's local memory policy; it is not part of the
-browser-only gameplay-data store. No wallet keys belong in this repository.
+
 
 The development console previews run metadata entered by the user.
 Coinbase connection and NFT minting are planned. No uploads or transactions
 are performed.
 
-## Tests and source
 
-```sh
-npm test
-npm run test:homebrew
-```
-
-Run the suite above for current results. CI records published runs.
-
-Canonical source changes are synchronized with
-`node scripts/sync-hosted-game.js`; tests enforce byte-identical hosted mirrors.
-CI also produces a source ZIP.
 
 ## Archive
 
