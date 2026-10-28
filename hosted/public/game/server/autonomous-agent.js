@@ -1,6 +1,8 @@
 // Copyright 2026 Christopher R. Vessell. SPDX-License-Identifier: Apache-2.0
 'use strict';
 
+const { createHash, timingSafeEqual } = require('node:crypto');
+
 /**
  * Autonomous tactical agent for hail-to-the-analyst arena.
  * Evaluates arena state, computes tactical actions, and engages
@@ -60,7 +62,13 @@ function createAutonomousAgent(options = {}) {
 
     computeTacticalAction(state) {
       if (!state) return { forward: 0, strafe: 0, turn: 0, fire: false };
-      const me = state.player || (state.sessions && state.sessions.find(([t]) => t === token)?.[1]);
+      const expected = typeof token === 'string' && token.length > 0
+        ? createHash('sha256').update(token, 'utf8').digest() : null;
+      const me = state.player || (expected && state.sessions && state.sessions.find(([candidate]) => {
+        if (typeof candidate !== 'string' || candidate.length === 0) return false;
+        const actual = createHash('sha256').update(candidate, 'utf8').digest();
+        return timingSafeEqual(actual, expected);
+      })?.[1]);
       const enemies = (state.enemies || []).filter(e => e.hp > 0);
 
       if (!me || me.hp <= 0) {

@@ -15,6 +15,11 @@ Worker. Keep local previews on loopback. These commands do not publish a site.
 Preserve the runtime/profile scripts, CommonJS game boundary, vendor notices,
 D1 schema/migrations and hosting configuration.
 
+The separate autonomous arena agent compares session bearer tokens using
+`timingSafeEqual` on fixed-size SHA-256 digests, rejecting empty/non-string
+candidates. This protects the token equality operation, not the timing of the
+entire session search, and does not add automation to the human-only campaign.
+
 The pnpm lock holder derives the configured runtime root's `install.lock`
 and the fixed `/workspace/.sites-runtime/pnpm-store.seed.lock` internally.
 `--hold-install-locks` accepts no additional CLI arguments; its shell caller

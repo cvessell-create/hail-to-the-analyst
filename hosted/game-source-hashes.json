@@ -420,7 +420,7 @@
     },
     {
       "path": "server/autonomous-agent.js",
-      "sha256": "96b0987991f805bcc23f9ac14c312f719ac855a842348347b71e02d9a6ae06b8"
+      "sha256": "8b81cf432bf3d0d04d6dd15a8fc59db839ec0ca6421069e207556fd34da911ad"
     },
     {
       "path": "server/engine-services.js",
@@ -452,7 +452,7 @@
     },
     {
       "path": "tests/autonomous-agent.test.js",
-      "sha256": "3f221f55fb74bb21d7f9e3748601578362db62dca93655c4d4768ff09865871c"
+      "sha256": "edf379f4ece21f53fec37a45746a7cb30e3c4eec10f890ded8d434d1e1beee0f"
     },
     {
       "path": "tests/autopilot.test.js",

@@ -56,6 +56,31 @@ test('AutonomousAgent computes fair division bids for all methods', () => {
   assert.ok(knasterBid.reduce((a, b) => a + b, 0) <= 600);
 });
 
+test('AutonomousAgent session lookup matches bearer tokens exactly and rejects invalid candidates', async () => {
+  const token = 'session-fixture-é';
+  const agent = createAutonomousAgent({
+    fetch: async () => ({ ok: true, json: async () => ({ token, id: 'p1' }) }),
+  });
+  const player = { hp: 100, position: { x: 0, y: 0, angle: 0 } };
+  const enemy = { hp: 50, position: { x: 6, y: 0 } };
+  const idle = { forward: 0, strafe: 0, turn: 0, fire: false };
+  assert.deepEqual(agent.computeTacticalAction({ sessions: [[null, player]], enemies: [enemy] }), idle);
+  await agent.join();
+  for (const candidate of [null, undefined, '', 123, {}, Buffer.from(token),
+    'session-fixture-e', `${token}x`, token.slice(0, -1), 'session-fixture-e\u0301']) {
+    assert.deepEqual(agent.computeTacticalAction({
+      sessions: [[candidate, player]], enemies: [enemy],
+    }), idle);
+  }
+  const state = { sessions: [['wrong', { hp: 0 }], [token, player]], enemies: [enemy] };
+  assert.deepEqual(agent.computeTacticalAction(state),
+    agent.computeTacticalAction({ player, enemies: [enemy] }));
+  assert.equal(agent.computeTacticalAction(state).fire, true);
+  assert.deepEqual(agent.computeTacticalAction({
+    player: { hp: 0 }, sessions: [[token, player]], enemies: [enemy],
+  }), idle);
+});
+
 test('AutonomousAgent joins arena, steps tactics, and handles bidding', async () => {
   const { server } = createServer({ manual: true });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
