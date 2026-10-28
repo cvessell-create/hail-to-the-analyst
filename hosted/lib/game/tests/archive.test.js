@@ -55,39 +55,3 @@ test('compatibility and development modules remain separate from the campaign', 
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   assert.doesNotMatch(html, /(?:src|href)="[^"]*(?:archive\/|autopilot|si-dialogue|si-story-corpus|vessell-formula|nes-visual)/);
 });
-
-test('mirror retirement removes only unchanged registered files and rejects unsafe history', () => {
-  const crypto = require('node:crypto'), vm = require('node:vm');
-  const source = fs.readFileSync(path.join(root, 'scripts/sync-hosted-game.js'), 'utf8');
-  const bytes = Buffer.from('retired demo');
-  const row = { path: 'engine/retired.html',
-    sha256: crypto.createHash('sha256').update(bytes).digest('hex') };
-  function simulate(history, edited = false) {
-    const mirrors = new Map();
-    for (const target of ['hosted/lib/game', 'hosted/public/game']) {
-      mirrors.set(path.join(root, target, row.path), edited ? Buffer.from('local edit') : bytes);
-      mirrors.set(path.join(root, target, 'hosted-only.txt'), Buffer.from('keep'));
-    }
-    const isMirror = file => ['hosted/lib/game', 'hosted/public/game']
-      .some(target => file.startsWith(path.join(root, target) + path.sep));
-    const mock = { ...fs,
-      existsSync: file => isMirror(file) ? mirrors.has(file) : fs.existsSync(file),
-      readFileSync: (file, encoding) => file === path.join(root, 'hosted/game-source-hashes.json')
-        ? JSON.stringify({ files: history }) : isMirror(file) ? mirrors.get(file) : fs.readFileSync(file, encoding),
-      mkdirSync() {},
-      copyFileSync: (from, to) => mirrors.set(to, fs.readFileSync(from)),
-      unlinkSync: file => mirrors.delete(file),
-      writeFileSync() {},
-    };
-    vm.runInNewContext(source, { __dirname: path.join(root, 'scripts'),
-      require: name => name === 'node:fs' ? mock : require(name), console: { log() {} } });
-    return mirrors;
-  }
-  const mirrors = simulate([row]);
-  for (const target of ['hosted/lib/game', 'hosted/public/game']) {
-    assert.equal(mirrors.has(path.join(root, target, row.path)), false);
-    assert.equal(mirrors.get(path.join(root, target, 'hosted-only.txt')).toString(), 'keep');
-  }
-  assert.throws(() => simulate([row], true), /Retired mirror was edited/);
-  assert.throws(() => simulate([{ ...row, path: '../outside' }]), /Invalid retired mirror path/);
-});

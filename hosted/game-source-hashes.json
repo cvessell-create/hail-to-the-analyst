@@ -376,7 +376,7 @@
     },
     {
       "path": "scripts/audit-math.js",
-      "sha256": "2d44ed4e8b1a867a1fa94c902a813bd9d8a7382db53c7e97c4cc7ba87374170f"
+      "sha256": "a81818666f253fe319abf35786d91a2650209920bda94a02c517e295062e1bec"
     },
     {
       "path": "scripts/autonomous-interop.js",
@@ -384,7 +384,7 @@
     },
     {
       "path": "scripts/build-level-tuning.js",
-      "sha256": "65f94828b1324346b3a8b4af18d0b99211bbb061f82212aacd181a57235d36de"
+      "sha256": "24cb8e9e0e8867b81b137e1f616abc02345acf112ff5b1abad4be0dde8bc8a74"
     },
     {
       "path": "scripts/hf-client.js",
@@ -411,8 +411,12 @@
       "sha256": "72225171dfb897a12eff70d416eb946346e4c2a255fe57ac54a9453305b1370c"
     },
     {
+      "path": "scripts/repository-paths.js",
+      "sha256": "d16614bc499c51149f42e50bd4575fb327f359dce020b96b69b007b30c7e90cc"
+    },
+    {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "6a8ad22d296bc1641d81f2ec4ff0cde62129414ab4f8518f8145050694042032"
+      "sha256": "a37ba338fdba59d76622e3aba34faff35e40a8fa4e44aa87b2bff99d4dc0fa88"
     },
     {
       "path": "server/arena.js",
@@ -440,7 +444,7 @@
     },
     {
       "path": "tests/archive.test.js",
-      "sha256": "03df2bcf65928a568b7dd59549f4236ca1038ad403a7639809dd0f2596d013f5"
+      "sha256": "24f8a04d41f85a56e560b18ab3157ce70a77fbacb62b621f9c608150ad969881"
     },
     {
       "path": "tests/arena-persistence.test.js",
@@ -537,6 +541,10 @@
     {
       "path": "tests/request-clock.test.js",
       "sha256": "286131cee3a403c378f0b0eb44453483924d80e83845d2a67d0d4e6738286144"
+    },
+    {
+      "path": "tests/script-paths.test.js",
+      "sha256": "b96ac47bb1dd98f3dabbc2b6c973fa189ed17adffdc5d48328bdd2485a929292"
     },
     {
       "path": "tests/si-dialogue.test.js",

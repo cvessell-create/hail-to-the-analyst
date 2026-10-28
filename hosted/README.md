@@ -20,6 +20,17 @@ The separate autonomous arena agent compares session bearer tokens using
 candidates. This protects the token equality operation, not the timing of the
 entire session search, and does not add automation to the human-only campaign.
 
+The canonical audit and tuning CLIs confine file paths to the game repository
+and reject symlink components. Relative CLI paths retain their working-directory
+meaning. Stage external loop-model JSON inside the repository before running
+`node scripts/build-level-tuning.js <repository-report.json> [repository-out.js]`;
+the default output remains `engine/level-tuning.js`, and provenance records the
+actual input's repository-relative path and SHA-256. Audit output defaults to
+`audit/`; custom output directories must also stay inside the repository.
+The mirror synchronizer validates recursive source and destination paths too.
+These checks assume the local checkout is not concurrently modified by an
+adversary; they are not an OS-level filesystem sandbox.
+
 The pnpm lock holder derives the configured runtime root's `install.lock`
 and the fixed `/workspace/.sites-runtime/pnpm-store.seed.lock` internally.
 `--hold-install-locks` accepts no additional CLI arguments; its shell caller
