@@ -8,6 +8,7 @@ import {
   ftruncateSync,
   openSync,
   readFileSync,
+  realpathSync,
   writeFileSync,
   writeSync,
 } from "node:fs";
@@ -120,11 +121,36 @@ function showLine(line, progress, failure) {
   }
 }
 
-async function openLock(filename, waitSeconds) {
+export function resolveInstallLockPath(filename, kind) {
+  if (typeof filename !== "string" || !path.isAbsolute(filename) ||
+      filename.includes("\0") || filename.split(path.sep).includes("..")) {
+    throw new Error("Install locks require an absolute path without traversal");
+  }
+  const projectRoot = realpathSync(process.cwd());
+  const runtimeRoot = process.env.SITES_RUNTIME_ROOT || path.join(projectRoot, ".sites-runtime");
+  const expected = kind === "project" ? path.resolve(runtimeRoot, "install.lock")
+    : kind === "shared" ? "/workspace/.sites-runtime/pnpm-store.seed.lock" : undefined;
+  if (!expected || path.resolve(filename) !== expected) {
+    throw new Error("Install lock path is not an allowed lock");
+  }
+  // O_NOFOLLOW protects only the final entry; reject symlinked ancestors too.
+  const parent = path.dirname(expected);
+  if (realpathSync(parent) !== parent) throw new Error("Install lock directory must not be a symlink");
+  return expected;
+}
+
+async function openLock(filename, waitSeconds, kind) {
+  let lockPath;
+  try {
+    lockPath = resolveInstallLockPath(filename, kind);
+  } catch {
+    process.stderr.write("Invalid or unavailable install lock directory/path.\n");
+    return { status: "unavailable" };
+  }
   let fd;
   try {
-    if (!filename || !constants.O_NOFOLLOW || !constants.O_NONBLOCK) throw new Error("Unsupported lock");
-    fd = openSync(filename, constants.O_CREAT | constants.O_RDWR | constants.O_NOFOLLOW | constants.O_NONBLOCK, 0o600);
+    if (!constants.O_NOFOLLOW || !constants.O_NONBLOCK) throw new Error("Unsupported lock");
+    fd = openSync(lockPath, constants.O_CREAT | constants.O_RDWR | constants.O_NOFOLLOW | constants.O_NONBLOCK, 0o600);
     if (!fstatSync(fd).isFile()) throw new Error("Expected a regular lock file");
     const child = spawn("flock", ["-w", waitSeconds, "3"], { stdio: ["ignore", "ignore", "ignore", fd] });
     const code = await new Promise((resolve) => {
@@ -144,13 +170,13 @@ async function holdInstallLocks(projectLock, sharedLock, waitSeconds) {
   // The shell holds both leases through stdin. EOF (including caller exit)
   // releases the same open file descriptions that flock locked in its child.
   const requests = createInterface({ input: process.stdin, crlfDelay: Infinity });
-  const project = await openLock(projectLock, "0");
+  const project = await openLock(projectLock, "0", "project");
   let shared;
   try {
     process.stdout.write(`${project.status}\n`);
     for await (const request of requests) {
       if (request === "shared" && project.fd !== undefined) {
-        shared ??= await openLock(sharedLock, waitSeconds);
+        shared ??= await openLock(sharedLock, waitSeconds, "shared");
         process.stdout.write(`${shared.status}\n`);
       } else if (request === "release-shared") {
         if (shared?.fd !== undefined) closeSync(shared.fd);
