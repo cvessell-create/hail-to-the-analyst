@@ -19,3 +19,5 @@ verifyDepsBeforeRun: false
 optimisticRepeatInstall: false
 overrides:
   sharp: 0.35.5
+  immer: 11.1.9
+  es-toolkit: 1.51.0

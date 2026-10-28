@@ -3,6 +3,10 @@
   "source": "parent repository canonical game source",
   "files": [
     {
+      "path": ".github/workflows/engine.yml",
+      "sha256": "e17030631123cfd6b19ec80ca7b74b707e09c13f72666312a1e0bde2e6ba97de"
+    },
+    {
       "path": "ATTRIBUTION.md",
       "sha256": "4172ed9696d454b05ec817bae08334d0d31e17f688324f3d8756e657abdf2309"
     },
@@ -416,7 +420,7 @@
     },
     {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "a37ba338fdba59d76622e3aba34faff35e40a8fa4e44aa87b2bff99d4dc0fa88"
+      "sha256": "3d9bfe678d877b4e594690c46de922c63c1420f1c6b63ad5f37f36f7da25d91a"
     },
     {
       "path": "server/arena.js",
@@ -544,7 +548,7 @@
     },
     {
       "path": "tests/script-paths.test.js",
-      "sha256": "b96ac47bb1dd98f3dabbc2b6c973fa189ed17adffdc5d48328bdd2485a929292"
+      "sha256": "f09eba7db69f6649962e18b5b05cf2c80a0eded4825ddde2d689c92040346283"
     },
     {
       "path": "tests/si-dialogue.test.js",
@@ -589,6 +593,10 @@
     {
       "path": "tests/weight-trace.test.js",
       "sha256": "21e2e55425247aa7147951f09e960a5b6626cde989958bf14a4da061c581b3b1"
+    },
+    {
+      "path": "tests/workflow-security.test.js",
+      "sha256": "8dd318b67c13bf426b209e5259eb81c437d0d9d4913a82b8bf9965fb4ae1e624"
     },
     {
       "path": "vendor/augmented-ui/LICENSE",

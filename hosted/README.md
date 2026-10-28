@@ -15,6 +15,18 @@ Worker. Keep local previews on loopback. These commands do not publish a site.
 Preserve the runtime/profile scripts, CommonJS game boundary, vendor notices,
 D1 schema/migrations and hosting configuration.
 
+Recharts is pinned to `3.10.1`, with package-manager overrides for Immer
+`11.1.9` (AIKIDO-2026-445255) and es-toolkit `1.51.0`
+(AIKIDO-2026-523264) in both npm and pnpm. The exact Immer pin is intentional:
+the `11.1.9` prototype-access protection was reverted upstream in `11.1.12`.
+Re-evaluate that protection before changing the pin.
+See the [Immer advisory](https://intel.aikido.dev/cve/AIKIDO-2026-445255),
+[upstream revert](https://github.com/immerjs/immer/releases/tag/v11.1.12) and
+[es-toolkit advisory](https://intel.aikido.dev/cve/AIKIDO-2026-523264).
+The engine CI workflow disables checkout credential persistence and retains
+read-only contents permissions. Its two embedded copies are generated from
+the canonical workflow by the mirror synchronizer.
+
 The separate autonomous arena agent compares session bearer tokens using
 `timingSafeEqual` on fixed-size SHA-256 digests, rejecting empty/non-string
 candidates. This protects the token equality operation, not the timing of the

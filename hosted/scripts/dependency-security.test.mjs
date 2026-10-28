@@ -22,8 +22,24 @@ test("Next.js advisories: manifests and both lockfiles use the patched release",
 
 test("GHSA-wq5f-xc86-pv6w: both package managers override every Sharp dependency", () => {
   assert.equal(manifest.overrides.sharp, patchedSharp);
-  assert.match(workspace, /^overrides:\n  sharp: 0\.35\.5\s*$/m);
-  assert.match(pnpmLock, /^overrides:\n  sharp: 0\.35\.5\s*$/m);
+  assert.match(workspace, /^overrides:\n  sharp: 0\.35\.5$/m);
+  assert.match(pnpmLock, /^overrides:\n  sharp: 0\.35\.5$/m);
+});
+
+test("Aikido prototype-pollution advisories: both package managers pin protected versions", () => {
+  assert.equal(manifest.dependencies.recharts, "3.10.1");
+  for (const [name, version] of [["immer", "11.1.9"], ["es-toolkit", "1.51.0"]]) {
+    assert.equal(manifest.overrides[name], version);
+    for (const text of [workspace, pnpmLock])
+      assert.ok(text.includes(`  ${name}: ${version}\n`));
+    const versions = [...pnpmLock.matchAll(new RegExp(`^\\s+${name}@(\\d+\\.\\d+\\.\\d+)(?:[:(])`, "gm"))];
+    assert.ok(versions.length > 0, `${name} must be present in pnpm`);
+    for (const match of versions) assert.equal(match[1], version);
+    const packages = Object.entries(npmLock.packages)
+      .filter(([key]) => key.endsWith(`/node_modules/${name}`) || key === `node_modules/${name}`);
+    assert.ok(packages.length > 0, `${name} must be present in npm`);
+    for (const [, entry] of packages) assert.equal(entry.version, version);
+  }
 });
 
 test("GHSA-wq5f-xc86-pv6w: pnpm locks only patched Sharp and libvips binaries", () => {

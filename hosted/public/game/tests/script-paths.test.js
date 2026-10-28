@@ -11,10 +11,12 @@ function fixture(t) {
   t.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
   const root = path.join(temporary, 'repo');
   for (const dir of ['engine', 'js', 'server', 'tests', 'css', 'vendor', 'audit',
-    'scripts', 'archive', 'homebrew', 'hosted/lib/game', 'hosted/public/game'])
+    'scripts', 'archive', 'homebrew', '.github/workflows', 'hosted/lib/game', 'hosted/public/game'])
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   for (const name of ['repository-paths.js', 'audit-math.js', 'build-level-tuning.js', 'sync-hosted-game.js'])
     fs.copyFileSync(path.join(repository, 'scripts', name), path.join(root, 'scripts', name));
+  fs.copyFileSync(path.join(repository, '.github/workflows/engine.yml'),
+    path.join(root, '.github/workflows/engine.yml'));
   for (const name of ['index.html', 'README.md', 'play-button.svg', 'LICENSE', 'COPYING-GPL-3', 'ATTRIBUTION.md'])
     fs.writeFileSync(path.join(root, name), 'fixture\n');
   for (const name of ['.gitignore', 'README.md', 'Makefile', 'Makefile.kos', 'slice.h',
