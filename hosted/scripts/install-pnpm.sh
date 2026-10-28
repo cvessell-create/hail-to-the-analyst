@@ -53,9 +53,7 @@ fi
 # A single Node process owns the regular-file descriptors for both leases.
 # Closing its input (including this shell exiting) releases the project lock.
 coproc SITES_INSTALL_LOCKS {
-  node "${script_dir}/pnpm-install.mjs" --hold-install-locks \
-    "${runtime_root}/install.lock" "${SITES_PNPM_SHARED_STORE:-}.seed.lock" \
-    "${SITES_PNPM_STORE_LOCK_TIMEOUT:-30}"
+  node "${script_dir}/pnpm-install.mjs" --hold-install-locks
 }
 install_lock_pid="${SITES_INSTALL_LOCKS_PID}"
 install_lock_output="${SITES_INSTALL_LOCKS[0]}"

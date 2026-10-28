@@ -7,6 +7,18 @@ const workspace = readFileSync(new URL("../pnpm-workspace.yaml", import.meta.url
 const pnpmLock = readFileSync(new URL("../pnpm-lock.yaml", import.meta.url), "utf8");
 const npmLock = JSON.parse(readFileSync(new URL("../package-lock.json", import.meta.url), "utf8"));
 const patchedSharp = "0.35.5";
+const patchedNext = "16.4.1";
+
+test("Next.js advisories: manifests and both lockfiles use the patched release", () => {
+  assert.equal(manifest.dependencies.next, patchedNext);
+  assert.equal(manifest.devDependencies["eslint-config-next"], patchedNext);
+  const versions = [...pnpmLock.matchAll(/^\s+next@(\d+\.\d+\.\d+)/gm)];
+  assert.ok(versions.length > 0);
+  for (const match of versions) assert.equal(match[1], patchedNext);
+  const packages = Object.entries(npmLock.packages).filter(([name]) => /(?:^|\/)node_modules\/next$/.test(name));
+  assert.ok(packages.length > 0);
+  for (const [, entry] of packages) assert.equal(entry.version, patchedNext);
+});
 
 test("GHSA-wq5f-xc86-pv6w: both package managers override every Sharp dependency", () => {
   assert.equal(manifest.overrides.sharp, patchedSharp);

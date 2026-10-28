@@ -40,8 +40,8 @@ const OPERATIONAL_FAILURE_CODES = new Set([
 // These are pnpm-reported package IDs, not an assertion about network bytes or
 // image-cache provenance. Do not interpret an installed-tree no-op as 100% reuse.
 export class InstallProgress {
-  constructor(project) {
-    this.project = path.resolve(project);
+  constructor() {
+    this.project = process.cwd();
     this.reused = new Set();
     this.downloaded = new Set();
     this.complete = false;
@@ -121,28 +121,29 @@ function showLine(line, progress, failure) {
   }
 }
 
-export function resolveInstallLockPath(filename, kind) {
-  if (typeof filename !== "string" || !path.isAbsolute(filename) ||
-      filename.includes("\0") || filename.split(path.sep).includes("..")) {
-    throw new Error("Install locks require an absolute path without traversal");
-  }
+export function resolveInstallLockPath(kind) {
   const projectRoot = realpathSync(process.cwd());
   const runtimeRoot = process.env.SITES_RUNTIME_ROOT || path.join(projectRoot, ".sites-runtime");
-  const expected = kind === "project" ? path.resolve(runtimeRoot, "install.lock")
-    : kind === "shared" ? "/workspace/.sites-runtime/pnpm-store.seed.lock" : undefined;
-  if (!expected || path.resolve(filename) !== expected) {
-    throw new Error("Install lock path is not an allowed lock");
+  if (!path.isAbsolute(runtimeRoot) || runtimeRoot.includes("\0") ||
+      runtimeRoot.split(path.sep).includes("..")) {
+    throw new Error("Install runtime directory requires an absolute path without traversal");
   }
+  const expected = kind === "project" ? path.join(runtimeRoot, "install.lock")
+    : kind === "shared" ? "/workspace/.sites-runtime/pnpm-store.seed.lock" : undefined;
+  if (!expected) throw new Error("Unknown install lock kind");
   // O_NOFOLLOW protects only the final entry; reject symlinked ancestors too.
   const parent = path.dirname(expected);
   if (realpathSync(parent) !== parent) throw new Error("Install lock directory must not be a symlink");
   return expected;
 }
 
-async function openLock(filename, waitSeconds, kind) {
-  let lockPath;
+async function openLock(kind, waitSeconds) {
   try {
-    lockPath = resolveInstallLockPath(filename, kind);
+    const directory = path.dirname(resolveInstallLockPath(kind));
+    // This dedicated holder does no other path-based work. Pin cwd before
+    // opening a fixed basename so later directory renames cannot redirect it.
+    process.chdir(directory);
+    if (process.cwd() !== directory) throw new Error("Install lock directory changed");
   } catch {
     process.stderr.write("Invalid or unavailable install lock directory/path.\n");
     return { status: "unavailable" };
@@ -150,7 +151,9 @@ async function openLock(filename, waitSeconds, kind) {
   let fd;
   try {
     if (!constants.O_NOFOLLOW || !constants.O_NONBLOCK) throw new Error("Unsupported lock");
-    fd = openSync(lockPath, constants.O_CREAT | constants.O_RDWR | constants.O_NOFOLLOW | constants.O_NONBLOCK, 0o600);
+    const flags = constants.O_CREAT | constants.O_RDWR | constants.O_NOFOLLOW | constants.O_NONBLOCK;
+    fd = kind === "project" ? openSync("install.lock", flags, 0o600)
+      : openSync("pnpm-store.seed.lock", flags, 0o600);
     if (!fstatSync(fd).isFile()) throw new Error("Expected a regular lock file");
     const child = spawn("flock", ["-w", waitSeconds, "3"], { stdio: ["ignore", "ignore", "ignore", fd] });
     const code = await new Promise((resolve) => {
@@ -166,17 +169,17 @@ async function openLock(filename, waitSeconds, kind) {
   }
 }
 
-async function holdInstallLocks(projectLock, sharedLock, waitSeconds) {
+async function holdInstallLocks(waitSeconds) {
   // The shell holds both leases through stdin. EOF (including caller exit)
   // releases the same open file descriptions that flock locked in its child.
   const requests = createInterface({ input: process.stdin, crlfDelay: Infinity });
-  const project = await openLock(projectLock, "0", "project");
+  const project = await openLock("project", "0");
   let shared;
   try {
     process.stdout.write(`${project.status}\n`);
     for await (const request of requests) {
       if (request === "shared" && project.fd !== undefined) {
-        shared ??= await openLock(sharedLock, waitSeconds, "shared");
+        shared ??= await openLock("shared", waitSeconds);
         process.stdout.write(`${shared.status}\n`);
       } else if (request === "release-shared") {
         if (shared?.fd !== undefined) closeSync(shared.fd);
@@ -196,7 +199,14 @@ async function holdInstallLocks(projectLock, sharedLock, waitSeconds) {
 async function main() {
   const argsIn = process.argv.slice(2);
   if (argsIn[0] === "--hold-install-locks") {
-    await holdInstallLocks(argsIn[1], argsIn[2], argsIn[3]);
+    const waitSeconds = process.env.SITES_PNPM_STORE_LOCK_TIMEOUT || "30";
+    if (argsIn.length !== 1 || !/^\d+(?:\.\d+)?$/.test(waitSeconds) ||
+        !Number.isFinite(Number(waitSeconds))) {
+      process.stderr.write("Install lock mode accepts no path arguments and requires a nonnegative timeout.\n");
+      process.exitCode = 64;
+      return;
+    }
+    await holdInstallLocks(waitSeconds);
     return;
   }
   if (argsIn[0] === "--report-store") {
@@ -221,7 +231,7 @@ async function main() {
   const fd = openReport();
   const report = { version: 1, cache_seed: cacheSeed, store_scope: storeScope, store_state: storeState };
   writeReport(fd, report);
-  const progress = new InstallProgress(process.cwd());
+  const progress = new InstallProgress();
   const failure = {};
   const env = { ...process.env };
   delete env.SITES_INSTALL_REPORT_PATH;
