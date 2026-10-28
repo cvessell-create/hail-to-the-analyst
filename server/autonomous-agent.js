@@ -60,7 +60,12 @@ function createAutonomousAgent(options = {}) {
 
     computeTacticalAction(state) {
       if (!state) return { forward: 0, strafe: 0, turn: 0, fire: false };
-      const me = state.player || (state.sessions && state.sessions.find(([t]) => t === token)?.[1]);
+      const me = state.player || (state.sessions && state.sessions.find(([t]) => {
+        if (!t || !token) return false;
+        const actual = crypto.createHash('sha256').update(t).digest();
+        const expected = crypto.createHash('sha256').update(token).digest();
+        return crypto.timingSafeEqual(actual, expected);
+      })?.[1]);
       const enemies = (state.enemies || []).filter(e => e.hp > 0);
 
       if (!me || me.hp <= 0) {
