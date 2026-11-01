@@ -27,6 +27,11 @@ See the [selected architecture](engine/README.md#selected-rebuild-direct-game-fl
 
 ## Play
 
+The separate [Hail to the Analyst: Flipper Edition](flipper/hail_analyst/README.md)
+is a standalone C companion for the Flipper Zero: three compact turn-based
+missions, Sidearm/Breacher weapons, Data Moles, Splice Drones and a Fabricator boss.
+It preserves the full game and has no campaign automation or radio features.
+
 Use the Play link above in a modern WebGL-capable browser. GitHub Pages runs
 the solo game and offline tools; it does not run the multiplayer or AI backend.
 If a deployment is still updating, download the source and open `index.html`

@@ -1,0 +1,13 @@
+App(
+    appid="hail_analyst",
+    name="Hail: Flipper Edition",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="hail_analyst_app",
+    requires=["gui"],
+    stack_size=2048,
+    fap_category="Games",
+    fap_version=(0, 2),
+    fap_author="Christopher R. Vessell",
+    fap_description="Three turn-based missions with two weapons, enemies and a boss",
+    sources=["hail_analyst.c", "game_slice.c", "game_rules.c", "campaign.c"],
+)

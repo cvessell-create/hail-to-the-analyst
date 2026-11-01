@@ -20,7 +20,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d77507c986d20c773e9843c542c7f2eb0baff724c3ac50bd4a98dfeae80b8d6b"
+      "sha256": "eeb6ccf09ffe6a381dbcac03061c7ca6885d679d82a3274609f61176f4f94dde"
     },
     {
       "path": "archive/README.md",
@@ -307,6 +307,54 @@
       "sha256": "bed6f6c33042b4ac6985731540ace48ab12dbc8300d78c4d13cf00be61a58326"
     },
     {
+      "path": "flipper/hail_analyst/.gitignore",
+      "sha256": "1706d84650f3106a5e4160c0ce7c885fb00320d3d7513e484d83894646db1d8f"
+    },
+    {
+      "path": "flipper/hail_analyst/README.md",
+      "sha256": "a06239828a026ed1548a2bbb61a449dae38c3da25dbec9e3c187ebf9b74d3458"
+    },
+    {
+      "path": "flipper/hail_analyst/application.fam",
+      "sha256": "bddd8cd5fabbf27a207cfaee665c643105a6ddfd3ef6c6f01c7aab4bbb1df407"
+    },
+    {
+      "path": "flipper/hail_analyst/campaign.c",
+      "sha256": "b6d70568b7545e1d8ae104bd33db07616b9a92547165e5dfe1a1ac49c3c10277"
+    },
+    {
+      "path": "flipper/hail_analyst/campaign.h",
+      "sha256": "3b522cb224ae00fae728e1bed0c9aedee1a0fba3ad84c677ec9ef9d7bc10a1f0"
+    },
+    {
+      "path": "flipper/hail_analyst/game_rules.c",
+      "sha256": "842767247ea7ee6f3c15ee6fd0eb561d3a1e36e4e5afbf4b39b601efe1b78501"
+    },
+    {
+      "path": "flipper/hail_analyst/game_rules.h",
+      "sha256": "3792bce04a1307d47a5d603a8bb84428be55075bcb96991b2895354dff776f76"
+    },
+    {
+      "path": "flipper/hail_analyst/game_slice.c",
+      "sha256": "0901eaf05819ed616ae36ca95d44ffabb84fd06a29073a91a4aea0d146525119"
+    },
+    {
+      "path": "flipper/hail_analyst/hail_analyst.c",
+      "sha256": "622da5ee87a9d490fd756de5e61d0d208f5a367a005d7f1ca5ce1f2694016ce3"
+    },
+    {
+      "path": "flipper/hail_analyst/requirements-build.txt",
+      "sha256": "e3002f2a657f9a5268623f5106a3e6335b82f29c03d4393b9fea6c218a69e9e5"
+    },
+    {
+      "path": "flipper/hail_analyst/test_campaign.c",
+      "sha256": "6c378c4cbb8beb9268838d91a5c347e6f01aae42f48e8763cd34c02aab0347a1"
+    },
+    {
+      "path": "flipper/hail_analyst/test_game_rules.c",
+      "sha256": "705a3467098c92be8906474a743370dc74e594404948487e5303261df3b375a0"
+    },
+    {
       "path": "homebrew/.gitignore",
       "sha256": "49225e94fe74f46765c9a6cfae6a8b84fc864d684375e043145e37a5d9920447"
     },
@@ -420,7 +468,7 @@
     },
     {
       "path": "scripts/sync-hosted-game.js",
-      "sha256": "3d9bfe678d877b4e594690c46de922c63c1420f1c6b63ad5f37f36f7da25d91a"
+      "sha256": "e043d405ba301405601233c33a2b9f218b86c4987c847d075ad3c3ce4b260a7d"
     },
     {
       "path": "server/arena.js",
@@ -499,6 +547,10 @@
       "sha256": "42258b7121ad2fffd8c34a3c500fa07764344459bdde068f5f0657ef8b81f4bf"
     },
     {
+      "path": "tests/flipper-game.test.js",
+      "sha256": "5263ca3a5744a6582904ecdb7cfde423b35486d358972ea511e04a219a9e1140"
+    },
+    {
       "path": "tests/footprint-ops.test.js",
       "sha256": "288f4fbbb2138d5b7dc3d11d5e9298038577b6ae2d9f296f4292ca72ebcaf2bf"
     },
@@ -548,7 +600,7 @@
     },
     {
       "path": "tests/script-paths.test.js",
-      "sha256": "f09eba7db69f6649962e18b5b05cf2c80a0eded4825ddde2d689c92040346283"
+      "sha256": "80993da89b3367a9130ce26e0e351d51f1b246750fc8b9dbef0f93f91eb52378"
     },
     {
       "path": "tests/si-dialogue.test.js",

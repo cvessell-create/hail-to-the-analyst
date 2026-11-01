@@ -11,7 +11,7 @@ function fixture(t) {
   t.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
   const root = path.join(temporary, 'repo');
   for (const dir of ['engine', 'js', 'server', 'tests', 'css', 'vendor', 'audit',
-    'scripts', 'archive', 'homebrew', '.github/workflows', 'hosted/lib/game', 'hosted/public/game'])
+    'scripts', 'archive', 'homebrew', 'flipper/hail_analyst', '.github/workflows', 'hosted/lib/game', 'hosted/public/game'])
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   for (const name of ['repository-paths.js', 'audit-math.js', 'build-level-tuning.js', 'sync-hosted-game.js'])
     fs.copyFileSync(path.join(repository, 'scripts', name), path.join(root, 'scripts', name));
@@ -22,6 +22,10 @@ function fixture(t) {
   for (const name of ['.gitignore', 'README.md', 'Makefile', 'Makefile.kos', 'slice.h',
     'slice.c', 'main.c', 'worker.c', 'test_slice.c', 'native-build.sh', 'toolchain.json'])
     fs.writeFileSync(path.join(root, 'homebrew', name), 'fixture\n');
+  for (const name of ['application.fam', '.gitignore', 'requirements-build.txt',
+    'game_slice.c', 'game_rules.h', 'game_rules.c', 'hail_analyst.c',
+    'test_game_rules.c', 'README.md', 'campaign.c', 'campaign.h', 'test_campaign.c'])
+    fs.writeFileSync(path.join(root, 'flipper/hail_analyst', name), 'fixture\n');
   const run = (script, ...args) => spawnSync(process.execPath, [path.join(root, 'scripts', script), ...args],
     { cwd: root, encoding: 'utf8' });
   return { temporary, root, run };
