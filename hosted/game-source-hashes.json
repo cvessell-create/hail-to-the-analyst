@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d77507c986d20c773e9843c542c7f2eb0baff724c3ac50bd4a98dfeae80b8d6b"
+      "sha256": "99ed536f09f23728d99b0c59c385fb178bc3660842bac6efcc20bfe3bf563964"
     },
     {
       "path": "archive/README.md",
@@ -420,7 +420,7 @@
     },
     {
       "path": "server/autonomous-agent.js",
-      "sha256": "96b0987991f805bcc23f9ac14c312f719ac855a842348347b71e02d9a6ae06b8"
+      "sha256": "addd48247c6d4dbfcc7d48f631d5b729703ea082983baea1ae61ac81a0fdcd03"
     },
     {
       "path": "server/engine-services.js",
