@@ -60,7 +60,7 @@ Hero progression stays saved; deploying again starts a fresh run, not a resume.
 
 The story, enemies and operations are fictional. Gateway Sprawl and Vessell
 City are free-roam settings; Footprint Purge is an optional simulated exposure
-side quest, not an account-removal tool. 
+side quest, not an account-removal tool.
 
 ## AI, data and backend boundaries
 

@@ -4,7 +4,7 @@
   "files": [
     {
       "path": "ATTRIBUTION.md",
-      "sha256": "4172ed9696d454b05ec817bae08334d0d31e17f688324f3d8756e657abdf2309"
+      "sha256": "37cdfae41401c9ac1428f2d2d3bf599009b23a819ead3a160aac79c049366d23"
     },
     {
       "path": "COPYING-GPL-3",
@@ -16,7 +16,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d77507c986d20c773e9843c542c7f2eb0baff724c3ac50bd4a98dfeae80b8d6b"
+      "sha256": "99ed536f09f23728d99b0c59c385fb178bc3660842bac6efcc20bfe3bf563964"
     },
     {
       "path": "archive/README.md",
@@ -420,7 +420,7 @@
     },
     {
       "path": "server/autonomous-agent.js",
-      "sha256": "96b0987991f805bcc23f9ac14c312f719ac855a842348347b71e02d9a6ae06b8"
+      "sha256": "addd48247c6d4dbfcc7d48f631d5b729703ea082983baea1ae61ac81a0fdcd03"
     },
     {
       "path": "server/engine-services.js",

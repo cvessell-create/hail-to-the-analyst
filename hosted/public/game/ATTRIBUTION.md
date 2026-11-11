@@ -33,22 +33,19 @@ licences. The current game engine remains canonical until migration acceptance.
 
 The hosted source export and final branch bundle were supplied by Christopher
 R. Vessell on October 7, 2026. The export retains its starter/UI/build-tool
-notices, dependency lockfiles, game GPL grants, Apache engine notices, JSNES
-license and preferred source. The parent game remains the canonical source;
-hosted server/browser copies are generated mirrors.
+notices, dependency lockfiles, game GPL grants, Apache engine notices.
 
-The new NES visual program, pattern tiles and palette arrangement are original
-project code/assets, executed by the included JSNES runtime. No commercial ROM,
-Capcom assets or purported CC0 third-party textures were imported in this repair.
+The new pattern tiles and palette arrangement are original
+project code/assets, executed by the included runtime. No commercial ROM,
+assets or purported CC0 third-party textures were imported in this repair.
 
 ## Engine integration, October 7, 2026
 
 The owner supplied `Vessell-engine-source.zip`, containing original Apache-2.0
-engine code and JSNES 2.1.0. Original engine extensions remain Apache-2.0 in
+engine code remain Apache-2.0 in
 `engine/`, `server/`, `scripts/`, `js/power-index.js`, and their marked tests.
-The imported engine notice/license remain in `engine/NOTICE` and `engine/LICENSE`.
-JSNES compiled runtime, source map, matching preferred JavaScript source,
-upstream README/package metadata and license are retained in `vendor/jsnes/`.
+The imported engine notice/license remain in `engine/NOTICE` and, source map, matching preferred JavaScript source,
+upstream README/package metadata and license are retained in
 No commercial ROM or BIOS is included; mission bytecode is original homebrew.
 
 The combined distribution selects GPL-3.0-or-later from the existing campaign
@@ -97,14 +94,7 @@ Terrain numbers are **original game data**, not imported Wesnoth movement-type
 configuration. This game's `defense` is displayed avoidance, so hit chance is
 `100 - defense`; upstream's defence value ordinarily represents chance to be hit.
 
-## SRD 5.1
 
-This work includes material taken from the System Reference Document 5.1 (“SRD 5.1”) by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.
-
-This attribution is reproduced without alteration. Adapted SRD material retains
-**CC BY 4.0**; the GPL grant for original code does not remove its attribution
-or licence. No SRD 5.2, non-SRD books, third-party character API or monster database
-is included.
 
 | SRD 5.1 section | Where used | Adaptation |
 | --- | --- | --- |
